@@ -1,86 +1,17 @@
 import subprocess
-import re
 import sys
 import click
 from rich.console import Console
 
 import os
 from pathlib import Path
+
+from code_review.exceptions import SimpleGitToolError
+from code_review.git.handlers import _are_there_uncommited_changes, _get_git_version, _compare_versions, _get_latest_tag
+
 # Initialize the console for rich
 console = Console()
 
-class SimpleGitToolError(Exception):
-    """
-    A custom exception class for handling errors in the simple git tool.
-    This provides more specific and user-friendly error messages.
-    """
-    pass
-
-def _are_there_uncommited_changes() -> bool:
-    """
-    Check if there are any committed changes in the current git repository.
-
-    Returns:
-        bool: True if there are committed changes, False otherwise.
-    """
-    try:
-        # Run the git log command to check for commits
-        result = subprocess.run(
-            ["git", "status", "--porcelain"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        # If the output is not empty, there are committed changes
-        return bool(result.stdout.strip())
-    except subprocess.CalledProcessError:
-        # If git command fails, we assume there are no committed changes
-        return False
-
-def _get_git_version() -> str:
-    """
-    Internal helper function to get the current git version.
-
-    Returns:
-        str: The version of git as a string (e.g., '2.3.4').
-
-    Raises:
-        SimpleGitToolError: If git is not installed or cannot be found.
-    """
-    try:
-        # Run the git --version command and capture its output
-        result = subprocess.run(['git', '--version'], capture_output=True, text=True, check=True)
-        # The output is typically "git version X.Y.Z", so we split to get the version number
-        return result.stdout.strip().split()[-1]
-    except FileNotFoundError:
-        # This error occurs if the 'git' command is not found on the system
-        raise SimpleGitToolError("Git is not installed or not in the system's PATH.")
-    except subprocess.CalledProcessError:
-        # This handles any other issues with running the command
-        raise SimpleGitToolError("An unexpected error occurred while checking the git version.")
-
-def _compare_versions(current_version: str, min_version: str) -> bool:
-    """
-    Internal helper function to compare two version strings.
-
-    Args:
-        current_version (str): The version of git currently installed.
-        min_version (str): The minimum required version.
-
-    Returns:
-        bool: True if current_version is greater than or equal to min_version,
-              False otherwise.
-    """
-    # Split the versions into a list of integers for comparison
-    current_parts = [int(v) for v in re.findall(r'\d+', current_version)]
-    min_parts = [int(v) for v in re.findall(r'\d+', min_version)]
-
-    # Pad the shorter list with zeros to ensure they have the same length for comparison
-    max_len = max(len(current_parts), len(min_parts))
-    current_parts.extend([0] * (max_len - len(current_parts)))
-    min_parts.extend([0] * (max_len - len(min_parts)))
-
-    return tuple(current_parts) >= tuple(min_parts)
 
 @click.group()
 def cli():
@@ -221,25 +152,140 @@ def sync(folder: Path, verbose: bool):
         if folder:
             os.chdir(original_dir)
 
+@git.command()
+@click.option("--folder", "-f", type=Path, help="Path to the git repository", default=None)
+@click.option("--merged", is_flag=True, help="List branches that are merged into master", default=False)
+@click.option("--un-merged", is_flag=True, help="List branches that are not merged into master", default=False)
+@click.option("--delete", is_flag=True, help="Delete merged branches (use with --merged)", default=False)
+@click.option("--base", help="Base branch to compare against", default="master")
+def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str):
+    """
+    Lists merged or unmerged branches relative to a base branch (default: master).
+    Can also delete merged branches.
 
-def _get_latest_tag() -> str:
-    latest_tag = "No tags found"
+    Args:
+        folder: Path to the git repository. If not provided, uses current directory.
+        merged: List branches that are merged into the base branch.
+        un_merged: List branches that are not merged into the base branch.
+        delete: Delete merged branches (only works with --merged flag).
+        base: Base branch to compare against (default: master).
+    """
+    # Store original directory to return to it later
+    original_dir = os.getcwd()
     try:
-        result = subprocess.run(
-            ["git", "describe", "--tags", "--abbrev=0"],
+        # Validate options
+        if not merged and not un_merged:
+            raise SimpleGitToolError("Please specify either --merged or --un-merged")
+
+        if delete and not merged:
+            raise SimpleGitToolError("--delete option requires --merged flag")
+
+        # Change to the specified directory if provided
+        if folder:
+            if not folder.exists():
+                raise SimpleGitToolError(f"Directory does not exist: {folder}")
+            if not folder.is_dir():
+                raise SimpleGitToolError(f"Not a directory: {folder}")
+
+            console.print(f"Changing to directory: [cyan]{folder}[/cyan]")
+            os.chdir(folder)
+
+        # Check if the base branch exists
+        try:
+            subprocess.run(
+                ["git", "rev-parse", "--verify", base],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+        except subprocess.CalledProcessError:
+            raise SimpleGitToolError(f"Base branch '{base}' does not exist")
+
+        # Get current branch to restore it later
+        current_branch = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
             capture_output=True,
             text=True,
-            check=True,
-        )
-        latest_tag = result.stdout.strip()
-        #console.print(f"Latest tag: [bold cyan]{latest_tag}[/bold cyan]")
+            check=True
+        ).stdout.strip()
 
-    except subprocess.CalledProcessError:
-        #console.print("[bold yellow]No tags found in the repository.[/bold yellow]")
-        pass
-    return latest_tag
+        # Handle merged branches
+        if merged:
+            console.print(f"[bold cyan]Listing branches merged into [green]{base}[/green]:[/bold cyan]")
+            result = subprocess.run(
+                ["git", "branch", "--merged", base],
+                capture_output=True,
+                text=True,
+                check=True
+            )
 
+            # Process and display merged branches
+            merged_branches = []
+            for line in result.stdout.strip().split('\n'):
+                branch_name = line.strip()
+                if branch_name and not branch_name.startswith('*') and branch_name != base:
+                    # Remove the asterisk from the current branch if present
+                    branch_name = branch_name.replace('* ', '')
+                    merged_branches.append(branch_name)
+                    console.print(f" - [yellow]{branch_name}[/yellow]")
 
+            # Delete merged branches if requested
+            if delete and merged_branches:
+                console.print("[bold]Deleting merged branches...[/bold]")
+                for branch in merged_branches:
+                    # Don't delete the current branch or protected branches
+                    if branch != current_branch and branch != 'master' and branch != 'develop':
+                        try:
+                            console.print(f"Deleting branch: [red]{branch}[/red]")
+                            subprocess.run(
+                                ["git", "branch", "-d", branch],
+                                check=True,
+                                stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL
+                            )
+                        except subprocess.CalledProcessError:
+                            console.print(f"[yellow]Warning: Could not delete branch {branch}[/yellow]")
+                    elif branch == current_branch:
+                        console.print(f"[yellow]Skipping current branch: {branch}[/yellow]")
+                    else:
+                        console.print(f"[yellow]Skipping protected branch: {branch}[/yellow]")
+
+            if not merged_branches:
+                console.print("[bold green]No merged branches found.[/bold green]")
+
+        # Handle unmerged branches
+        if un_merged:
+            console.print(f"[bold cyan]Listing branches not merged into [green]{base}[/green]:[/bold cyan]")
+            result = subprocess.run(
+                ["git", "branch", "--no-merged", base],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+
+            unmerged_branches = []
+            for line in result.stdout.strip().split('\n'):
+                branch_name = line.strip()
+                if branch_name:
+                    # Remove the asterisk from the current branch if present
+                    branch_name = branch_name.replace('* ', '')
+                    unmerged_branches.append(branch_name)
+                    console.print(f" - [yellow]{branch_name}[/yellow]")
+
+            if not unmerged_branches:
+                console.print("[bold green]No unmerged branches found.[/bold green]")
+
+    except subprocess.CalledProcessError as e:
+        console.print("[bold red]Error:[/bold red] Git command failed.")
+        console.print(f"[red]Details:[/red]\n{e.stderr.strip()}")
+        sys.exit(1)
+    except SimpleGitToolError as e:
+        console.print(f"[bold red]Error:[/bold red] {e}")
+        sys.exit(1)
+    finally:
+        # Change back to the original directory if we changed it
+        if folder:
+            os.chdir(original_dir)
 if __name__ == '__main__':
     # The `cli` entry point is handled by the click library,
     # so we just need to call it.
