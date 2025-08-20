@@ -157,8 +157,9 @@ def sync(folder: Path, verbose: bool):
 @click.option("--merged", is_flag=True, help="List branches that are merged into master", default=False)
 @click.option("--un-merged", is_flag=True, help="List branches that are not merged into master", default=False)
 @click.option("--delete", is_flag=True, help="Delete merged branches (use with --merged)", default=False)
+@click.option("--interactive", is_flag=True, help="Ask before deleting (use with --merged --delete)", default=False)
 @click.option("--base", help="Base branch to compare against", default="master")
-def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str):
+def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str, interactive: bool):
     """
     Lists merged or unmerged branches relative to a base branch (default: master).
     Can also delete merged branches.
@@ -166,6 +167,7 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str)
     Args:
         folder: Path to the git repository. If not provided, uses current directory.
         merged: List branches that are merged into the base branch.
+        interactive: Ask before deleting branches (only works with --merged and --delete).
         un_merged: List branches that are not merged into the base branch.
         delete: Delete merged branches (only works with --merged flag).
         base: Base branch to compare against (default: master).
@@ -211,23 +213,12 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str)
 
         # Handle merged branches
         if merged:
-            console.print(f"[bold cyan]Listing branches merged into [green]{base}[/green]:[/bold cyan]")
-            result = subprocess.run(
-                ["git", "branch", "--merged", base],
-                capture_output=True,
-                text=True,
-                check=True
+            console.print(
+                f"[bold cyan]Listing branches merged into [green]{base}[/green]:[/bold cyan]"
             )
-
-            # Process and display merged branches
-            merged_branches = []
-            for line in result.stdout.strip().split('\n'):
-                branch_name = line.strip()
-                if branch_name and not branch_name.startswith('*') and branch_name != base:
-                    # Remove the asterisk from the current branch if present
-                    branch_name = branch_name.replace('* ', '')
-                    merged_branches.append(branch_name)
-                    console.print(f" - [yellow]{branch_name}[/yellow]")
+            merged_branches = _get_merged_branches(base)
+            for i, branch_name in enumerate(merged_branches, 1):
+                console.print(f" {i}  [yellow]{branch_name}[/yellow]")
 
             # Delete merged branches if requested
             if delete and merged_branches:
@@ -236,13 +227,17 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str)
                     # Don't delete the current branch or protected branches
                     if branch != current_branch and branch != 'master' and branch != 'develop':
                         try:
-                            console.print(f"Deleting branch: [red]{branch}[/red]")
-                            subprocess.run(
-                                ["git", "branch", "-d", branch],
-                                check=True,
-                                stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL
-                            )
+                            do_delete = True
+                            if interactive:
+                                do_delete = click.confirm(f"Do you want to delete branch {branch}?", default=True)
+                            if do_delete:
+                                console.print(f"Deleting branch: [red]{branch}[/red]")
+                                subprocess.run(
+                                    ["git", "push", "origin", "--delete", branch],
+                                    check=True,
+                                    stdout=subprocess.DEVNULL,
+                                    stderr=subprocess.DEVNULL
+                                )
                         except subprocess.CalledProcessError:
                             console.print(f"[yellow]Warning: Could not delete branch {branch}[/yellow]")
                     elif branch == current_branch:
@@ -286,6 +281,27 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str)
         # Change back to the original directory if we changed it
         if folder:
             os.chdir(original_dir)
+
+
+def _get_merged_branches(base: str) -> list:
+    result = subprocess.run(
+        ["git", "branch", "-r", "--merged", base],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    # Process and display merged branches
+    merged_branches = []
+    for line in result.stdout.strip().split('\n'):
+        branch_name = line.strip()
+        if branch_name and not branch_name.startswith('*') and f"origin/{base}" not in branch_name:
+            # Remove the asterisk from the current branch if present
+            branch_name = branch_name.replace('* ', '')
+            branch_name = branch_name.replace('origin/', '')
+            merged_branches.append(branch_name)
+    return merged_branches
+
+
 if __name__ == '__main__':
     # The `cli` entry point is handled by the click library,
     # so we just need to call it.
