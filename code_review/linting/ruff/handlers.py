@@ -1,6 +1,8 @@
 import subprocess
 import re
 from pathlib import Path
+from typing import List
+
 
 def count_ruff_issues(path: Path) -> int:
     """
@@ -23,10 +25,10 @@ def count_ruff_issues(path: Path) -> int:
         # `text=True` decodes the output as text.
         # We specify the path as the argument for the ruff command.
         result = subprocess.run(
-            ['ruff', 'check', str(path)],
+            ['ruff', 'check', path],
             capture_output=True,
             text=True,
-            check=True
+            # check=True
         )
 
         # The last line of the `ruff check` output contains the summary, e.g.,
@@ -35,7 +37,7 @@ def count_ruff_issues(path: Path) -> int:
 
         # Use a regular expression to find the number of issues.
         # The pattern looks for one or more digits (\d+) after "Found " and before " issue".
-        match = re.search(r"Found (\d+) issue", last_line)
+        match = re.search(r"Found (\d+) error[s]?", last_line)
 
         if match:
             # If a match is found, extract the number and convert it to an integer.
@@ -57,40 +59,51 @@ def count_ruff_issues(path: Path) -> int:
         # This error occurs if the subprocess command returns a non-zero exit code,
         # which can happen if `ruff check` fails for reasons other than finding issues
         # (e.g., invalid path).
-        print(f"Error running `ruff`: {e.stderr}")
+        print(f"Error running `ruff`: {e.stderr} {e}")
         return -1
     except Exception as e:
         # Catch any other unexpected errors.
         print(f"An unexpected error occurred: {e}")
         return -1
 
-if __name__ == "__main__":
-    # --- Example Usage ---
-    # To run this example, save the code as a Python file (e.g., `count_issues.py`)
-    # and then run it from your terminal: `python count_issues.py`
 
-    # Create a dummy file with a common ruff issue (unused import)
-    # The `with` statement ensures the file is properly closed.
-    dummy_file_path = Path("test_code.py")
-    with open(dummy_file_path, "w") as f:
-        f.write("import os\n\ndef my_func():\n    return 'hello world'\n")
 
-    print(f"Checking for issues in '{dummy_file_path}'...")
+def _check_and_format_ruff(folder_path: Path) -> bool:
+    """
+    Runs `ruff format` on a specified folder.
 
-    # Call the function with the path to the dummy file.
-    issue_count = count_ruff_issues(dummy_file_path)
+    First, it checks if any files need formatting without applying changes.
+    If changes are needed, it then runs `ruff format` to apply them.
 
-    if issue_count > -1:
-        print(f"Found {issue_count} issue(s).")
+    Args:
+        folder_path: The path to the folder to format.
 
-    # Clean up the dummy file
-    dummy_file_path.unlink()
+    Returns:
+        True if any files were formatted, False otherwise.
+        Raises an exception if `ruff` is not found or other errors occur.
+    """
 
-    # Example for a directory (assuming you have some python files in it)
-    # The current directory '.' is a common test case.
-    current_directory = Path('.')
-    print(f"\nChecking for issues in the current directory '{current_directory}'...")
-    directory_issue_count = count_ruff_issues(current_directory)
+    # Command to check for unformatted files without applying changes.
+    # The --check flag will cause a non-zero exit code if formatting is needed.
+    check_command: List[str] = ["ruff", "format", "--check", folder_path]
 
-    if directory_issue_count > -1:
-        print(f"Found {directory_issue_count} issue(s).")
+    try:
+        # Use subprocess.run() to execute the command.
+        # `capture_output=True` captures stdout and stderr.
+        # `text=True` decodes output to strings.
+        # `check=False` is crucial here so we can handle the non-zero exit code manually.
+        check_result = subprocess.run(check_command, capture_output=True, text=True, check=False)
+
+        # Check the return code. A non-zero code from `ruff format --check`
+        # indicates that there are unformatted files.
+        if check_result.returncode != 0:
+            return True
+        else:
+            return False
+
+    except FileNotFoundError:
+        return False
+    except subprocess.CalledProcessError as e:
+        return False
+    except Exception as e:
+        return False

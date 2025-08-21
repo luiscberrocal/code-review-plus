@@ -89,3 +89,43 @@ def _get_latest_tag() -> str:
         #console.print("[bold yellow]No tags found in the repository.[/bold yellow]")
         pass
     return latest_tag
+
+def get_current_git_branch() -> str:
+    """Gets the currently checked out Git branch.
+
+    This function executes a Git command to determine the name of the current
+    branch. It assumes that the current working directory is inside a Git
+    repository.
+
+    Returns:
+        str: The name of the currently checked out Git branch, or an empty
+             string if an error occurs.
+    """
+    try:
+        # Check if we are inside a git repository
+        subprocess.run(['git', 'rev-parse', '--is-inside-work-tree'],
+                       check=True,
+                       capture_output=True,
+                       text=True)
+
+        # Get the branch name
+        result = subprocess.run(
+            ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+            check=True,
+            capture_output=True,
+            text=True,
+            # The shell=True argument can be a security risk if the command
+            # string comes from untrusted user input, but here it's
+            # a hardcoded command so it's safe.
+            shell=False
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred: {e}")
+        # Return an empty string or handle the error as appropriate
+        return ""
+    except FileNotFoundError:
+        print("Git command not found. Please ensure Git is installed and in your system's PATH.")
+        return ""
+
+

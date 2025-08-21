@@ -1,17 +1,18 @@
+import logging
 import subprocess
 import sys
 import click
-from rich.console import Console
 
 import os
 from pathlib import Path
 
 from code_review.cli import cli
 from code_review.exceptions import SimpleGitToolError
-from code_review.git.handlers import _are_there_uncommited_changes, _get_git_version, _compare_versions, _get_latest_tag
+from code_review.git.handlers import _are_there_uncommited_changes, _get_git_version, _compare_versions, _get_latest_tag, \
+    get_current_git_branch
 
 from code_review.settings import CLI_CONSOLE
-
+logger = logging.getLogger(__name__)
 
 @cli.group()
 def git():
@@ -58,8 +59,9 @@ def sync(folder: Path, verbose: bool):
     """
     # Store original directory to return to it later
     original_dir = os.getcwd()
-    try:
 
+    original_branch = None
+    try:
         CLI_CONSOLE.print("[bold cyan]Starting branch synchronization...[/bold cyan]")
         # Change to the specified directory if provided
         if folder:
@@ -82,20 +84,19 @@ def sync(folder: Path, verbose: bool):
         master_branch = "master"
         develop_branch = "develop"
 
+        original_branch = get_current_git_branch()
         # 1. Checkout master and pull
         CLI_CONSOLE.print(
-            f"[bold]Checking out and pulling [green]{master_branch}[/green]...[/bold]"
+            f"[bold]Checking out and pulling [green]{master_branch}[/green] from [green]{original_branch}[/green]...[/bold]"
         )
-        subprocess.run(["git", "checkout", master_branch], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(["git", "pull", "origin", master_branch], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        check_out_and_pull(master_branch)
 
         latest_tag = _get_latest_tag()
         # 2. Checkout develop and pull
         CLI_CONSOLE.print(
             f"[bold]Checking out and pulling [green]{develop_branch}[/green]...[/bold]"
         )
-        subprocess.run(["git", "checkout", develop_branch], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(["git", "pull", "origin", develop_branch], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        check_out_and_pull(develop_branch)
 
         # 3. Do a git diff and check for differences
         CLI_CONSOLE.print(
@@ -146,6 +147,22 @@ def sync(folder: Path, verbose: bool):
         # Change back to the original directory if we changed it
         if folder:
             os.chdir(original_dir)
+        if original_branch:
+            current_branch  = get_current_git_branch()
+            logger.debug(f"Current branch: {current_branch} | Original branch: {original_branch}")
+            if current_branch != original_branch:
+                CLI_CONSOLE.print(
+                f"[bold cyan]Returning to original branch: [green]{original_branch}[/green][/bold cyan]"
+            )
+                # Ensure we check out the original branch at the end
+                check_out_and_pull(original_branch, check=False)
+
+
+def check_out_and_pull(branch:str, check: bool = True):
+    subprocess.run(["git", "checkout", branch], check=check, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(["git", "pull", "origin", branch], check=check, stdout=subprocess.DEVNULL,
+                   stderr=subprocess.DEVNULL)
+
 
 @git.command()
 @click.option("--folder", "-f", type=Path, help="Path to the git repository", default=None)
@@ -296,8 +313,3 @@ def _get_merged_branches(base: str) -> list:
             merged_branches.append(branch_name)
     return merged_branches
 
-
-if __name__ == '__main__':
-    # The `cli` entry point is handled by the click library,
-    # so we just need to call it.
-    cli()

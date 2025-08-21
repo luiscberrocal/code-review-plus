@@ -11,3 +11,8 @@ dependencies = [
 ]
 [project.scripts]
 code-review-plus = "code_review.git.main:cli"
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.4.1",
+]
