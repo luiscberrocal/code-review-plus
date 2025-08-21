@@ -1,7 +1,7 @@
 
 import requests
 
-from code_review.docker_hub.schemas import ImageInfo
+from code_review.docker_hub.schemas import ImageTag
 
 
 def get_image_versions(image_name:str):
@@ -25,7 +25,7 @@ def get_image_versions(image_name:str):
 
             # Extract tag names from the results and add to our list
             for result in data['results']:
-                image_info_schema = ImageInfo(**result)
+                image_info_schema = ImageTag(**result)
                 if image_info_schema.tag_status == 'active':
                     all_versions.append(image_info_schema)
 
@@ -42,13 +42,15 @@ def get_image_versions(image_name:str):
 
 if __name__ == "__main__":
     name = "python"
+    name = "postgres"
+    # name = "node"
     print(f"Fetching all {name.capitalize()} image versions from Docker Hub...")
     versions = get_image_versions(image_name=name)
 
     if versions:
         print(f"Found {len(versions)} tags for the official {name.capitalize()} image:")
-        for version in versions:
-            print(version)
+        for i, version in enumerate(versions, 1):
+            print(f"{i}. {version.name} - Last Updated: {version.last_updated}")
     else:
         print("Could not retrieve any versions.")
     print(f"Found {len(versions)} tags for the official {name.capitalize()} image:")

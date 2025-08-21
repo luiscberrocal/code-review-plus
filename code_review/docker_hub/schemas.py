@@ -19,7 +19,7 @@ class Image(BaseModel):
     last_pushed: str | None = None
 
 
-class ImageInfo(BaseModel):
+class ImageTag(BaseModel):
     creator: int
     id: int
     images: list[Image]
