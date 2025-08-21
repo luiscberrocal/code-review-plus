@@ -1,4 +1,8 @@
+
 import requests
+
+from code_review.docker_hub.schemas import ImageInfo
+
 
 def get_image_versions(image_name:str):
     """
@@ -7,7 +11,7 @@ def get_image_versions(image_name:str):
     base_url = f"https://hub.docker.com/v2/repositories/library/{image_name}/tags"
     all_versions = []
     page = 1
-    page_size = 100  # You can increase this to reduce the number of requests
+    page_size = 200  # You can increase this to reduce the number of requests
 
     while True:
         params = {
@@ -21,7 +25,9 @@ def get_image_versions(image_name:str):
 
             # Extract tag names from the results and add to our list
             for result in data['results']:
-                all_versions.append(result['name'])
+                image_info_schema = ImageInfo(**result)
+                if image_info_schema.tag_status == 'active':
+                    all_versions.append(image_info_schema)
 
             # Check for the next page
             if data['next']:
@@ -32,15 +38,17 @@ def get_image_versions(image_name:str):
             print(f"Error: {e}")
             break
 
-    return sorted(all_versions)
+    return all_versions
 
 if __name__ == "__main__":
-    print("Fetching all Python image versions from Docker Hub...")
-    versions = get_image_versions(image_name="postgres")
+    name = "python"
+    print(f"Fetching all {name.capitalize()} image versions from Docker Hub...")
+    versions = get_image_versions(image_name=name)
 
     if versions:
-        print(f"Found {len(versions)} tags for the official Python image:")
+        print(f"Found {len(versions)} tags for the official {name.capitalize()} image:")
         for version in versions:
             print(version)
     else:
         print("Could not retrieve any versions.")
+    print(f"Found {len(versions)} tags for the official {name.capitalize()} image:")
