@@ -6,4 +6,4 @@ from code_review.linting.ruff.handlers import count_ruff_issues
 def test_count():
     folder = Path.home() / "adelantos" / "clave-adelantos"
     c = count_ruff_issues(folder)
-    assert c >= 0, "Issue count should be non-negative"
+    assert c > 0, "Issue count should be non-negative"

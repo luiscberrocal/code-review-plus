@@ -30,10 +30,12 @@ def count_ruff_issues(path: Path) -> int:
             text=True,
             # check=True
         )
-
         # The last line of the `ruff check` output contains the summary, e.g.,
-        # "Found 12 issues."
-        last_line = result.stdout.strip().split('\n')[-1]
+
+        result_lines = result.stdout.strip().split('\n')
+        last_line = result_lines[-1]
+        if last_line.startswith("[*]"):
+            last_line = result_lines[-2]
 
         # Use a regular expression to find the number of issues.
         # The pattern looks for one or more digits (\d+) after "Found " and before " issue".
