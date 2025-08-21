@@ -7,7 +7,7 @@ from code_review.docker_hub.filters.inclusions import include_by_regex
 from code_review.docker_hub.schemas import ImageTag
 
 
-def get_image_versions(image_name:str, cache_folder: Path) -> list[ImageTag]:
+def get_image_versions(image_name:str, cache_folder: Path, ignore_cache:bool=False) -> list[ImageTag]:
     """
     Fetches and prints all available tags for the official Python image on Docker Hub.
     """
@@ -16,7 +16,7 @@ def get_image_versions(image_name:str, cache_folder: Path) -> list[ImageTag]:
     page = 1
     page_size = 200  # You can increase this to reduce the number of requests
     cache_file = cache_folder / f"{image_name}_tags.json"
-    if cache_file.exists():
+    if cache_file.exists() and not ignore_cache:
         print(f"Loading cached tags from {cache_file}")
         with open(cache_file, 'r') as f:
             cached_data = json.load(f)
@@ -37,6 +37,7 @@ def get_image_versions(image_name:str, cache_folder: Path) -> list[ImageTag]:
             # Extract tag names from the results and add to our list
             for result in data['results']:
                 image_info_schema = ImageTag(**result)
+                image_info_schema.set_version()
                 if image_info_schema.tag_status == 'active':
                     all_versions.append(image_info_schema)
 
@@ -55,9 +56,6 @@ def get_image_versions(image_name:str, cache_folder: Path) -> list[ImageTag]:
     return all_versions
 
 
-def inxclude_by_regex(name, regex):
-    pass
-
 
 if __name__ == "__main__":
     name = "python"
@@ -66,7 +64,7 @@ if __name__ == "__main__":
     print(f"Fetching all {name.capitalize()} image versions from Docker Hub...")
     cache_folder = Path(__file__).parent.parent.parent /"output" / ".cache" / "docker_hub"
     cache_folder.mkdir(parents=True, exist_ok=True)
-    versions = get_image_versions(image_name=name, cache_folder=cache_folder)
+    versions = get_image_versions(image_name=name, cache_folder=cache_folder, ignore_cache=True)
     filtered_tags = [ v for v in versions if not exclude_by_content(v, ["alpine", "beta", "-rc1", "-rc", "windowsservercore"]) ]
 
     regex = r"(\d+\.\d+\.?\d*?)-(.+)"
@@ -74,7 +72,7 @@ if __name__ == "__main__":
 
     if filtered_tags:
         for i, version in enumerate(filtered_tags, 1):
-            print(f"{i}. {version.name} - Last Updated: {version.last_updated}")
+            print(f"{i}. {version.name} ({version.version})- Last Updated: {version.last_updated}")
             # print(f"{version.name}")
     else:
         print("Could not retrieve any versions.")

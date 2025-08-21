@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import List, Optional
+import re
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -36,3 +37,14 @@ class ImageTag(BaseModel):
     media_type: str | None = None
     content_type: str | None = None
     digest: str | None = None
+    version: tuple[int, ...] | None = None
+
+    def set_version(self):
+        regex = r"(?<version>\d+\.\d+\.?\d*?)-(.+)"
+        regexp = re.compile(regex)
+        match = regexp.match(self.name)
+        if match:
+            version_str = match.group("version")
+            self.version = tuple(int(part) for part in version_str.split('.'))
+        else:
+            self.version = None
