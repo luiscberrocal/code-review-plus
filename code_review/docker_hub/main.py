@@ -3,6 +3,7 @@ from pathlib import Path
 import requests
 import json
 from code_review.docker_hub.filters.exclusions import exclude_by_content
+from code_review.docker_hub.filters.inclusions import include_by_regex
 from code_review.docker_hub.schemas import ImageTag
 
 
@@ -18,14 +19,11 @@ def get_image_versions(image_name:str, cache_folder: Path) -> list[ImageTag]:
     if cache_file.exists():
         print(f"Loading cached tags from {cache_file}")
         with open(cache_file, 'r') as f:
-            cached_data = f.read()
-            if cached_data:
-                data = requests.models.json.loads(cached_data)
-                for result in data['results']:
-                    image_info_schema = ImageTag(**result)
-                    if image_info_schema.tag_status == 'active':
-                        all_versions.append(image_info_schema)
-                return all_versions
+            cached_data = json.load(f)
+            all_versions = [ImageTag(**item) for item in cached_data]
+            print(f"Loaded {len(all_versions)} tags from {cache_file}")
+        return all_versions
+
     while True:
         params = {
             'page': page,
@@ -63,19 +61,21 @@ def inxclude_by_regex(name, regex):
 
 if __name__ == "__main__":
     name = "python"
-    name = "postgres"
+    # name = "postgres"
     # name = "node"
     print(f"Fetching all {name.capitalize()} image versions from Docker Hub...")
     cache_folder = Path(__file__).parent.parent.parent /"output" / ".cache" / "docker_hub"
     cache_folder.mkdir(parents=True, exist_ok=True)
     versions = get_image_versions(image_name=name, cache_folder=cache_folder)
     filtered_tags = [ v for v in versions if not exclude_by_content(v, ["alpine", "beta", "-rc1", "-rc", "windowsservercore"]) ]
+
     regex = r"(\d+\.\d+\.?\d*?)-(.+)"
-    filtered_tags = [v for v in filtered_tags if inxclude_by_regex(v.name, regex)]
+    filtered_tags = [v for v in filtered_tags if include_by_regex(v, regex)]
+
     if filtered_tags:
         for i, version in enumerate(filtered_tags, 1):
-            # print(f"{i}. {version.name} - Last Updated: {version.last_updated}")
-            print(f"{version.name}")
+            print(f"{i}. {version.name} - Last Updated: {version.last_updated}")
+            # print(f"{version.name}")
     else:
         print("Could not retrieve any versions.")
     print(f"Found {len(filtered_tags)} tags for the official {name.capitalize()} image:")
