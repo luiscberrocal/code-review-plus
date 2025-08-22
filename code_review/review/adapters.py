@@ -1,8 +1,10 @@
+import json
 from pathlib import Path
 
 from code_review.git.handlers import get_author
 from code_review.handlers import ch_dir
 from code_review.review.schemas import BranchSchema, CodeReviewSchema
+from code_review.settings import OUTPUT_FOLDER
 
 
 def build_code_review_schema(folder: Path, target_branch_name: str):
@@ -13,7 +15,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str):
 
     target_author = get_author(target_branch_name)
     target_branch = BranchSchema(name=target_branch_name, author=target_author)
-    
+
     code_review_schema = CodeReviewSchema(
         name=folder.name,
         source_folder=folder,
@@ -26,4 +28,7 @@ if __name__ == '__main__':
     f = Path.home() / "adelantos" / "wompi-integration"
     tb = "feature/wompi-48_update_mdc"
     schema = build_code_review_schema(f, tb)
-    print(schema)
+
+    file = OUTPUT_FOLDER / f"{schema.name}_code_review.json"
+    with open(file, "w") as f:
+        json.dump(schema.model_dump(), f, indent=4, default=str)

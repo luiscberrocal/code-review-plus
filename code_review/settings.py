@@ -1,18 +1,20 @@
 
 from rich.console import Console
-CLI_CONSOLE = Console()
+import logging.config
 from pathlib import Path
+CLI_CONSOLE = Console()
 
 CODE_REVIEW_FOLDER = Path(__file__).home() / "Documents" / "code_review"
 if not CODE_REVIEW_FOLDER.exists():
     CODE_REVIEW_FOLDER.mkdir(parents=True, exist_ok=True)
-import os
-import logging.config
 
 # Define log directory
 LOG_DIR = CODE_REVIEW_FOLDER / "logs"
 if not LOG_DIR.exists():
     LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+BASE_FOLDER = Path(__file__).parent.parent
+OUTPUT_FOLDER = BASE_FOLDER / "output"
 
 LOGGING = {
     "version": 1,
