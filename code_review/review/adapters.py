@@ -1,32 +1,43 @@
 import json
 from pathlib import Path
 
-from code_review.git.handlers import get_author
+from code_review.coverage.main import get_makefile, get_minimum_coverage
+from code_review.git.handlers import get_author, check_out_and_pull
 from code_review.handlers import ch_dir
+from code_review.linting.ruff.handlers import count_ruff_issues
 from code_review.review.schemas import BranchSchema, CodeReviewSchema
 from code_review.settings import OUTPUT_FOLDER
 
 
 def build_code_review_schema(folder: Path, target_branch_name: str):
     ch_dir(folder)
+    makefile = get_makefile(folder)  # Assuming this function is defined elsewhere to get the makefile path
     base_name = "master"
+    check_out_and_pull(base_name, check=False)
+    base_count = count_ruff_issues(folder)
     base_author = get_author(base_name)
-    base_branch = BranchSchema(name=base_name, author=base_author)
+    base_cov = get_minimum_coverage(makefile)
+    base_branch = BranchSchema(name=base_name, author=base_author, linting_errors=base_count, min_coverage=base_cov)
 
+    check_out_and_pull(target_branch_name, check=False)
     target_author = get_author(target_branch_name)
-    target_branch = BranchSchema(name=target_branch_name, author=target_author)
+    target_count = count_ruff_issues(folder)
+    target_cov = get_minimum_coverage(makefile)
+    target_branch = BranchSchema(name=target_branch_name, author=target_author, linting_errors=target_count,
+                                 min_coverage=target_cov)
 
     code_review_schema = CodeReviewSchema(
         name=folder.name,
         source_folder=folder,
+        makefile_path=makefile,
         target_branch=target_branch,
         base_branch=base_branch
     )
     return code_review_schema
 
 if __name__ == '__main__':
-    f = Path.home() / "adelantos" / "wompi-integration"
-    tb = "feature/wompi-48_update_mdc"
+    f = Path.home() / "adelantos" / "payment-options-vue"
+    tb = "feature/vpop-188_implement_pay_pse"
     schema = build_code_review_schema(f, tb)
 
     file = OUTPUT_FOLDER / f"{schema.name}_code_review.json"

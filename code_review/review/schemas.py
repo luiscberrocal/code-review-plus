@@ -10,6 +10,7 @@ class BranchSchema(BaseModel):
     name: str
     author: str
     linting_errors: int = -1
+    min_coverage: float | None = None
 
 
 class CodeReviewSchema(BaseModel):
@@ -18,5 +19,6 @@ class CodeReviewSchema(BaseModel):
     """
     name: str
     source_folder: Path
+    makefile_path: Path | None
     target_branch: BranchSchema
     base_branch: BranchSchema
