@@ -185,3 +185,27 @@ def get_author(branch_name: str) -> str:
             # Re-raise the exception if the error is for another reason.
             raise e
 
+
+def check_out_and_pull(branch:str, check: bool = True):
+    subprocess.run(["git", "checkout", branch], check=check, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(["git", "pull", "origin", branch], check=check, stdout=subprocess.DEVNULL,
+                   stderr=subprocess.DEVNULL)
+
+
+def _get_merged_branches(base: str) -> list:
+    result = subprocess.run(
+        ["git", "branch", "-r", "--merged", base],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    # Process and display merged branches
+    merged_branches = []
+    for line in result.stdout.strip().split('\n'):
+        branch_name = line.strip()
+        if branch_name and not branch_name.startswith('*') and f"origin/{base}" not in branch_name:
+            # Remove the asterisk from the current branch if present
+            branch_name = branch_name.replace('* ', '')
+            branch_name = branch_name.replace('origin/', '')
+            merged_branches.append(branch_name)
+    return merged_branches

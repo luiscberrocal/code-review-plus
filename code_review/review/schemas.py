@@ -12,7 +12,7 @@ class BranchSchema(BaseModel):
     linting_errors: int = -1
 
 
-class CodeReviewSchema:
+class CodeReviewSchema(BaseModel):
     """
     Schema for code review requests.
     """

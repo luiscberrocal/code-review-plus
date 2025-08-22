@@ -14,8 +14,9 @@ from code_review.git.handlers import (
     _compare_versions,
     _get_latest_tag,
     get_current_git_branch,
-    get_author,
+    get_author, check_out_and_pull, _get_merged_branches,
 )
+from code_review.handlers import ch_dir
 
 from code_review.settings import CLI_CONSOLE
 logger = logging.getLogger(__name__)
@@ -164,12 +165,6 @@ def sync(folder: Path, verbose: bool):
                 check_out_and_pull(original_branch, check=False)
 
 
-def check_out_and_pull(branch:str, check: bool = True):
-    subprocess.run(["git", "checkout", branch], check=check, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    subprocess.run(["git", "pull", "origin", branch], check=check, stdout=subprocess.DEVNULL,
-                   stderr=subprocess.DEVNULL)
-
-
 @git.command()
 @click.option("--folder", "-f", type=Path, help="Path to the git repository", default=None)
 @click.option("--merged", is_flag=True, help="List branches that are merged into master", default=False)
@@ -201,14 +196,7 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
             raise SimpleGitToolError("--delete option requires --merged flag")
 
         # Change to the specified directory if provided
-        if folder:
-            if not folder.exists():
-                raise SimpleGitToolError(f"Directory does not exist: {folder}")
-            if not folder.is_dir():
-                raise SimpleGitToolError(f"Not a directory: {folder}")
-
-            CLI_CONSOLE.print(f"Changing to directory: [cyan]{folder}[/cyan]")
-            os.chdir(folder)
+        ch_dir(folder)
 
         # Check if the base branch exists
         try:
@@ -301,22 +289,4 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
         if folder:
             os.chdir(original_dir)
 
-
-def _get_merged_branches(base: str) -> list:
-    result = subprocess.run(
-        ["git", "branch", "-r", "--merged", base],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    # Process and display merged branches
-    merged_branches = []
-    for line in result.stdout.strip().split('\n'):
-        branch_name = line.strip()
-        if branch_name and not branch_name.startswith('*') and f"origin/{base}" not in branch_name:
-            # Remove the asterisk from the current branch if present
-            branch_name = branch_name.replace('* ', '')
-            branch_name = branch_name.replace('origin/', '')
-            merged_branches.append(branch_name)
-    return merged_branches
 
