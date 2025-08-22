@@ -127,5 +127,61 @@ def get_current_git_branch() -> str:
     except FileNotFoundError:
         print("Git command not found. Please ensure Git is installed and in your system's PATH.")
         return ""
+import subprocess
 
+
+def get_author(branch_name: str) -> str:
+    """
+    Retrieves the author of the most recent commit on a given Git branch.
+
+    This function uses subprocess calls to execute Git commands on the local
+    repository. It first checks if the branch exists and then retrieves the
+    author of the last commit.
+
+    Args:
+        branch_name: The name of the Git branch (e.g., "main", "feature/my-branch").
+
+    Returns:
+        The name of the author as a string.
+
+    Raises:
+        ValueError: If the specified branch does not exist in the repository.
+        subprocess.CalledProcessError: If a Git command fails for another reason
+                                      (e.g., not a Git repository, Git not installed).
+    """
+    try:
+        # Step 1: Check if the branch exists and get its latest commit hash.
+        # `check=True` will raise an exception if the command fails (e.g., branch not found).
+        # `capture_output=True` captures stdout and stderr.
+        # `text=True` decodes the output as a string.
+        commit_hash_result = subprocess.run(
+            ["git", "rev-parse", branch_name],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        commit_hash = commit_hash_result.stdout.strip()
+
+        # Step 2: Get the author of the commit.
+        # The `--pretty=format:'%an'` flag formats the output to just the author's name.
+        author_result = subprocess.run(
+            ["git", "log", "-1", "--pretty=format:%an", commit_hash],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        author_name = author_result.stdout.strip()
+
+        return author_name
+
+    except subprocess.CalledProcessError as e:
+        # If `git rev-parse` failed, it's likely because the branch doesn't exist.
+        # The stderr output usually contains "unknown revision or path not in the working tree".
+        if "unknown revision" in e.stderr or "not in the working tree" in e.stderr:
+            raise ValueError(
+                f"Error: The branch '{branch_name}' does not exist."
+            ) from e
+        else:
+            # Re-raise the exception if the error is for another reason.
+            raise e
 

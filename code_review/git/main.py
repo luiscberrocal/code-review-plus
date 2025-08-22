@@ -8,8 +8,14 @@ from pathlib import Path
 
 from code_review.cli import cli
 from code_review.exceptions import SimpleGitToolError
-from code_review.git.handlers import _are_there_uncommited_changes, _get_git_version, _compare_versions, _get_latest_tag, \
-    get_current_git_branch
+from code_review.git.handlers import (
+    _are_there_uncommited_changes,
+    _get_git_version,
+    _compare_versions,
+    _get_latest_tag,
+    get_current_git_branch,
+    get_author,
+)
 
 from code_review.settings import CLI_CONSOLE
 logger = logging.getLogger(__name__)
@@ -277,7 +283,8 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
                     # Remove the asterisk from the current branch if present
                     branch_name = branch_name.replace('* ', '')
                     unmerged_branches.append(branch_name)
-                    CLI_CONSOLE.print(f" - [yellow]{branch_name}[/yellow]")
+                    author = get_author(branch_name)
+                    CLI_CONSOLE.print(f" - [yellow]{branch_name}[/yellow] (by [blue]{author}[/blue])")
 
             if not unmerged_branches:
                 CLI_CONSOLE.print("[bold green]No unmerged branches found.[/bold green]")
