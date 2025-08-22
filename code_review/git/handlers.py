@@ -5,8 +5,7 @@ from code_review.exceptions import SimpleGitToolError
 
 
 def _are_there_uncommited_changes() -> bool:
-    """
-    Check if there are any committed changes in the current git repository.
+    """Check if there are any committed changes in the current git repository.
 
     Returns:
         bool: True if there are committed changes, False otherwise.
@@ -27,8 +26,7 @@ def _are_there_uncommited_changes() -> bool:
 
 
 def _get_git_version() -> str:
-    """
-    Internal helper function to get the current git version.
+    """Internal helper function to get the current git version.
 
     Returns:
         str: The version of git as a string (e.g., '2.3.4').
@@ -38,7 +36,7 @@ def _get_git_version() -> str:
     """
     try:
         # Run the git --version command and capture its output
-        result = subprocess.run(['git', '--version'], capture_output=True, text=True, check=True)
+        result = subprocess.run(["git", "--version"], capture_output=True, text=True, check=True)
         # The output is typically "git version X.Y.Z", so we split to get the version number
         return result.stdout.strip().split()[-1]
     except FileNotFoundError:
@@ -50,8 +48,7 @@ def _get_git_version() -> str:
 
 
 def _compare_versions(current_version: str, min_version: str) -> bool:
-    """
-    Internal helper function to compare two version strings.
+    """Internal helper function to compare two version strings.
 
     Args:
         current_version (str): The version of git currently installed.
@@ -62,8 +59,8 @@ def _compare_versions(current_version: str, min_version: str) -> bool:
               False otherwise.
     """
     # Split the versions into a list of integers for comparison
-    current_parts = [int(v) for v in re.findall(r'\d+', current_version)]
-    min_parts = [int(v) for v in re.findall(r'\d+', min_version)]
+    current_parts = [int(v) for v in re.findall(r"\d+", current_version)]
+    min_parts = [int(v) for v in re.findall(r"\d+", min_version)]
 
     # Pad the shorter list with zeros to ensure they have the same length for comparison
     max_len = max(len(current_parts), len(min_parts))
@@ -83,12 +80,13 @@ def _get_latest_tag() -> str:
             check=True,
         )
         latest_tag = result.stdout.strip()
-        #console.print(f"Latest tag: [bold cyan]{latest_tag}[/bold cyan]")
+        # console.print(f"Latest tag: [bold cyan]{latest_tag}[/bold cyan]")
 
     except subprocess.CalledProcessError:
-        #console.print("[bold yellow]No tags found in the repository.[/bold yellow]")
+        # console.print("[bold yellow]No tags found in the repository.[/bold yellow]")
         pass
     return latest_tag
+
 
 def get_current_git_branch() -> str:
     """Gets the currently checked out Git branch.
@@ -103,21 +101,18 @@ def get_current_git_branch() -> str:
     """
     try:
         # Check if we are inside a git repository
-        subprocess.run(['git', 'rev-parse', '--is-inside-work-tree'],
-                       check=True,
-                       capture_output=True,
-                       text=True)
+        subprocess.run(["git", "rev-parse", "--is-inside-work-tree"], check=True, capture_output=True, text=True)
 
         # Get the branch name
         result = subprocess.run(
-            ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
             check=True,
             capture_output=True,
             text=True,
             # The shell=True argument can be a security risk if the command
             # string comes from untrusted user input, but here it's
             # a hardcoded command so it's safe.
-            shell=False
+            shell=False,
         )
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
@@ -127,12 +122,12 @@ def get_current_git_branch() -> str:
     except FileNotFoundError:
         print("Git command not found. Please ensure Git is installed and in your system's PATH.")
         return ""
-import subprocess
+
+
 
 
 def get_author(branch_name: str) -> str:
-    """
-    Retrieves the author of the most recent commit on a given Git branch.
+    """Retrieves the author of the most recent commit on a given Git branch.
 
     This function uses subprocess calls to execute Git commands on the local
     repository. It first checks if the branch exists and then retrieves the
@@ -170,26 +165,22 @@ def get_author(branch_name: str) -> str:
             text=True,
             check=True,
         )
-        author_name = author_result.stdout.strip()
+        return author_result.stdout.strip()
 
-        return author_name
 
     except subprocess.CalledProcessError as e:
         # If `git rev-parse` failed, it's likely because the branch doesn't exist.
         # The stderr output usually contains "unknown revision or path not in the working tree".
         if "unknown revision" in e.stderr or "not in the working tree" in e.stderr:
-            raise ValueError(
-                f"Error: The branch '{branch_name}' does not exist."
-            ) from e
+            raise ValueError(f"Error: The branch '{branch_name}' does not exist.") from e
         else:
             # Re-raise the exception if the error is for another reason.
             raise e
 
 
-def check_out_and_pull(branch:str, check: bool = True):
+def check_out_and_pull(branch: str, check: bool = True) -> None:
     subprocess.run(["git", "checkout", branch], check=check, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    subprocess.run(["git", "pull", "origin", branch], check=check, stdout=subprocess.DEVNULL,
-                   stderr=subprocess.DEVNULL)
+    subprocess.run(["git", "pull", "origin", branch], check=check, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def _get_merged_branches(base: str) -> list:
@@ -201,11 +192,11 @@ def _get_merged_branches(base: str) -> list:
     )
     # Process and display merged branches
     merged_branches = []
-    for line in result.stdout.strip().split('\n'):
+    for line in result.stdout.strip().split("\n"):
         branch_name = line.strip()
-        if branch_name and not branch_name.startswith('*') and f"origin/{base}" not in branch_name:
+        if branch_name and not branch_name.startswith("*") and f"origin/{base}" not in branch_name:
             # Remove the asterisk from the current branch if present
-            branch_name = branch_name.replace('* ', '')
-            branch_name = branch_name.replace('origin/', '')
+            branch_name = branch_name.replace("* ", "")
+            branch_name = branch_name.replace("origin/", "")
             merged_branches.append(branch_name)
     return merged_branches

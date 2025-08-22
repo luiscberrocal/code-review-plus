@@ -1,7 +1,8 @@
-
-from rich.console import Console
 import logging.config
 from pathlib import Path
+
+from rich.console import Console
+
 CLI_CONSOLE = Console()
 
 CODE_REVIEW_FOLDER = Path(__file__).home() / "Documents" / "code_review"
@@ -20,12 +21,8 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "standard": {
-            "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-        },
-        "detailed": {
-            "format": "%(asctime)s [%(levelname)s] %(name)s:%(lineno)d: %(message)s"
-        },
+        "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
+        "detailed": {"format": "%(asctime)s [%(levelname)s] %(name)s:%(lineno)d: %(message)s"},
     },
     "handlers": {
         "console": {
@@ -52,7 +49,7 @@ LOGGING = {
     "root": {
         "level": "INFO",
         "handlers": ["console"],
-    }
+    },
 }
 
 # Configure logging when the module is imported

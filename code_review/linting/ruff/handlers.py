@@ -1,12 +1,10 @@
-import subprocess
 import re
+import subprocess
 from pathlib import Path
-from typing import List
 
 
 def count_ruff_issues(path: Path) -> int:
-    """
-    Runs `ruff check` on a specified path and returns the total number of issues found.
+    """Runs `ruff check` on a specified path and returns the total number of issues found.
 
     This function executes the `ruff check` command as a subprocess, captures its
     output, and then uses a regular expression to parse the summary line to
@@ -25,14 +23,14 @@ def count_ruff_issues(path: Path) -> int:
         # `text=True` decodes the output as text.
         # We specify the path as the argument for the ruff command.
         result = subprocess.run(
-            ['ruff', 'check', path],
+            ["ruff", "check", path],
             capture_output=True,
-            text=True,
+            text=True, check=False,
             # check=True
         )
         # The last line of the `ruff check` output contains the summary, e.g.,
 
-        result_lines = result.stdout.strip().split('\n')
+        result_lines = result.stdout.strip().split("\n")
         last_line = result_lines[-1]
         if last_line.startswith("[*]"):
             last_line = result_lines[-2]
@@ -43,8 +41,7 @@ def count_ruff_issues(path: Path) -> int:
 
         if match:
             # If a match is found, extract the number and convert it to an integer.
-            issue_count = int(match.group(1))
-            return issue_count
+            return int(match.group(1))
         else:
             # If the regex doesn't match, it likely means there are no issues.
             # ruff outputs "Found 0 issues" or similar, but let's be safe and
@@ -69,10 +66,8 @@ def count_ruff_issues(path: Path) -> int:
         return -1
 
 
-
 def _check_and_format_ruff(folder_path: Path) -> bool:
-    """
-    Runs `ruff format` on a specified folder.
+    """Runs `ruff format` on a specified folder.
 
     First, it checks if any files need formatting without applying changes.
     If changes are needed, it then runs `ruff format` to apply them.
@@ -84,10 +79,9 @@ def _check_and_format_ruff(folder_path: Path) -> bool:
         True if any files were formatted, False otherwise.
         Raises an exception if `ruff` is not found or other errors occur.
     """
-
     # Command to check for unformatted files without applying changes.
     # The --check flag will cause a non-zero exit code if formatting is needed.
-    check_command: List[str] = ["ruff", "format", "--check", folder_path]
+    check_command: list[str] = ["ruff", "format", "--check", folder_path]
 
     try:
         # Use subprocess.run() to execute the command.
@@ -98,14 +92,11 @@ def _check_and_format_ruff(folder_path: Path) -> bool:
 
         # Check the return code. A non-zero code from `ruff format --check`
         # indicates that there are unformatted files.
-        if check_result.returncode != 0:
-            return True
-        else:
-            return False
+        return check_result.returncode != 0
 
     except FileNotFoundError:
         return False
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError:
         return False
-    except Exception as e:
+    except Exception:
         return False

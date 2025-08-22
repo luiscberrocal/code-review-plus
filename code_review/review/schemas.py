@@ -4,9 +4,8 @@ from pydantic import BaseModel
 
 
 class BranchSchema(BaseModel):
-    """
-    Schema for branch information.
-    """
+    """Schema for branch information."""
+
     name: str
     author: str
     linting_errors: int = -1
@@ -14,9 +13,8 @@ class BranchSchema(BaseModel):
 
 
 class CodeReviewSchema(BaseModel):
-    """
-    Schema for code review requests.
-    """
+    """Schema for code review requests."""
+
     name: str
     source_folder: Path
     makefile_path: Path | None

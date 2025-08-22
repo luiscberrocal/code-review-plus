@@ -1,10 +1,10 @@
+import os
 import re
 from pathlib import Path
-import os
+
 
 def get_minimum_coverage(file_path: Path) -> float:
-    """
-    Parses a Makefile from a given file path and extracts the value for the
+    """Parses a Makefile from a given file path and extracts the value for the
     MINIMUM_COVERAGE variable.
 
     Args:
@@ -31,7 +31,7 @@ def get_minimum_coverage(file_path: Path) -> float:
     # \s*=\s*: Equals sign surrounded by zero or more whitespace characters
     # (.*): Captures everything that follows (the value)
     # $: End of the line
-    match = re.search(r'^\s*MINIMUM_COVERAGE\s*=\s*(.*)$', makefile_content, re.MULTILINE)
+    match = re.search(r"^\s*MINIMUM_COVERAGE\s*=\s*(.*)$", makefile_content, re.MULTILINE)
 
     if match:
         # If a match is found, return the captured group (the value).
@@ -41,9 +41,9 @@ def get_minimum_coverage(file_path: Path) -> float:
         # If no match is found, raise a ValueError as requested.
         raise ValueError("MINIMUM_COVERAGE not found in the Makefile content.")
 
+
 def get_makefile(folder: Path) -> Path:
-    """
-    Returns the path to the Makefile in the specified folder.
+    """Returns the path to the Makefile in the specified folder.
 
     Args:
         folder: A pathlib.Path object pointing to the folder containing the Makefile.
@@ -57,6 +57,7 @@ def get_makefile(folder: Path) -> Path:
     if not makefile_path.exists():
         raise FileNotFoundError(f"Makefile not found in folder: {folder}")
     return makefile_path
+
 
 if __name__ == "__main__":
     projects_folder = Path.home() / "adelantos"

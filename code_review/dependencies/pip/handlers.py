@@ -1,13 +1,13 @@
-import subprocess
-import re
-from pathlib import Path
-from typing import List, Dict
 import logging
+import re
+import subprocess
+from pathlib import Path
+
 logger = logging.getLogger(__name__)
 
-def requirements_updated(folder: Path) -> List[Dict[str, str]]:
-    """
-    Updates minor version dependencies in requirement files within a specified folder
+
+def requirements_updated(folder: Path) -> list[dict[str, str]]:
+    """Updates minor version dependencies in requirement files within a specified folder
     and returns a list of updated packages.
 
     This function looks for a 'requirements' subdirectory inside the provided folder
@@ -38,7 +38,7 @@ def requirements_updated(folder: Path) -> List[Dict[str, str]]:
 
     # Regex to parse the output line from `pur`
     # Example line: Updated mypy: 1.16.1 -> 1.17.1
-    update_pattern = re.compile(r'Updated (.+): (.+) -> (.+)')
+    update_pattern = re.compile(r"Updated (.+): (.+) -> (.+)")
 
     # Iterate over all .txt files in the requirements directory
     for req_file in requirements_folder.glob("*.txt"):
@@ -47,10 +47,10 @@ def requirements_updated(folder: Path) -> List[Dict[str, str]]:
             # `capture_output=True` gets the stdout and stderr
             # `text=True` decodes the output as text
             result = subprocess.run(
-                ['pur', '-r', str(req_file), '--minor'],
+                ["pur", "-r", str(req_file), "--minor"],
                 capture_output=True,
                 text=True,
-                check=True  # Raise an exception if the command fails
+                check=True,  # Raise an exception if the command fails
             )
 
             # Process the output line by line
@@ -58,11 +58,9 @@ def requirements_updated(folder: Path) -> List[Dict[str, str]]:
                 match = update_pattern.match(line.strip())
                 if match:
                     library, old_version, new_version = match.groups()
-                    updated_packages.append({
-                        'library': library,
-                        'old_version': old_version,
-                        'new_version': new_version
-                    })
+                    updated_packages.append(
+                        {"library": library, "old_version": old_version, "new_version": new_version}
+                    )
 
         except FileNotFoundError:
             print("Error: 'pur' command not found. Please ensure it is installed and in your PATH.")
@@ -77,6 +75,7 @@ def requirements_updated(folder: Path) -> List[Dict[str, str]]:
             return []
 
     return updated_packages
+
 
 # --- Example Usage ---
 
@@ -122,12 +121,14 @@ Updated pre-commit: 3.8.0 -> 4.3.0
 Updated django-debug-toolbar: 4.4.6 -> 6.0.0
 Updated django-extensions: 3.2.3 -> 4.
 """
+
     # Replace the actual subprocess.run call with a mock for the example
     def mock_run(*args, **kwargs):
         class MockResult:
-            def __init__(self, stdout, returncode=0):
+            def __init__(self, stdout, returncode=0) -> None:
                 self.stdout = stdout
                 self.returncode = returncode
+
         print("--- Simulating 'pur' command output ---")
         return MockResult(mock_pur_output)
 
@@ -146,11 +147,13 @@ Updated django-extensions: 3.2.3 -> 4.
     print("\n--- List of Updated Packages ---")
     if updated:
         for pkg in updated:
-            print(f"Library: {pkg['library']:<25} | Old Version: {pkg['old_version']:<10} | New Version: {pkg['new_version']}")
+            print(
+                f"Library: {pkg['library']:<25} | Old Version: {pkg['old_version']:<10} | New Version: {pkg['new_version']}"
+            )
     else:
         print("No packages were updated.")
 
     # Clean up the dummy directory
     import shutil
-    shutil.rmtree(dummy_folder)
 
+    shutil.rmtree(dummy_folder)

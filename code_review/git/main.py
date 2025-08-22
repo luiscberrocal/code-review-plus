@@ -1,37 +1,39 @@
 import logging
+import os
 import subprocess
 import sys
-import click
-
-import os
 from pathlib import Path
+
+import click
 
 from code_review.cli import cli
 from code_review.exceptions import SimpleGitToolError
 from code_review.git.handlers import (
     _are_there_uncommited_changes,
-    _get_git_version,
     _compare_versions,
+    _get_git_version,
     _get_latest_tag,
+    _get_merged_branches,
+    check_out_and_pull,
+    get_author,
     get_current_git_branch,
-    get_author, check_out_and_pull, _get_merged_branches,
 )
 from code_review.handlers import ch_dir
-
 from code_review.settings import CLI_CONSOLE
+
 logger = logging.getLogger(__name__)
 
+
 @cli.group()
-def git():
+def git() -> None:
     """Tools for interacting with Git repositories."""
     pass
 
+
 @git.command()
-@click.option('--version', 'min_version', help='The minimum required git version.', default=None)
-def check(min_version: str):
-    """
-    Checks if git is installed and meets the minimum version requirement.
-    """
+@click.option("--version", "min_version", help="The minimum required git version.", default=None)
+def check(min_version: str) -> None:
+    """Checks if git is installed and meets the minimum version requirement."""
     try:
         current_version = _get_git_version()
         if min_version:
@@ -52,13 +54,10 @@ def check(min_version: str):
 
 
 @git.command()
-@click.option(
-    "--folder", "-f", type=Path, help="Path to the git repository", default=None
-)
+@click.option("--folder", "-f", type=Path, help="Path to the git repository", default=None)
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed diff information", default=False)
-def sync(folder: Path, verbose: bool):
-    """
-    Syncs the master and develop branches, ensuring consistency.
+def sync(folder: Path, verbose: bool) -> None:
+    """Syncs the master and develop branches, ensuring consistency.
 
     Args:
         folder: Path to the git repository. If not provided, uses current directory.
@@ -82,9 +81,7 @@ def sync(folder: Path, verbose: bool):
 
         uncommited_changes = _are_there_uncommited_changes()
         if uncommited_changes:
-            CLI_CONSOLE.print(
-                "[bold red]ERROR: There are uncommitted changes in the repository.[/bold red]"
-            )
+            CLI_CONSOLE.print("[bold red]ERROR: There are uncommitted changes in the repository.[/bold red]")
             sys.exit(1)
 
         # Define the branches to sync
@@ -100,15 +97,11 @@ def sync(folder: Path, verbose: bool):
 
         latest_tag = _get_latest_tag()
         # 2. Checkout develop and pull
-        CLI_CONSOLE.print(
-            f"[bold]Checking out and pulling [green]{develop_branch}[/green]...[/bold]"
-        )
+        CLI_CONSOLE.print(f"[bold]Checking out and pulling [green]{develop_branch}[/green]...[/bold]")
         check_out_and_pull(develop_branch)
 
         # 3. Do a git diff and check for differences
-        CLI_CONSOLE.print(
-            "[bold]Checking for differences between develop and master...[/bold]"
-        )
+        CLI_CONSOLE.print("[bold]Checking for differences between develop and master...[/bold]")
         result = subprocess.run(
             ["git", "diff", "--name-only", master_branch, develop_branch],
             capture_output=True,
@@ -119,19 +112,13 @@ def sync(folder: Path, verbose: bool):
         if result.stdout.strip():
             # If the diff command returns any output, it means there are differences.
             diff_files = result.stdout.strip().split("\n")
-            CLI_CONSOLE.print(
-                "[bold red]ERROR: Differences found between develop and master.[/bold red]"
-            )
+            CLI_CONSOLE.print("[bold red]ERROR: Differences found between develop and master.[/bold red]")
             if verbose:
                 for file in diff_files:
                     CLI_CONSOLE.print(f" - [yellow]{file}[/yellow]")
-            raise SimpleGitToolError(
-                "Please merge changes from master into develop before syncing."
-            )
+            raise SimpleGitToolError("Please merge changes from master into develop before syncing.")
 
-        CLI_CONSOLE.print(
-            "[bold green]develop and master branches are in sync.[/bold green]"
-        )
+        CLI_CONSOLE.print("[bold green]develop and master branches are in sync.[/bold green]")
 
         # 4. Get the latest tag
         # console.print("[bold]Getting the latest tag...[/bold]")
@@ -141,9 +128,7 @@ def sync(folder: Path, verbose: bool):
 
     except subprocess.CalledProcessError as e:
         # Catch any git command failures and raise a custom error
-        CLI_CONSOLE.print(
-            "[bold red]Error:[/bold red] Git command failed. Check the repository state."
-        )
+        CLI_CONSOLE.print("[bold red]Error:[/bold red] Git command failed. Check the repository state.")
         CLI_CONSOLE.print(f"[red]Command:[/red] {e}")
         CLI_CONSOLE.print(f"[red]Details:[/red]\n{e.stderr.strip()}")
         sys.exit(1)
@@ -155,12 +140,12 @@ def sync(folder: Path, verbose: bool):
         if folder:
             os.chdir(original_dir)
         if original_branch:
-            current_branch  = get_current_git_branch()
+            current_branch = get_current_git_branch()
             logger.debug(f"Current branch: {current_branch} | Original branch: {original_branch}")
             if current_branch != original_branch:
                 CLI_CONSOLE.print(
-                f"[bold cyan]Returning to original branch: [green]{original_branch}[/green][/bold cyan]"
-            )
+                    f"[bold cyan]Returning to original branch: [green]{original_branch}[/green][/bold cyan]"
+                )
                 # Ensure we check out the original branch at the end
                 check_out_and_pull(original_branch, check=False)
 
@@ -172,9 +157,8 @@ def sync(folder: Path, verbose: bool):
 @click.option("--delete", is_flag=True, help="Delete merged branches (use with --merged)", default=False)
 @click.option("--interactive", is_flag=True, help="Ask before deleting (use with --merged --delete)", default=False)
 @click.option("--base", help="Base branch to compare against", default="master")
-def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str, interactive: bool):
-    """
-    Lists merged or unmerged branches relative to a base branch (default: master).
+def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str, interactive: bool) -> None:
+    """Lists merged or unmerged branches relative to a base branch (default: master).
     Can also delete merged branches.
 
     Args:
@@ -201,27 +185,19 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
         # Check if the base branch exists
         try:
             subprocess.run(
-                ["git", "rev-parse", "--verify", base],
-                check=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
+                ["git", "rev-parse", "--verify", base], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
             )
         except subprocess.CalledProcessError:
             raise SimpleGitToolError(f"Base branch '{base}' does not exist")
 
         # Get current branch to restore it later
         current_branch = subprocess.run(
-            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-            capture_output=True,
-            text=True,
-            check=True
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True, check=True
         ).stdout.strip()
 
         # Handle merged branches
         if merged:
-            CLI_CONSOLE.print(
-                f"[bold cyan]Listing branches merged into [green]{base}[/green]:[/bold cyan]"
-            )
+            CLI_CONSOLE.print(f"[bold cyan]Listing branches merged into [green]{base}[/green]:[/bold cyan]")
             merged_branches = _get_merged_branches(base)
             for i, branch_name in enumerate(merged_branches, 1):
                 CLI_CONSOLE.print(f" {i}  [yellow]{branch_name}[/yellow]")
@@ -231,7 +207,7 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
                 CLI_CONSOLE.print("[bold]Deleting merged branches...[/bold]")
                 for branch in merged_branches:
                     # Don't delete the current branch or protected branches
-                    if branch != current_branch and branch != 'master' and branch != 'develop':
+                    if branch not in (current_branch, "master", "develop"):
                         try:
                             do_delete = True
                             if interactive:
@@ -242,7 +218,7 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
                                     ["git", "push", "origin", "--delete", branch],
                                     check=True,
                                     stdout=subprocess.DEVNULL,
-                                    stderr=subprocess.DEVNULL
+                                    stderr=subprocess.DEVNULL,
                                 )
                         except subprocess.CalledProcessError:
                             CLI_CONSOLE.print(f"[yellow]Warning: Could not delete branch {branch}[/yellow]")
@@ -257,19 +233,14 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
         # Handle unmerged branches
         if un_merged:
             CLI_CONSOLE.print(f"[bold cyan]Listing branches not merged into [green]{base}[/green]:[/bold cyan]")
-            result = subprocess.run(
-                ["git", "branch", "--no-merged", base],
-                capture_output=True,
-                text=True,
-                check=True
-            )
+            result = subprocess.run(["git", "branch", "--no-merged", base], capture_output=True, text=True, check=True)
 
             unmerged_branches = []
-            for line in result.stdout.strip().split('\n'):
+            for line in result.stdout.strip().split("\n"):
                 branch_name = line.strip()
                 if branch_name:
                     # Remove the asterisk from the current branch if present
-                    branch_name = branch_name.replace('* ', '')
+                    branch_name = branch_name.replace("* ", "")
                     unmerged_branches.append(branch_name)
                     author = get_author(branch_name)
                     CLI_CONSOLE.print(f" - [yellow]{branch_name}[/yellow] (by [blue]{author}[/blue])")
@@ -288,5 +259,3 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
         # Change back to the original directory if we changed it
         if folder:
             os.chdir(original_dir)
-
-
