@@ -25,7 +25,8 @@ def count_ruff_issues(path: Path) -> int:
         result = subprocess.run(
             ["ruff", "check", path],
             capture_output=True,
-            text=True, check=False,
+            text=True,
+            check=False,
             # check=True
         )
         # The last line of the `ruff check` output contains the summary, e.g.,
@@ -42,13 +43,12 @@ def count_ruff_issues(path: Path) -> int:
         if match:
             # If a match is found, extract the number and convert it to an integer.
             return int(match.group(1))
-        else:
-            # If the regex doesn't match, it likely means there are no issues.
-            # ruff outputs "Found 0 issues" or similar, but let's be safe and
-            # handle the case where it's a different summary message.
-            # In the absence of a clear number, assume 0 issues.
-            print("No issue count found in output. Assuming 0 issues.")
-            return 0
+        # If the regex doesn't match, it likely means there are no issues.
+        # ruff outputs "Found 0 issues" or similar, but let's be safe and
+        # handle the case where it's a different summary message.
+        # In the absence of a clear number, assume 0 issues.
+        print("No issue count found in output. Assuming 0 issues.")
+        return 0
 
     except FileNotFoundError:
         # This error occurs if the `ruff` command is not found in the system's PATH.

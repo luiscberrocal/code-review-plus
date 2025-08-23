@@ -124,8 +124,6 @@ def get_current_git_branch() -> str:
         return ""
 
 
-
-
 def get_author(branch_name: str) -> str:
     """Retrieves the author of the most recent commit on a given Git branch.
 
@@ -167,15 +165,13 @@ def get_author(branch_name: str) -> str:
         )
         return author_result.stdout.strip()
 
-
     except subprocess.CalledProcessError as e:
         # If `git rev-parse` failed, it's likely because the branch doesn't exist.
         # The stderr output usually contains "unknown revision or path not in the working tree".
         if "unknown revision" in e.stderr or "not in the working tree" in e.stderr:
             raise ValueError(f"Error: The branch '{branch_name}' does not exist.") from e
-        else:
-            # Re-raise the exception if the error is for another reason.
-            raise e
+        # Re-raise the exception if the error is for another reason.
+        raise e
 
 
 def check_out_and_pull(branch: str, check: bool = True) -> None:

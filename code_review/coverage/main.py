@@ -37,9 +37,8 @@ def get_minimum_coverage(file_path: Path) -> float:
         # If a match is found, return the captured group (the value).
         # We also strip any leading/trailing whitespace from the captured value.
         return float(match.group(1).strip())
-    else:
-        # If no match is found, raise a ValueError as requested.
-        raise ValueError("MINIMUM_COVERAGE not found in the Makefile content.")
+    # If no match is found, raise a ValueError as requested.
+    raise ValueError("MINIMUM_COVERAGE not found in the Makefile content.")
 
 
 def get_makefile(folder: Path) -> Path:

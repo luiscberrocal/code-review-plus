@@ -79,6 +79,7 @@ version = "0.1.1"
 source = { virtual = "." }
 dependencies = [
     { name = "click" },
+    { name = "pur" },
     { name = "pydantic" },
     { name = "requests" },
     { name = "rich" },
@@ -92,6 +93,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.2.1" },
+    { name = "pur", specifier = ">=7.3.3" },
     { name = "pydantic", specifier = ">=2.11.7" },
     { name = "requests", specifier = ">=2.32.5" },
     { name = "rich", specifier = ">=14.1.0" },
@@ -165,6 +167,15 @@ sdist = { url = "https://files.pythonhosted.org/packages/f9/e2/3e91f31a7d2b083fe
 wheels = [
     { url = "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746", size = 20538 },
 ]
+
+[[package]]
+name = "pur"
+version = "7.3.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0c/de/bf0943e91a3c992e3e07d8e3ff8a5839befca9b76061bf1ad395720233f5/pur-7.3.3.tar.gz", hash = "sha256:83acc7fc4d07dbd6b026e2bcb33611f61f7c51a30b9f5ef6f4f9e2846a23f19d", size = 1519636 }
 
 [[package]]
 name = "pydantic"
