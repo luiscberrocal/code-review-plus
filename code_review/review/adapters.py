@@ -5,7 +5,8 @@ from code_review.coverage.main import get_makefile, get_minimum_coverage
 from code_review.git.handlers import check_out_and_pull, get_author
 from code_review.handlers import ch_dir
 from code_review.linting.ruff.handlers import count_ruff_issues
-from code_review.review.schemas import BranchSchema, CodeReviewSchema
+from code_review.review.schemas import CodeReviewSchema
+from code_review.git.schemas import BranchSchema
 from code_review.settings import OUTPUT_FOLDER
 
 

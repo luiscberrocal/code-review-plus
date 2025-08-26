@@ -1,21 +1,14 @@
 from pathlib import Path
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-
-class BranchSchema(BaseModel):
-    """Schema for branch information."""
-
-    name: str
-    author: str
-    linting_errors: int = -1
-    min_coverage: float | None = None
+from code_review.git.schemas import BranchSchema
 
 
 class CodeReviewSchema(BaseModel):
     """Schema for code review requests."""
 
-    name: str
+    name: str = Field(description="Name of the project to code review")
     source_folder: Path
     makefile_path: Path | None
     target_branch: BranchSchema
