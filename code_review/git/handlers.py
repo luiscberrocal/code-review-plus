@@ -157,6 +157,7 @@ def get_author(branch_name: str) -> str:
 
         # Step 2: Get the author of the commit.
         # The `--pretty=format:'%an'` flag formats the output to just the author's name.
+        formatting = "%an"
         author_result = subprocess.run(
             ["git", "log", "-1", "--pretty=format:%an", commit_hash],
             capture_output=True,

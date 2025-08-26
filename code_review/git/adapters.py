@@ -63,7 +63,8 @@ if __name__ == '__main__':
 
     # Call the function to parse the data.
     lines = log_data.split("\n")
-    results = create_branch_schema(lines[0])
-    print(results)
+    for line in lines:
+        results = create_branch_schema(line)
+        print(results)
 
 

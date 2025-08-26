@@ -39,7 +39,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str):
 
 if __name__ == "__main__":
     f = Path.home() / "adelantos" / "payment-options-vue"
-    tb = "feature/vpop-188_implement_pay_pse"
+    tb = "feature/VPOP-282_reduce_connection_timeout"
     schema = build_code_review_schema(f, tb)
 
     file = OUTPUT_FOLDER / f"{schema.name}_code_review.json"
