@@ -3,6 +3,7 @@ import logging
 import re
 import subprocess
 from datetime import datetime
+from typing import Any
 
 from code_review.exceptions import SimpleGitToolError
 from code_review.git.adapters import parse_git_date
@@ -264,12 +265,12 @@ def _get_unmerged_branches(base: str) -> list[BranchSchema]:
     return sorted_branches
 
 
-def branch_line_to_dict(clean_line):
-    logger.debug("Branch found: %s", clean_line)
-    branch_info = get_branch_info(clean_line)
+def branch_line_to_dict(branch_name: str) -> dict[str, Any]:
+    logger.debug("Branch found: %s", branch_name)
+    branch_info = get_branch_info(branch_name)
     logger.debug("Branch info: %s", branch_info)
     branch_dict = json.loads(branch_info)
-    branch_dict["name"] = clean_line.replace("origin/", "")
+    branch_dict["name"] = branch_name.replace("origin/", "")
     branch_dict["date"] = parse_git_date(branch_dict["date"])
     logger.debug("Branch info: %s", branch_dict)
     return branch_dict

@@ -45,6 +45,11 @@ LOGGING = {
             "handlers": ["console", "file"],
             "propagate": False,
         },
+        "code_review.git.adapters": {
+            "level": "DEBUG",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
     },
     "root": {
         "level": "INFO",
