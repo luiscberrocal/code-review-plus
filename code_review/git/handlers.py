@@ -1,12 +1,14 @@
+import json
 import logging
 import re
 import subprocess
 
 from code_review.exceptions import SimpleGitToolError
-from code_review.git.adapters import create_branch_schema
+from code_review.git.adapters import parse_git_date
 from code_review.git.schemas import BranchSchema
 
 logger = logging.getLogger(__name__)
+
 
 def _are_there_uncommited_changes() -> bool:
     """Check if there are any committed changes in the current git repository.
@@ -128,6 +130,41 @@ def get_current_git_branch() -> str:
         return ""
 
 
+def get_branch_info(branch_name: str) -> str:
+    """Retrieves the author of the most recent commit on a given Git branch."""
+    try:
+        # Step 1: Check if the branch exists and get its latest commit hash.
+        # `check=True` will raise an exception if the command fails (e.g., branch not found).
+        # `capture_output=True` captures stdout and stderr.
+        # `text=True` decodes the output as a string.
+        commit_hash_result = subprocess.run(
+            ["git", "rev-parse", branch_name],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        commit_hash = commit_hash_result.stdout.strip()
+
+        # Step 2: Get the author of the commit.
+        # The `--pretty=format:'%an'` flag formats the output to just the author's name.
+        formatting = '{"hash": "%h", "author": "%an", "email": "%ce", "date": "%ad"}'
+        author_result = subprocess.run(
+            ["git", "log", "-1", f"--pretty=format:{formatting}", commit_hash],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return author_result.stdout.strip()
+
+    except subprocess.CalledProcessError as e:
+        # If `git rev-parse` failed, it's likely because the branch doesn't exist.
+        # The stderr output usually contains "unknown revision or path not in the working tree".
+        if "unknown revision" in e.stderr or "not in the working tree" in e.stderr:
+            raise ValueError(f"Error: The branch '{branch_name}' does not exist.") from e
+        # Re-raise the exception if the error is for another reason.
+        raise e
+
+
 def get_author(branch_name: str) -> str:
     """Retrieves the author of the most recent commit on a given Git branch.
 
@@ -202,7 +239,9 @@ def _get_merged_branches(base: str) -> list:
             merged_branches.append(branch_name)
     return merged_branches
 
+
 def _get_unmerged_branches(base: str) -> list[BranchSchema]:
+    unmerged_branches = []
     result = subprocess.run(
         ["git", "branch", "-r", "--no-merged", base],
         capture_output=True,
@@ -211,12 +250,17 @@ def _get_unmerged_branches(base: str) -> list[BranchSchema]:
     )
     # Process and display unmerged branches
     try:
-        unmerged_branches = []
         for line in result.stdout.strip().split("\n"):
             clean_line = line.strip()
             logger.debug("Branch found: %s", clean_line)
+            branch_info = get_branch_info(clean_line)
+            logger.debug("Branch info: %s", branch_info)
+            branch_dict = json.loads(branch_info)
+            branch_dict["name"] = clean_line.replace("origin/", "")
+            branch_dict["date"] = parse_git_date(branch_dict["date"])
+            logger.debug("Branch info: %s", branch_dict)
 
-            unmerged_branches.append(create_branch_schema(clean_line))
+            unmerged_branches.append(BranchSchema(**branch_dict))
     except ValueError as e:
         logger.debug("Branch not found: %s", e)
     return unmerged_branches

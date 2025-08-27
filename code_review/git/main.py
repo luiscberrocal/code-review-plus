@@ -17,6 +17,7 @@ from code_review.git.handlers import (
     check_out_and_pull,
     get_author,
     get_current_git_branch,
+    _get_unmerged_branches,
 )
 from code_review.handlers import ch_dir
 from code_review.settings import CLI_CONSOLE
@@ -231,7 +232,8 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
                 CLI_CONSOLE.print("[bold green]No merged branches found.[/bold green]")
 
         # Handle unmerged branches
-        if un_merged:
+        un_merged2 = False
+        if un_merged2:
             CLI_CONSOLE.print(f"[bold cyan]Listing branches not merged into [green]{base}[/green]:[/bold cyan]")
             result = subprocess.run(["git", "branch", "-r", "--no-merged", base], capture_output=True, text=True, check=True)
 
@@ -247,7 +249,16 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
 
             if not unmerged_branches:
                 CLI_CONSOLE.print("[bold green]No unmerged branches found.[/bold green]")
+        if un_merged:
+            CLI_CONSOLE.print(f"[bold cyan]Listing branches not merged into [green]{base}[/green]:[/bold cyan]")
+             
+            unmerged_branches = _get_unmerged_branches(base)
+            for branch in unmerged_branches:
 
+                CLI_CONSOLE.print(f" - [yellow]{branch.name}[/yellow] (by [blue]{branch.author}[/blue])")
+
+            if not unmerged_branches:
+                CLI_CONSOLE.print("[bold green]No unmerged branches found.[/bold green]")
     except subprocess.CalledProcessError as e:
         CLI_CONSOLE.print("[bold red]Error:[/bold red] Git command failed.")
         CLI_CONSOLE.print(f"[red]Details:[/red]\n{e.stderr.strip()}")
