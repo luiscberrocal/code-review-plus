@@ -2,6 +2,7 @@ import json
 import logging
 import re
 import subprocess
+from datetime import datetime
 
 from code_review.exceptions import SimpleGitToolError
 from code_review.git.adapters import parse_git_date
@@ -263,4 +264,7 @@ def _get_unmerged_branches(base: str) -> list[BranchSchema]:
             unmerged_branches.append(BranchSchema(**branch_dict))
     except ValueError as e:
         logger.debug("Branch not found: %s", e)
-    return unmerged_branches
+    sorted_branches = sorted(
+        unmerged_branches, key=lambda branch: branch.date if branch.date is not None else datetime.min, reverse=True
+    )
+    return sorted_branches

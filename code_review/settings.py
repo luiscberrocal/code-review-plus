@@ -41,7 +41,7 @@ LOGGING = {
     },
     "loggers": {
         "code_review": {
-            "level": "DEBUG",
+            "level": "INFO",
             "handlers": ["console", "file"],
             "propagate": False,
         },

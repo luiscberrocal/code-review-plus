@@ -253,9 +253,9 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
             CLI_CONSOLE.print(f"[bold cyan]Listing branches not merged into [green]{base}[/green]:[/bold cyan]")
              
             unmerged_branches = _get_unmerged_branches(base)
-            for branch in unmerged_branches:
+            for i, branch in enumerate(unmerged_branches, 1):
 
-                CLI_CONSOLE.print(f" - [yellow]{branch.name}[/yellow] (by [blue]{branch.author}[/blue])")
+                CLI_CONSOLE.print(f" {i} [yellow]{branch.name}[/yellow] {branch.date}(by [blue]{branch.author}[/blue])")
 
             if not unmerged_branches:
                 CLI_CONSOLE.print("[bold green]No unmerged branches found.[/bold green]")
