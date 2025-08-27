@@ -5,7 +5,10 @@ from code_review.git.schemas import BranchSchema
 
 
 def create_branch_schema(git_line: str) -> BranchSchema:
-    """Create a BranchSchema instance."""
+    """Create a BranchSchema instance.
+    
+     Luis C. Berrocal Wed Jun 11 13:33:34 2025 -0500 Merge branch 'feature/vpop-211_refactoring' into develop
+    """
     regex_pattern = re.compile(
         r"^(?P<name>[\w\s.]+) "  # Match the name (one or more words and spaces, with periods)
         r"(?P<date>[A-Za-z]{3}\s+[A-Za-z]{3}\s+\d+\s+\d{2}:\d{2}:\d{2}\s+\d{4}\s+[-+]\d{4}) " # Match the full date format

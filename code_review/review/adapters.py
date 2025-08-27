@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from pathlib import Path
 
 from code_review.coverage.main import get_makefile, get_minimum_coverage
@@ -34,6 +35,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str):
         makefile_path=makefile,
         target_branch=target_branch,
         base_branch=base_branch,
+        date_created=datetime.now(),
     )
 
 

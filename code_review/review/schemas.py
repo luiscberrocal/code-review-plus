@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 from pydantic import BaseModel, Field
@@ -11,5 +12,6 @@ class CodeReviewSchema(BaseModel):
     name: str = Field(description="Name of the project to code review")
     source_folder: Path
     makefile_path: Path | None
+    date_created: datetime | None
     target_branch: BranchSchema
     base_branch: BranchSchema

@@ -233,7 +233,7 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
         # Handle unmerged branches
         if un_merged:
             CLI_CONSOLE.print(f"[bold cyan]Listing branches not merged into [green]{base}[/green]:[/bold cyan]")
-            result = subprocess.run(["git", "branch", "--no-merged", base], capture_output=True, text=True, check=True)
+            result = subprocess.run(["git", "branch", "-r", "--no-merged", base], capture_output=True, text=True, check=True)
 
             unmerged_branches = []
             for line in result.stdout.strip().split("\n"):

@@ -1,8 +1,12 @@
+import logging
 import re
 import subprocess
 
 from code_review.exceptions import SimpleGitToolError
+from code_review.git.adapters import create_branch_schema
+from code_review.git.schemas import BranchSchema
 
+logger = logging.getLogger(__name__)
 
 def _are_there_uncommited_changes() -> bool:
     """Check if there are any committed changes in the current git repository.
@@ -197,3 +201,22 @@ def _get_merged_branches(base: str) -> list:
             branch_name = branch_name.replace("origin/", "")
             merged_branches.append(branch_name)
     return merged_branches
+
+def _get_unmerged_branches(base: str) -> list[BranchSchema]:
+    result = subprocess.run(
+        ["git", "branch", "-r", "--no-merged", base],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    # Process and display unmerged branches
+    try:
+        unmerged_branches = []
+        for line in result.stdout.strip().split("\n"):
+            clean_line = line.strip()
+            logger.debug("Branch found: %s", clean_line)
+
+            unmerged_branches.append(create_branch_schema(clean_line))
+    except ValueError as e:
+        logger.debug("Branch not found: %s", e)
+    return unmerged_branches
