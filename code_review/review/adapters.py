@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 from code_review.coverage.main import get_makefile, get_minimum_coverage
-from code_review.git.handlers import check_out_and_pull, get_author
+from code_review.git.handlers import check_out_and_pull, get_author, get_branch_info
 from code_review.handlers import ch_dir
 from code_review.linting.ruff.handlers import count_ruff_issues
 from code_review.review.schemas import CodeReviewSchema
@@ -17,7 +17,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str):
     base_name = "master"
     check_out_and_pull(base_name, check=False)
     base_count = count_ruff_issues(folder)
-    base_author = get_author(base_name)
+    base_author = get_branch_info(base_name)
     base_cov = get_minimum_coverage(makefile)
     base_branch = BranchSchema(name=base_name, author=base_author, linting_errors=base_count, min_coverage=base_cov)
 
@@ -41,7 +41,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str):
 
 if __name__ == "__main__":
     f = Path.home() / "adelantos" / "payment-options-vue"
-    tb = "feature/VPOP-282_reduce_connection_timeout"
+    tb = "feature/VPOP-284_refactor_installment_detail_update_or_create"
     schema = build_code_review_schema(f, tb)
 
     file = OUTPUT_FOLDER / f"{schema.name}_code_review.json"

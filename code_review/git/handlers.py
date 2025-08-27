@@ -253,18 +253,23 @@ def _get_unmerged_branches(base: str) -> list[BranchSchema]:
     try:
         for line in result.stdout.strip().split("\n"):
             clean_line = line.strip()
-            logger.debug("Branch found: %s", clean_line)
-            branch_info = get_branch_info(clean_line)
-            logger.debug("Branch info: %s", branch_info)
-            branch_dict = json.loads(branch_info)
-            branch_dict["name"] = clean_line.replace("origin/", "")
-            branch_dict["date"] = parse_git_date(branch_dict["date"])
-            logger.debug("Branch info: %s", branch_dict)
+            branch_dict = branch_line_to_dict(clean_line)
 
             unmerged_branches.append(BranchSchema(**branch_dict))
     except ValueError as e:
         logger.debug("Branch not found: %s", e)
     sorted_branches = sorted(
-        unmerged_branches, key=lambda branch: branch.date if branch.date is not None else datetime.min, reverse=True
+        unmerged_branches, reverse=True
     )
     return sorted_branches
+
+
+def branch_line_to_dict(clean_line):
+    logger.debug("Branch found: %s", clean_line)
+    branch_info = get_branch_info(clean_line)
+    logger.debug("Branch info: %s", branch_info)
+    branch_dict = json.loads(branch_info)
+    branch_dict["name"] = clean_line.replace("origin/", "")
+    branch_dict["date"] = parse_git_date(branch_dict["date"])
+    logger.debug("Branch info: %s", branch_dict)
+    return branch_dict

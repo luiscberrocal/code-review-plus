@@ -231,24 +231,7 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
             if not merged_branches:
                 CLI_CONSOLE.print("[bold green]No merged branches found.[/bold green]")
 
-        # Handle unmerged branches
-        un_merged2 = False
-        if un_merged2:
-            CLI_CONSOLE.print(f"[bold cyan]Listing branches not merged into [green]{base}[/green]:[/bold cyan]")
-            result = subprocess.run(["git", "branch", "-r", "--no-merged", base], capture_output=True, text=True, check=True)
 
-            unmerged_branches = []
-            for line in result.stdout.strip().split("\n"):
-                branch_name = line.strip()
-                if branch_name:
-                    # Remove the asterisk from the current branch if present
-                    branch_name = branch_name.replace("* ", "")
-                    unmerged_branches.append(branch_name)
-                    author = get_author(branch_name)
-                    CLI_CONSOLE.print(f" - [yellow]{branch_name}[/yellow] (by [blue]{author}[/blue])")
-
-            if not unmerged_branches:
-                CLI_CONSOLE.print("[bold green]No unmerged branches found.[/bold green]")
         if un_merged:
             CLI_CONSOLE.print(f"[bold cyan]Listing branches not merged into [green]{base}[/green]:[/bold cyan]")
              
