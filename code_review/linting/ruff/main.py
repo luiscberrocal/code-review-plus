@@ -9,7 +9,7 @@ from code_review.settings import CLI_CONSOLE
 
 @cli.group()
 def ruff() -> None:
-    """Tools for interacting with Git repositories."""
+    """Tools for linting and formatting."""
     pass
 
 

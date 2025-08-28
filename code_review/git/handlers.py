@@ -8,6 +8,7 @@ from typing import Any
 from code_review.exceptions import SimpleGitToolError
 from code_review.git.adapters import parse_git_date
 from code_review.git.schemas import BranchSchema
+from code_review.settings import CLI_CONSOLE
 
 logger = logging.getLogger(__name__)
 
@@ -274,3 +275,8 @@ def branch_line_to_dict(branch_name: str) -> dict[str, Any]:
     branch_dict["date"] = parse_git_date(branch_dict["date"])
     logger.debug("Branch info: %s", branch_dict)
     return branch_dict
+
+def display_branches(branches: list[BranchSchema]) -> None:
+    for i, branch in enumerate(branches, 1):
+
+        CLI_CONSOLE.print(f" {i} [yellow]{branch.name}[/yellow] {branch.date}(by [blue]{branch.author}[/blue])")

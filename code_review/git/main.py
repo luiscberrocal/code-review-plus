@@ -18,6 +18,7 @@ from code_review.git.handlers import (
     get_author,
     get_current_git_branch,
     _get_unmerged_branches,
+    display_branches,
 )
 from code_review.handlers import ch_dir
 from code_review.settings import CLI_CONSOLE
@@ -182,7 +183,12 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
 
         # Change to the specified directory if provided
         ch_dir(folder)
-
+        try:
+            subprocess.run(
+                ["git", "fetch"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            )
+        except subprocess.CalledProcessError:
+            raise SimpleGitToolError(f"Base branch '{base}' does not exist")
         # Check if the base branch exists
         try:
             subprocess.run(
@@ -236,9 +242,7 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
             CLI_CONSOLE.print(f"[bold cyan]Listing branches not merged into [green]{base}[/green]:[/bold cyan]")
              
             unmerged_branches = _get_unmerged_branches(base)
-            for i, branch in enumerate(unmerged_branches, 1):
-
-                CLI_CONSOLE.print(f" {i} [yellow]{branch.name}[/yellow] {branch.date}(by [blue]{branch.author}[/blue])")
+            display_branches(unmerged_branches)
 
             if not unmerged_branches:
                 CLI_CONSOLE.print("[bold green]No unmerged branches found.[/bold green]")
