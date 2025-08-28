@@ -22,11 +22,16 @@ def make(folder: Path) -> None:
     """List branches in the specified Git repository."""
     ch_dir(folder)
     unmerged_branches = _get_unmerged_branches("master")
+    if not unmerged_branches:
+        click.echo("No unmerged branches found.")
+        return
     display_branches(unmerged_branches)
     branch_num = click.prompt("Select a branch by number", type=int)
     selected_branch = unmerged_branches[branch_num - 1]
     click.echo(f"You selected branch: {selected_branch.name}")
     schema = build_code_review_schema(folder, selected_branch.name)
+    ticket= click.prompt("Select a ticket by number", type=str)
+    schema.ticket = ticket
     updated = requirements_updated(folder)
     if updated:
         CLI_CONSOLE.print("[green]Updated packages:[/green]")

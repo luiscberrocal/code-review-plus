@@ -13,5 +13,6 @@ class CodeReviewSchema(BaseModel):
     source_folder: Path
     makefile_path: Path | None
     date_created: datetime | None
+    ticket: str | None = Field(default=None, description="Ticket associated with the code review")
     target_branch: BranchSchema
     base_branch: BranchSchema

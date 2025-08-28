@@ -245,21 +245,29 @@ def _get_merged_branches(base: str) -> list:
 
 def _get_unmerged_branches(base: str) -> list[BranchSchema]:
     unmerged_branches = []
+    command_list = ["git", "branch", "-r", "--no-merged", base]
+    logger.debug("Running command: %s", " ".join(command_list))
     result = subprocess.run(
-        ["git", "branch", "-r", "--no-merged", base],
+        command_list,
         capture_output=True,
         text=True,
         check=True,
     )
+
     # Process and display unmerged branches
     try:
         for line in result.stdout.strip().split("\n"):
+
             clean_line = line.strip()
+            logger.debug("Clean line: %s", clean_line)
+            if "->" in clean_line:
+                logger.warning("Found '->' in unmerged branches from '%s'", clean_line)
+                continue
             branch_dict = branch_line_to_dict(clean_line)
 
             unmerged_branches.append(BranchSchema(**branch_dict))
     except ValueError as e:
-        logger.debug("Branch not found: %s", e)
+        logger.error("Branch not found: %s", e)
     sorted_branches = sorted(
         unmerged_branches, reverse=True
     )

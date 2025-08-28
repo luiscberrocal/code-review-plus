@@ -45,9 +45,18 @@ LOGGING = {
             "handlers": ["console", "file"],
             "propagate": False,
         },
-        "code_review.dependencies.pip.handlers": {
+        "code_review.review.main": {
             "level": "DEBUG",
-            "handlers": ["console", "file"],
+            "handlers": [
+                "console",
+            ],
+            "propagate": False,
+        },
+        "code_review.git": {
+            "level": "INFO",
+            "handlers": [
+                "console",
+            ],
             "propagate": False,
         },
     },
