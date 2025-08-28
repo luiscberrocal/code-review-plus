@@ -1,12 +1,13 @@
+from code_review.settings import CLI_CONSOLE, LOGGING
 import logging
 import re
 import subprocess
 from pathlib import Path
-
-from code_review.settings import CLI_CONSOLE
+# Ensure configuration is applied
+logging.config.dictConfig(LOGGING)
 
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.DEBUG)
 
 def requirements_updated(folder: Path) -> list[dict[str, str]]:
     """Updates minor version dependencies in requirement files within a specified folder
@@ -57,6 +58,7 @@ def requirements_updated(folder: Path) -> list[dict[str, str]]:
 
             # Process the output line by line
             for line in result.stdout.splitlines():
+                logger.debug("Pur output line: %s", line)
                 match = update_pattern.match(line.strip())
                 if match:
                     library, old_version, new_version = match.groups()
@@ -83,7 +85,8 @@ def requirements_updated(folder: Path) -> list[dict[str, str]]:
 
 if __name__ == "__main__":
     # Simulate a project directory structure for demonstration
-    projects_folder = Path.home() / "adelantos" / "monitoring_dashboard"
+    projects_folder = Path.home() / "adelantos" / "wompi-integration"
+    logger.debug(f"Checking for requirements updates in {projects_folder}")
     updated = requirements_updated(projects_folder)
     if updated:
         CLI_CONSOLE.print("[green]Updated packages:[/green]")
