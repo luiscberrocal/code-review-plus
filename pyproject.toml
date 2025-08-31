@@ -4,6 +4,7 @@ version = "0.1.1"
 description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
+    "ast2json>=0.4",
     "click>=8.2.1",
     "pur>=7.3.3",
     "pyaml>=25.7.0",
