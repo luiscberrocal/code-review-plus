@@ -3,9 +3,6 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from code_review.review.schemas import SemanticVersion
-
-
 class SemanticVersion(BaseModel):
     """Schema for semantic versioning."""
 
@@ -16,8 +13,9 @@ class SemanticVersion(BaseModel):
 
     def __str__(self):
         return f"{self.major}.{self.minor}.{self.patch}"
+
     @classmethod
-    def parse_version(cls, version:str, file_path: Path) -> SemanticVersion:
+    def parse_version(cls, version:str, file_path: Path) -> "SemanticVersion":
         """Parse a version string into a SemanticVersion object."""
         parts = version.split(".")
         if len(parts) != 3:
