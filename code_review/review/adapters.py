@@ -51,22 +51,6 @@ def build_code_review_schema(folder: Path, target_branch_name: str):
     )
 
 
-if __name__ == "__main__":
-    f = Path.home() / "adelantos" / "red-activa-integration"
-    tb = "feature/PAYTSA-423_send_payments_async"
-
-    f = Path.home() / "adelantos" / "payment-options-vue"
-    tb = "feature/PAYTSA-423_send_payments_async"
-
-    f = Path.home() / "adelantos" / "wompi-integration"
-    tb = "feature/wompi-48_update_mdc"
-    schema = build_code_review_schema(f, tb)
-
-    file = OUTPUT_FOLDER / f"{schema.name}_code_review.json"
-    with open(file, "w") as f:
-        json.dump(schema.model_dump(), f, indent=4, default=str)
-    print(f"Wrote code review schema to {file}")
-
 
 def get_version_from_file(folder: Path) -> SemanticVersion | None:
     """Extract the version string from a given file."""

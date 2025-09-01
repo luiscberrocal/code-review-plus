@@ -5,6 +5,7 @@ import click
 
 from code_review.cli import cli
 from code_review.dependencies.pip.handlers import requirements_updated
+from code_review.git.adapters import is_rebased
 from code_review.git.handlers import _get_unmerged_branches, display_branches
 from code_review.handlers import ch_dir
 from code_review.review.adapters import build_code_review_schema
@@ -33,6 +34,12 @@ def make(folder: Path) -> None:
     code_review_schema = build_code_review_schema(folder, selected_branch.name)
     ticket= click.prompt("Select a ticket by number", type=str)
     code_review_schema.ticket = ticket
+
+    is_branch_rebased = is_rebased(code_review_schema.target_branch.name, "develop")
+    if is_branch_rebased:
+        CLI_CONSOLE.print(f"[bold green]Branch {code_review_schema.target_branch.name} is rebased on develop.[/bold green]")
+    else:
+        CLI_CONSOLE.print(f"[bold red]Branch {code_review_schema.target_branch.name} is not rebased on develop![/bold red]")
 
     display_review(code_review_schema)
     # updated = requirements_updated(folder)

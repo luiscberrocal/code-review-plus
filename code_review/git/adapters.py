@@ -60,3 +60,55 @@ def parse_git_date(date_str: str) -> datetime | None:
         # If parsing fails, print an error message and return None.
         logger.debug("Error parsing date string '%s': %s", date_str, e)
         return None
+
+
+#!/usr/bin/env python3
+
+import subprocess
+import sys
+
+
+def is_rebased(target_branch: str, base_branch: str) -> bool:
+    """Verifies if a target Git branch has been rebased against a base branch.
+
+    This is determined by checking if the merge base (common ancestor) of the
+    two branches is the same as the head of the base branch. If they are the
+    same, it means all commits on the target branch are descendants of the
+    base branch's current head, which is the result of a successful rebase.
+
+    Args:
+        target_branch: The name of the branch to check (e.g., 'feature/my-branch').
+        base_branch: The name of the base branch (e.g., 'develop').
+
+    Returns:
+        True if the target branch has been rebased against the base branch,
+        False otherwise.
+    """
+    try:
+        # Get the commit hash of the merge base between the two branches.
+        # This is the most recent common ancestor.
+        merge_base_result = subprocess.run(
+            ["git", "merge-base", target_branch, base_branch], capture_output=True, text=True, check=True
+        )
+        merge_base_hash = merge_base_result.stdout.strip()
+
+        # Get the commit hash of the head of the base branch.
+        base_branch_head_result = subprocess.run(
+            ["git", "rev-parse", base_branch], capture_output=True, text=True, check=True
+        )
+        base_branch_head_hash = base_branch_head_result.stdout.strip()
+
+        # The branch is considered rebased if the merge base is the same as
+        # the head of the base branch.
+        return merge_base_hash == base_branch_head_hash
+
+    except subprocess.CalledProcessError as e:
+        # Handle cases where a branch does not exist or git command fails.
+        print(f"Error executing git command: {e.cmd}", file=sys.stderr)
+        print(f"Stdout: {e.stdout}", file=sys.stderr)
+        print(f"Stderr: {e.stderr}", file=sys.stderr)
+        return False
+    except FileNotFoundError:
+        print("Error: 'git' command not found. Please ensure Git is installed and in your PATH.", file=sys.stderr)
+        return False
+
