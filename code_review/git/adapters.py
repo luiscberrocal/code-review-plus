@@ -2,7 +2,7 @@ import logging
 import re
 from datetime import datetime
 
-from code_review.git.schemas import BranchSchema
+from code_review.schemas import BranchSchema
 
 logger = logging.getLogger(__name__)
 
