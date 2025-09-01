@@ -3,6 +3,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+
 class SemanticVersion(BaseModel):
     """Schema for semantic versioning."""
 
@@ -15,7 +16,7 @@ class SemanticVersion(BaseModel):
         return f"{self.major}.{self.minor}.{self.patch}"
 
     @classmethod
-    def parse_version(cls, version:str, file_path: Path) -> "SemanticVersion":
+    def parse_version(cls, version: str, file_path: Path) -> "SemanticVersion":
         """Parse a version string into a SemanticVersion object."""
         parts = version.split(".")
         if len(parts) != 3:
@@ -34,7 +35,10 @@ class BranchSchema(BaseModel):
     date: datetime | None = None
     linting_errors: int = Field(default=-1, description="Number of linting errors found by ruff. -1 means not checked")
     min_coverage: float | None = Field(default=None, description="Minimum coverage based on the Makefile")
-    version: SemanticVersion | None = None
+    version: SemanticVersion | None = Field(default=None, description="Semantic version from the version file")
+    changelog_versions: list[SemanticVersion] = Field(
+        default_factory=list, description="List of last 5 semantic versions found in the changelog"
+    )
 
     def __lt__(self, other):
         if not isinstance(other, BranchSchema):

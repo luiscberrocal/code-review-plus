@@ -1,10 +1,11 @@
 import re
 from pathlib import Path
 
+from code_review.schemas import SemanticVersion
 from code_review.settings import OUTPUT_FOLDER
 
 
-def parse_changelog(changelog_file: Path):
+def parse_changelog(changelog_file: Path) -> list[SemanticVersion]:
     """Parses a markdown changelog and returns a list of dictionaries
     with the version and date for each entry.
 
@@ -31,7 +32,8 @@ def parse_changelog(changelog_file: Path):
     for match in matches:
         version = match.group(1).strip()
         date = match.group(2).strip()
-        versions.append({"version": version, "date": date})
+        data_dict = {"version": version, "date": date, "source": changelog_file}
+        versions.append(SemanticVersion.parse_version (data_dict.get("version"), file_path=changelog_file))
 
     return versions
 
@@ -44,6 +46,6 @@ if __name__ == "__main__":
     if parsed_data:
         print("Found changelog entries:")
         for entry in parsed_data:
-            print(f"  Version: {entry['version']}, Date: {entry['date']}")
+            print(f"  Version: {entry}")
     else:
         print("No changelog entries found.")
