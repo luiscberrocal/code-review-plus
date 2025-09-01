@@ -30,18 +30,18 @@ def make(folder: Path) -> None:
     branch_num = click.prompt("Select a branch by number", type=int)
     selected_branch = unmerged_branches[branch_num - 1]
     click.echo(f"You selected branch: {selected_branch.name}")
-    schema = build_code_review_schema(folder, selected_branch.name)
+    code_review_schema = build_code_review_schema(folder, selected_branch.name)
     ticket= click.prompt("Select a ticket by number", type=str)
-    schema.ticket = ticket
+    code_review_schema.ticket = ticket
 
-    display_review(schema)
+    display_review(code_review_schema)
     # updated = requirements_updated(folder)
     # if updated:
     #     CLI_CONSOLE.print("[green]Updated packages:[/green]")
     #     for pkg in updated:
     #         CLI_CONSOLE.print(f"- {pkg['library']}: {pkg['old_version']} -> {pkg['new_version']}")
 
-    file = OUTPUT_FOLDER / f"{schema.name}_code_review.json"
+    file = OUTPUT_FOLDER / f"{code_review_schema.ticket}-{code_review_schema.name}_code_review.json"
     with open(file, "w") as f:
-        json.dump(schema.model_dump(), f, indent=4, default=str)
-    print(f"Wrote code review schema to {file}")
+        json.dump(code_review_schema.model_dump(), f, indent=4, default=str)
+    print(f"Wrote code review code_review_schema to {file}")
