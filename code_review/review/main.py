@@ -8,6 +8,7 @@ from code_review.dependencies.pip.handlers import requirements_updated
 from code_review.git.handlers import _get_unmerged_branches, display_branches
 from code_review.handlers import ch_dir
 from code_review.review.adapters import build_code_review_schema
+from code_review.review.handlers import display_review
 from code_review.settings import OUTPUT_FOLDER, CLI_CONSOLE
 
 
@@ -32,11 +33,13 @@ def make(folder: Path) -> None:
     schema = build_code_review_schema(folder, selected_branch.name)
     ticket= click.prompt("Select a ticket by number", type=str)
     schema.ticket = ticket
-    updated = requirements_updated(folder)
-    if updated:
-        CLI_CONSOLE.print("[green]Updated packages:[/green]")
-        for pkg in updated:
-            CLI_CONSOLE.print(f"- {pkg['library']}: {pkg['old_version']} -> {pkg['new_version']}")
+
+    display_review(schema)
+    # updated = requirements_updated(folder)
+    # if updated:
+    #     CLI_CONSOLE.print("[green]Updated packages:[/green]")
+    #     for pkg in updated:
+    #         CLI_CONSOLE.print(f"- {pkg['library']}: {pkg['old_version']} -> {pkg['new_version']}")
 
     file = OUTPUT_FOLDER / f"{schema.name}_code_review.json"
     with open(file, "w") as f:
