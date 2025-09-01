@@ -10,6 +10,9 @@ class CodeReviewSchema(BaseModel):
     """Schema for code review requests."""
 
     name: str = Field(description="Name of the project to code review")
+    is_rebased: bool = Field(
+        default=False, description="Indicates if the target branch has been rebased onto the base branch"
+    )
     source_folder: Path
     makefile_path: Path | None
     date_created: datetime | None

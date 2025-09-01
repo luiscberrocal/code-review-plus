@@ -35,11 +35,7 @@ def make(folder: Path) -> None:
     ticket= click.prompt("Select a ticket by number", type=str)
     code_review_schema.ticket = ticket
 
-    is_branch_rebased = is_rebased(code_review_schema.target_branch.name, "develop")
-    if is_branch_rebased:
-        CLI_CONSOLE.print(f"[bold green]Branch {code_review_schema.target_branch.name} is rebased on develop.[/bold green]")
-    else:
-        CLI_CONSOLE.print(f"[bold red]Branch {code_review_schema.target_branch.name} is not rebased on develop![/bold red]")
+    code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, "develop")
 
     display_review(code_review_schema)
     # updated = requirements_updated(folder)
