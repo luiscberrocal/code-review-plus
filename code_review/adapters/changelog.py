@@ -5,7 +5,7 @@ from code_review.schemas import SemanticVersion
 from code_review.settings import OUTPUT_FOLDER
 
 
-def parse_changelog(changelog_file: Path) -> list[SemanticVersion]:
+def parse_changelog(changelog_file: Path, min_count: int = 2) -> list[SemanticVersion]:
     """Parses a markdown changelog and returns a list of dictionaries
     with the version and date for each entry.
 
@@ -33,8 +33,9 @@ def parse_changelog(changelog_file: Path) -> list[SemanticVersion]:
         version = match.group(1).strip()
         date = match.group(2).strip()
         data_dict = {"version": version, "date": date, "source": changelog_file}
-        versions.append(SemanticVersion.parse_version (data_dict.get("version"), file_path=changelog_file))
-
+        versions.append(SemanticVersion.parse_version(data_dict.get("version"), file_path=changelog_file))
+    if len(versions) > min_count:
+        return versions[:min_count]
     return versions
 
 
