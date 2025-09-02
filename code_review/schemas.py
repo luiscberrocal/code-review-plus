@@ -2,7 +2,8 @@ from datetime import datetime
 from pathlib import Path
 
 from pydantic import BaseModel, Field
-
+import logging
+logger = logging.getLogger(__name__)
 
 class SemanticVersion(BaseModel):
     """Schema for semantic versioning."""
@@ -18,10 +19,15 @@ class SemanticVersion(BaseModel):
     @classmethod
     def parse_version(cls, version: str, file_path: Path) -> "SemanticVersion":
         """Parse a version string into a SemanticVersion object."""
+        logger.debug("Parsing version '%s' from file '%s'", version, file_path)
         parts = version.split(".")
+
         if len(parts) != 3:
             raise ValueError(f"Invalid version format: {version}")
-        major, minor, patch = map(int, parts)
+        try:
+            major, minor, patch = map(int, parts)
+        except ValueError as e:
+            major, minor, patch = 0, 0, 0
         return cls(major=major, minor=minor, patch=patch, source=file_path)
 
 

@@ -47,7 +47,7 @@ def make(folder: Path) -> None:
     if updated:
         CLI_CONSOLE.print("[green]Updated packages:[/green]")
         for pkg in updated:
-            CLI_CONSOLE.print(f"- {pkg['library']}: {pkg['old_version']} -> {pkg['new_version']}")
+            CLI_CONSOLE.print(f"- {pkg['library']}: -> {pkg['file'].name}")
 
     new_file, backup_file = write_review_to_file(review=code_review_schema, folder=OUTPUT_FOLDER)
     CLI_CONSOLE.print("[bold blue]Code review written to:[/bold blue] " + str(new_file))
