@@ -9,7 +9,7 @@ logging.config.dictConfig(LOGGING)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-def requirements_updated(folder: Path) -> list[dict[str, str]]:
+def requirements_updated(folder: Path, level:str="minor") -> list[dict[str, str]]:
     """Updates minor version dependencies in requirement files within a specified folder
     and returns a list of updated packages.
 
@@ -20,6 +20,8 @@ def requirements_updated(folder: Path) -> list[dict[str, str]]:
 
     Args:
         folder (Path): The path to the root directory containing the 'requirements' folder.
+        level (str): The level of updates to apply. Can be "major", "minor", or "patch".
+                     Defaults to "minor".
 
     Returns:
         list[dict[str, str]]: A list of dictionaries, where each dictionary
@@ -30,14 +32,13 @@ def requirements_updated(folder: Path) -> list[dict[str, str]]:
                               - 'new_version': The new updated version.
                               Returns an empty list if no packages were updated or
                               if the 'requirements' folder does not exist.
-    """
+    """  # noqa: D205
     updated_packages = []
     requirements_folder = folder / "requirements"
 
     # Check if the requirements folder exists
     if not requirements_folder.is_dir():
-        CLI_CONSOLE.print(f"[red]Error:[/red] The 'requirements' directory was not found at {requirements_folder}")
-        return []
+        raise FileNotFoundError(f"Could not find '{requirements_folder}'")
 
     # Regex to parse the output line from `pur`
     # Example line: Updated mypy: 1.16.1 -> 1.17.1
@@ -46,18 +47,24 @@ def requirements_updated(folder: Path) -> list[dict[str, str]]:
     # Iterate over all .txt files in the requirements directory
     for req_file in requirements_folder.glob("*.txt"):
         try:
+            level_flag = []
+            if level == "minor":
+                level_flag = ["--minor", "*"]
+            elif level == "patch":
+                level_flag = ["--patch", "*"]
             # Run the pur command to update minor versions
             # `capture_output=True` gets the stdout and stderr
             # `text=True` decodes the output as text
             result = subprocess.run(
-                ["pur", "-r", str(req_file),"--dry-run", "--minor", "*"],
+                ["pur", "-r", str(req_file),"--dry-run-changed"] + level_flag,
                 capture_output=True,
                 text=True,
                 check=True,  # Raise an exception if the command fails
             )
 
             # Process the output line by line
-            for line in result.stdout.splitlines():
+            splitlines = result.stdout.splitlines()
+            for line in splitlines:
                 logger.debug("Pur output line: %s", line)
                 match = update_pattern.match(line.strip())
                 if match:
@@ -85,9 +92,9 @@ def requirements_updated(folder: Path) -> list[dict[str, str]]:
 
 if __name__ == "__main__":
     # Simulate a project directory structure for demonstration
-    projects_folder = Path.home() / "adelantos" / "wompi-integration"
+    projects_folder = Path.home() / "adelantos" / "refacil-payment-provider"
     logger.debug(f"Checking for requirements updates in {projects_folder}")
-    updated = requirements_updated(projects_folder)
+    updated = requirements_updated(projects_folder, level="major")
     if updated:
         CLI_CONSOLE.print("[green]Updated packages:[/green]")
         for pkg in updated:
