@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 
 
-def get_minimum_coverage(file_path: Path) -> float:
+def get_minimum_coverage(file_path: Path, raise_error: bool=False) -> float:
     """Parses a Makefile from a given file path and extracts the value for the
     MINIMUM_COVERAGE variable.
 
@@ -38,7 +38,9 @@ def get_minimum_coverage(file_path: Path) -> float:
         # We also strip any leading/trailing whitespace from the captured value.
         return float(match.group(1).strip())
     # If no match is found, raise a ValueError as requested.
-    raise ValueError("MINIMUM_COVERAGE not found in the Makefile content.")
+    if raise_error:
+        raise ValueError("MINIMUM_COVERAGE not found in the Makefile content.")
+    return -1.0
 
 
 def get_makefile(folder: Path) -> Path:

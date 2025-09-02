@@ -3,6 +3,7 @@ from pathlib import Path
 
 import click
 
+from code_review.adapters.generics import parse_for_ticket
 from code_review.cli import cli
 from code_review.dependencies.pip.handlers import requirements_updated
 from code_review.git.adapters import is_rebased
@@ -32,7 +33,13 @@ def make(folder: Path) -> None:
     selected_branch = unmerged_branches[branch_num - 1]
     click.echo(f"You selected branch: {selected_branch.name}")
     code_review_schema = build_code_review_schema(folder, selected_branch.name)
-    ticket= click.prompt("Select a ticket by number", type=str)
+    ticket_number = parse_for_ticket(selected_branch.name)
+
+    if ticket_number:
+        ticket = ticket_number
+    else:
+        ticket= click.prompt("Select a ticket by number", type=str)
+
     code_review_schema.ticket = ticket
 
     code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, "develop")
