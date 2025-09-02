@@ -1,15 +1,13 @@
-from code_review.settings import CLI_CONSOLE, LOGGING
 import logging
-import re
 import subprocess
 from pathlib import Path
-# Ensure configuration is applied
-logging.config.dictConfig(LOGGING)
+
+from code_review.settings import CLI_CONSOLE
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
-def requirements_updated(folder: Path, level:str="minor") -> list[dict[str, str]]:
+
+def requirements_updated(folder: Path, level: str = "minor") -> list[dict[str, str]]:
     """Updates minor version dependencies in requirement files within a specified folder
     and returns a list of updated packages.
 
@@ -40,10 +38,6 @@ def requirements_updated(folder: Path, level:str="minor") -> list[dict[str, str]
     if not requirements_folder.is_dir():
         raise FileNotFoundError(f"Could not find '{requirements_folder}'")
 
-    # Regex to parse the output line from `pur`
-    # Example line: Updated mypy: 1.16.1 -> 1.17.1
-    update_pattern = re.compile(r"Updated (.+): (.+) -> (.+)")
-
     # Iterate over all .txt files in the requirements directory
     for req_file in requirements_folder.glob("*.txt"):
         try:
@@ -52,11 +46,11 @@ def requirements_updated(folder: Path, level:str="minor") -> list[dict[str, str]
                 level_flag = ["--minor", "*"]
             elif level == "patch":
                 level_flag = ["--patch", "*"]
-            # Run the pur command to update minor versions
+            # Run the pur command to update versions
             # `capture_output=True` gets the stdout and stderr
             # `text=True` decodes the output as text
             result = subprocess.run(
-                ["pur", "-r", str(req_file),"--dry-run-changed"] + level_flag,
+                ["pur", "-r", str(req_file), "--dry-run-changed"] + level_flag,
                 capture_output=True,
                 text=True,
                 check=True,  # Raise an exception if the command fails
@@ -65,28 +59,22 @@ def requirements_updated(folder: Path, level:str="minor") -> list[dict[str, str]
             # Process the output line by line
             splitlines = result.stdout.splitlines()
             for line in splitlines:
-                logger.debug("Pur output line: %s", line)
-                match = update_pattern.match(line.strip())
-                if match:
-                    library, old_version, new_version = match.groups()
-                    updated_packages.append(
-                        {"library": library, "old_version": old_version, "new_version": new_version}
-                    )
-
+                if not line.startswith("==>") or not len(level_flag) == 0:
+                    logger.debug("Pur output line: %s", line)
+                    updated_packages.append({"library": line.strip(), "file": req_file})
+            return updated_packages
         except FileNotFoundError:
             logger.error("Error: 'pur' command not found. Please ensure it is installed and in your PATH.")
             return []
         except subprocess.CalledProcessError as e:
-            logger.error(f"Error running 'pur' on file {req_file}:")
-            logger.error(f"Stdout: {e.stdout}")
-            logger.error(f"Stderr: {e.stderr}")
+            logger.error(f"Error running 'pur' on file %s: Stdout: %s Stderr: %s", req_file, e.stdout, e.stderr)
             return []
         except Exception as e:
-            logger.error(f"An unexpected error occurred: {e}")
+            logger.error("An unexpected error occurred: %s", e)
             return []
 
     return updated_packages
-
+  # noqa: BLE001
 
 # --- Example Usage ---
 
@@ -98,4 +86,4 @@ if __name__ == "__main__":
     if updated:
         CLI_CONSOLE.print("[green]Updated packages:[/green]")
         for pkg in updated:
-            CLI_CONSOLE.print(f"- {pkg['library']}: {pkg['old_version']} -> {pkg['new_version']}")
+            CLI_CONSOLE.print(f"- {pkg['library']}: {pkg['file'].stem}")
