@@ -52,6 +52,13 @@ LOGGING = {
             ],
             "propagate": False,
         },
+        "code_review.dependencies.pip.handlers": {
+            "level": "DEBUG",
+            "handlers": [
+                "console",
+            ],
+            "propagate": False,
+        },
         "code_review.git": {
             "level": "INFO",
             "handlers": [

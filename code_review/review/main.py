@@ -10,7 +10,7 @@ from code_review.git.adapters import is_rebased
 from code_review.git.handlers import _get_unmerged_branches, display_branches
 from code_review.handlers import ch_dir
 from code_review.review.adapters import build_code_review_schema
-from code_review.review.handlers import display_review
+from code_review.review.handlers import display_review, write_review_to_file
 from code_review.settings import OUTPUT_FOLDER, CLI_CONSOLE
 
 
@@ -35,23 +35,19 @@ def make(folder: Path) -> None:
     code_review_schema = build_code_review_schema(folder, selected_branch.name)
     ticket_number = parse_for_ticket(selected_branch.name)
 
-    if ticket_number:
-        ticket = ticket_number
-    else:
-        ticket= click.prompt("Select a ticket by number", type=str)
+    ticket = ticket_number or click.prompt("Select a ticket by number", type=str)
 
     code_review_schema.ticket = ticket
 
     code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, "develop")
 
     display_review(code_review_schema)
-    # updated = requirements_updated(folder)
-    # if updated:
-    #     CLI_CONSOLE.print("[green]Updated packages:[/green]")
-    #     for pkg in updated:
-    #         CLI_CONSOLE.print(f"- {pkg['library']}: {pkg['old_version']} -> {pkg['new_version']}")
 
-    file = OUTPUT_FOLDER / f"{code_review_schema.ticket}-{code_review_schema.name}_code_review.json"
-    with open(file, "w") as f:
-        json.dump(code_review_schema.model_dump(), f, indent=4, default=str)
-    print(f"Wrote code review code_review_schema to {file}")
+    updated = requirements_updated(folder)
+    if updated:
+        CLI_CONSOLE.print("[green]Updated packages:[/green]")
+        for pkg in updated:
+            CLI_CONSOLE.print(f"- {pkg['library']}: {pkg['old_version']} -> {pkg['new_version']}")
+
+    new_file, backup_file = write_review_to_file(review=code_review_schema, folder=OUTPUT_FOLDER)
+    CLI_CONSOLE.print("[bold blue]Code review written to:[/bold blue] " + str(new_file))

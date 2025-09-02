@@ -49,8 +49,10 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[dict[str, s
             # Run the pur command to update versions
             # `capture_output=True` gets the stdout and stderr
             # `text=True` decodes the output as text
+            cmds = ["pur", "-r", str(req_file), "--dry-run-changed"] + level_flag
+            logger.debug("Running %s", " ".join(cmds))
             result = subprocess.run(
-                ["pur", "-r", str(req_file), "--dry-run-changed"] + level_flag,
+                cmds,
                 capture_output=True,
                 text=True,
                 check=True,  # Raise an exception if the command fails
@@ -62,7 +64,6 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[dict[str, s
                 if not line.startswith("==>") or not len(level_flag) == 0:
                     logger.debug("Pur output line: %s", line)
                     updated_packages.append({"library": line.strip(), "file": req_file})
-            return updated_packages
         except FileNotFoundError:
             logger.error("Error: 'pur' command not found. Please ensure it is installed and in your PATH.")
             return []
