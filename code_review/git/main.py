@@ -14,11 +14,10 @@ from code_review.git.handlers import (
     _get_git_version,
     _get_latest_tag,
     _get_merged_branches,
-    check_out_and_pull,
-    get_author,
-    get_current_git_branch,
     _get_unmerged_branches,
+    check_out_and_pull,
     display_branches,
+    get_current_git_branch,
 )
 from code_review.handlers import ch_dir
 from code_review.settings import CLI_CONSOLE

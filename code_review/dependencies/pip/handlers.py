@@ -68,7 +68,7 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[dict[str, s
             logger.error("Error: 'pur' command not found. Please ensure it is installed and in your PATH.")
             return []
         except subprocess.CalledProcessError as e:
-            logger.error(f"Error running 'pur' on file %s: Stdout: %s Stderr: %s", req_file, e.stdout, e.stderr)
+            logger.error("Error running 'pur' on file %s: Stdout: %s Stderr: %s", req_file, e.stdout, e.stderr)
             return []
         except Exception as e:
             logger.error("An unexpected error occurred: %s", e)

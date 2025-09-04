@@ -1,9 +1,10 @@
-from pprint import pprint
+from pathlib import Path
+from typing import Any
 
 import yaml
 
 
-def parse_yaml_file(file_path):
+def parse_yaml_file(file_path:Path) ->dict[str, Any] | None:
     """Parses a YAML file and returns a Python dictionary.
 
     Args:

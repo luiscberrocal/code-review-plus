@@ -1,11 +1,12 @@
 import json
 from ast import parse
+
 from ast2json import ast2json
 
 
 def test_ast_parsing(fixtures_folder):
     file = fixtures_folder / "condo_models.py"
-    with open(file, "r") as f:
+    with open(file) as f:
         content = f.read()
     tree = parse(content)
     ast_json = ast2json(tree)

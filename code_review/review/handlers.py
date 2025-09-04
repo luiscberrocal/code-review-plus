@@ -3,8 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 from code_review.review.schemas import CodeReviewSchema
-
-from code_review.settings import OUTPUT_FOLDER, CLI_CONSOLE
+from code_review.settings import CLI_CONSOLE
 
 
 def display_review(review: CodeReviewSchema):
