@@ -22,5 +22,3 @@ def parse_yaml_file(file_path):
     except yaml.YAMLError as exc:
         print(f"Error parsing YAML file: {exc}")
         return None
-
-

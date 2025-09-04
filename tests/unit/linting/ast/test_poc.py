@@ -14,4 +14,3 @@ def test_ast_parsing(fixtures_folder):
     json_file = fixtures_folder / "condo_models_ast.json"
     with open(json_file, "w") as f:
         json.dump(ast_json, f, indent=4, default=str)
-

@@ -75,7 +75,9 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[dict[str, s
             return []
 
     return updated_packages
-  # noqa: BLE001
+
+
+# noqa: BLE001
 
 # --- Example Usage ---
 

@@ -3,7 +3,9 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 class SemanticVersion(BaseModel):
     """Schema for semantic versioning."""

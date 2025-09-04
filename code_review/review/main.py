@@ -19,6 +19,7 @@ def review() -> None:
     """Tools for code review."""
     pass
 
+
 @review.command()
 @click.option("--folder", "-f", type=Path, help="Path to the git repository", default=None)
 def make(folder: Path) -> None:

@@ -256,7 +256,6 @@ def _get_unmerged_branches(base: str) -> list[BranchSchema]:
     # Process and display unmerged branches
     try:
         for line in result.stdout.strip().split("\n"):
-
             clean_line = line.strip()
             logger.debug("Clean line: %s", clean_line)
             if "->" in clean_line:
@@ -267,9 +266,7 @@ def _get_unmerged_branches(base: str) -> list[BranchSchema]:
             unmerged_branches.append(BranchSchema(**branch_dict))
     except ValueError as e:
         logger.error("Branch not found: %s", e)
-    sorted_branches = sorted(
-        unmerged_branches, reverse=True
-    )
+    sorted_branches = sorted(unmerged_branches, reverse=True)
     return sorted_branches
 
 
@@ -283,7 +280,7 @@ def branch_line_to_dict(branch_name: str) -> dict[str, Any]:
     logger.debug("Branch info: %s", branch_dict)
     return branch_dict
 
+
 def display_branches(branches: list[BranchSchema]) -> None:
     for i, branch in enumerate(branches, 1):
-
         CLI_CONSOLE.print(f" {i} [yellow]{branch.name}[/yellow] {branch.date}(by [blue]{branch.author}[/blue])")
