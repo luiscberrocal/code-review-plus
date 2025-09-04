@@ -2,6 +2,6 @@ import click
 
 
 @click.group()
-def cli():
+def cli() -> None:
     """A simple command-line tool for git operations."""
     pass

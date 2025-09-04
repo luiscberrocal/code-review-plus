@@ -1,10 +1,10 @@
-import subprocess
 import re
+import subprocess
 from pathlib import Path
 
+
 def count_ruff_issues(path: Path) -> int:
-    """
-    Runs `ruff check` on a specified path and returns the total number of issues found.
+    """Runs `ruff check` on a specified path and returns the total number of issues found.
 
     This function executes the `ruff check` command as a subprocess, captures its
     output, and then uses a regular expression to parse the summary line to
@@ -23,31 +23,32 @@ def count_ruff_issues(path: Path) -> int:
         # `text=True` decodes the output as text.
         # We specify the path as the argument for the ruff command.
         result = subprocess.run(
-            ['ruff', 'check', str(path)],
+            ["ruff", "check", path],
             capture_output=True,
             text=True,
-            check=True
+            check=False,
+            # check=True
         )
-
         # The last line of the `ruff check` output contains the summary, e.g.,
-        # "Found 12 issues."
-        last_line = result.stdout.strip().split('\n')[-1]
+
+        result_lines = result.stdout.strip().split("\n")
+        last_line = result_lines[-1]
+        if last_line.startswith("[*]"):
+            last_line = result_lines[-2]
 
         # Use a regular expression to find the number of issues.
         # The pattern looks for one or more digits (\d+) after "Found " and before " issue".
-        match = re.search(r"Found (\d+) issue", last_line)
+        match = re.search(r"Found (\d+) error[s]?", last_line)
 
         if match:
             # If a match is found, extract the number and convert it to an integer.
-            issue_count = int(match.group(1))
-            return issue_count
-        else:
-            # If the regex doesn't match, it likely means there are no issues.
-            # ruff outputs "Found 0 issues" or similar, but let's be safe and
-            # handle the case where it's a different summary message.
-            # In the absence of a clear number, assume 0 issues.
-            print("No issue count found in output. Assuming 0 issues.")
-            return 0
+            return int(match.group(1))
+        # If the regex doesn't match, it likely means there are no issues.
+        # ruff outputs "Found 0 issues" or similar, but let's be safe and
+        # handle the case where it's a different summary message.
+        # In the absence of a clear number, assume 0 issues.
+        print("No issue count found in output. Assuming 0 issues.")
+        return 0
 
     except FileNotFoundError:
         # This error occurs if the `ruff` command is not found in the system's PATH.
@@ -57,40 +58,45 @@ def count_ruff_issues(path: Path) -> int:
         # This error occurs if the subprocess command returns a non-zero exit code,
         # which can happen if `ruff check` fails for reasons other than finding issues
         # (e.g., invalid path).
-        print(f"Error running `ruff`: {e.stderr}")
+        print(f"Error running `ruff`: {e.stderr} {e}")
         return -1
     except Exception as e:
         # Catch any other unexpected errors.
         print(f"An unexpected error occurred: {e}")
         return -1
 
-if __name__ == "__main__":
-    # --- Example Usage ---
-    # To run this example, save the code as a Python file (e.g., `count_issues.py`)
-    # and then run it from your terminal: `python count_issues.py`
 
-    # Create a dummy file with a common ruff issue (unused import)
-    # The `with` statement ensures the file is properly closed.
-    dummy_file_path = Path("test_code.py")
-    with open(dummy_file_path, "w") as f:
-        f.write("import os\n\ndef my_func():\n    return 'hello world'\n")
+def _check_and_format_ruff(folder_path: Path) -> bool:
+    """Runs `ruff format` on a specified folder.
 
-    print(f"Checking for issues in '{dummy_file_path}'...")
+    First, it checks if any files need formatting without applying changes.
+    If changes are needed, it then runs `ruff format` to apply them.
 
-    # Call the function with the path to the dummy file.
-    issue_count = count_ruff_issues(dummy_file_path)
+    Args:
+        folder_path: The path to the folder to format.
 
-    if issue_count > -1:
-        print(f"Found {issue_count} issue(s).")
+    Returns:
+        True if any files were formatted, False otherwise.
+        Raises an exception if `ruff` is not found or other errors occur.
+    """
+    # Command to check for unformatted files without applying changes.
+    # The --check flag will cause a non-zero exit code if formatting is needed.
+    check_command: list[str] = ["ruff", "format", "--check", folder_path]
 
-    # Clean up the dummy file
-    dummy_file_path.unlink()
+    try:
+        # Use subprocess.run() to execute the command.
+        # `capture_output=True` captures stdout and stderr.
+        # `text=True` decodes output to strings.
+        # `check=False` is crucial here so we can handle the non-zero exit code manually.
+        check_result = subprocess.run(check_command, capture_output=True, text=True, check=False)
 
-    # Example for a directory (assuming you have some python files in it)
-    # The current directory '.' is a common test case.
-    current_directory = Path('.')
-    print(f"\nChecking for issues in the current directory '{current_directory}'...")
-    directory_issue_count = count_ruff_issues(current_directory)
+        # Check the return code. A non-zero code from `ruff format --check`
+        # indicates that there are unformatted files.
+        return check_result.returncode != 0
 
-    if directory_issue_count > -1:
-        print(f"Found {directory_issue_count} issue(s).")
+    except FileNotFoundError:
+        return False
+    except subprocess.CalledProcessError:
+        return False
+    except Exception:
+        return False

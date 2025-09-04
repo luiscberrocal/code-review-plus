@@ -1,3 +1,84 @@
+import logging.config
+from pathlib import Path
 
 from rich.console import Console
+
 CLI_CONSOLE = Console()
+
+CODE_REVIEW_FOLDER = Path(__file__).home() / "Documents" / "code_review"
+if not CODE_REVIEW_FOLDER.exists():
+    CODE_REVIEW_FOLDER.mkdir(parents=True, exist_ok=True)
+
+# Define log directory
+LOG_DIR = CODE_REVIEW_FOLDER / "logs"
+if not LOG_DIR.exists():
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+BASE_FOLDER = Path(__file__).parent.parent
+OUTPUT_FOLDER = BASE_FOLDER / "output"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {"format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"},
+        "detailed": {"format": "%(asctime)s [%(levelname)s] %(name)s:%(lineno)d: %(message)s"},
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "standard",
+            "stream": "ext://sys.stdout",
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "level": "DEBUG",
+            "formatter": "detailed",
+            "filename": str(LOG_DIR / "code_review.log"),
+            "mode": "a",
+        },
+    },
+    "loggers": {
+        "code_review": {
+            "level": "INFO",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        },
+        "code_review.review.main": {
+            "level": "DEBUG",
+            "handlers": [
+                "console",
+            ],
+            "propagate": False,
+        },
+        "code_review.schemas": {
+            "level": "DEBUG",
+            "handlers": [
+                "console",
+            ],
+            "propagate": False,
+        },
+        "code_review.dependencies.pip.handlers": {
+            "level": "DEBUG",
+            "handlers": [
+                "console",
+            ],
+            "propagate": False,
+        },
+        "code_review.git": {
+            "level": "INFO",
+            "handlers": [
+                "console",
+            ],
+            "propagate": False,
+        },
+    },
+    "root": {
+        "level": "INFO",
+        "handlers": ["console"],
+    },
+}
+
+# Configure logging when the module is imported
+logging.config.dictConfig(LOGGING)
