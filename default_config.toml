@@ -1,0 +1,2 @@
+[tool.cli_app]
+doc_folder = "~/Documents/my_custom_code_reviews"
