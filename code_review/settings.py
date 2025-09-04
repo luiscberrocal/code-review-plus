@@ -53,14 +53,14 @@ LOGGING = {
             "propagate": False,
         },
         "code_review.schemas": {
-            "level": "DEBUG",
+            "level": "INFO",
             "handlers": [
                 "console",
             ],
             "propagate": False,
         },
         "code_review.dependencies.pip.handlers": {
-            "level": "DEBUG",
+            "level": "INFO",
             "handlers": [
                 "console",
             ],

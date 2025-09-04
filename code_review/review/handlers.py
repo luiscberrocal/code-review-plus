@@ -14,13 +14,15 @@ def display_review(review: CodeReviewSchema):
         CLI_CONSOLE.print(f"[bold green]Branch {review.target_branch.name} is rebased on develop.[/bold green]")
     else:
         CLI_CONSOLE.print(f"[bold red]Branch {review.target_branch.name} is not rebased on develop![/bold red]")
-    if review.target_branch.linting_errors > review.base_branch.linting_errors:
-        CLI_CONSOLE.print(
-            f"[bold red]Linting Issues Increased![/bold red] base has "
-            f"{review.base_branch.linting_errors} while {review.target_branch.name} "
-            f"has {review.target_branch.linting_errors}"
-        )
-
+        
+    if  review.target_branch.linting_errors > review.base_branch.linting_errors:
+        CLI_CONSOLE.print(f"[bold red]Linting Issues Increased![/bold red] base has "
+                          f"{review.base_branch.linting_errors} while {review.target_branch.name} "
+                          f"has {review.target_branch.linting_errors}" )
+    else:
+        CLI_CONSOLE.print(f"[bold green]Linting Issues Decreased or Stayed the Same.[/bold green] base has "
+                          f"{review.base_branch.linting_errors} while {review.target_branch.name} "
+                          f"has {review.target_branch.linting_errors}" )
 
 def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:
     """Write the code review details to a JSON file."""
