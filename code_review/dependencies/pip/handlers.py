@@ -2,12 +2,13 @@ import logging
 import subprocess
 from pathlib import Path
 
+from code_review.dependencies.pip.schemas import RequirementInfo
 from code_review.settings import CLI_CONSOLE
 
 logger = logging.getLogger(__name__)
 
 
-def requirements_updated(folder: Path, level: str = "minor") -> list[dict[str, str]]:
+def requirements_updated(folder: Path, level: str = "minor") -> list[RequirementInfo]:
     """Updates minor version dependencies in requirement files within a specified folder
     and returns a list of updated packages.
 
@@ -63,19 +64,21 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[dict[str, s
             for line in splitlines:
                 if not line.startswith("==>") or not len(level_flag) == 0:
                     logger.debug("Pur output line: %s", line)
-                    updated_packages.append({"library": line.strip(), "file": req_file})
+                    updated_packages.append(RequirementInfo(line=line.strip(), file=req_file))
         except FileNotFoundError:
             logger.error("Error: 'pur' command not found. Please ensure it is installed and in your PATH.")
             return []
         except subprocess.CalledProcessError as e:
-            logger.error(f"Error running 'pur' on file %s: Stdout: %s Stderr: %s", req_file, e.stdout, e.stderr)
+            logger.error("Error running 'pur' on file %s: Stdout: %s Stderr: %s", req_file, e.stdout, e.stderr)
             return []
         except Exception as e:
             logger.error("An unexpected error occurred: %s", e)
             return []
 
     return updated_packages
-  # noqa: BLE001
+
+
+# noqa: BLE001
 
 # --- Example Usage ---
 

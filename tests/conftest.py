@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+
 @pytest.fixture
 def fixtures_folder() -> Path:
     """Return the path to the fixtures folder."""

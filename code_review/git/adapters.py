@@ -111,4 +111,3 @@ def is_rebased(target_branch: str, base_branch: str) -> bool:
     except FileNotFoundError:
         print("Error: 'git' command not found. Please ensure Git is installed and in your PATH.", file=sys.stderr)
         return False
-

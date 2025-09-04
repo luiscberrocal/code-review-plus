@@ -5,12 +5,11 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
-from model_utils.models import TimeStampedModel
-from slugify import slugify
-
 from happy_condo.condo_management.models import CondoManager
 from happy_condo.condos.managers import LivingUnitQuerySet
 from happy_condo.core.models import AuditableModel, Country
+from model_utils.models import TimeStampedModel
+from slugify import slugify
 
 User = get_user_model()
 

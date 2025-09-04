@@ -1,9 +1,11 @@
+import logging
 from datetime import datetime
 from pathlib import Path
 
 from pydantic import BaseModel, Field
-import logging
+
 logger = logging.getLogger(__name__)
+
 
 class SemanticVersion(BaseModel):
     """Schema for semantic versioning."""
@@ -13,7 +15,7 @@ class SemanticVersion(BaseModel):
     patch: int
     source: Path
 
-    def __str__(self):
+    def __str__(self): # noqa D105
         return f"{self.major}.{self.minor}.{self.patch}"
 
     @classmethod
@@ -26,7 +28,7 @@ class SemanticVersion(BaseModel):
             raise ValueError(f"Invalid version format: {version}")
         try:
             major, minor, patch = map(int, parts)
-        except ValueError as e:
+        except ValueError:
             major, minor, patch = 0, 0, 0
         return cls(major=major, minor=minor, patch=patch, source=file_path)
 
@@ -46,7 +48,7 @@ class BranchSchema(BaseModel):
         default_factory=list, description="List of last 5 semantic versions found in the changelog"
     )
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         if not isinstance(other, BranchSchema):
             return NotImplemented
 

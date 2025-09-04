@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 
 import click
@@ -11,13 +10,14 @@ from code_review.git.handlers import _get_unmerged_branches, display_branches
 from code_review.handlers import ch_dir
 from code_review.review.adapters import build_code_review_schema
 from code_review.review.handlers import display_review, write_review_to_file
-from code_review.settings import OUTPUT_FOLDER, CLI_CONSOLE
+from code_review.settings import CLI_CONSOLE, OUTPUT_FOLDER
 
 
 @cli.group()
 def review() -> None:
     """Tools for code review."""
     pass
+
 
 @review.command()
 @click.option("--folder", "-f", type=Path, help="Path to the git repository", default=None)

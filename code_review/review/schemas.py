@@ -19,4 +19,3 @@ class CodeReviewSchema(BaseModel):
     ticket: str | None = Field(default=None, description="Ticket associated with the code review")
     target_branch: BranchSchema
     base_branch: BranchSchema
-

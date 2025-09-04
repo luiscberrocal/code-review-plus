@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from pathlib import Path
 
@@ -10,7 +9,6 @@ from code_review.handlers import ch_dir
 from code_review.linting.ruff.handlers import count_ruff_issues
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
-from code_review.settings import OUTPUT_FOLDER
 
 
 def build_code_review_schema(folder: Path, target_branch_name: str):
@@ -51,16 +49,13 @@ def build_code_review_schema(folder: Path, target_branch_name: str):
     )
 
 
-
 def get_version_from_file(folder: Path) -> SemanticVersion | None:
     """Extract the version string from a given file."""
     setup_file = folder / "setup.cfg"
 
-
     setup_dict = setup_to_dict(setup_file)
     if setup_dict.get("bumpversion", {}).get("current_version"):
-        version_str =  setup_dict["bumpversion"]["current_version"]
+        version_str = setup_dict["bumpversion"]["current_version"]
         return SemanticVersion.parse_version(version_str, setup_file)
 
     return None
-
