@@ -32,7 +32,9 @@ def make(folder: Path) -> None:
     branch_num = click.prompt("Select a branch by number", type=int)
     selected_branch = unmerged_branches[branch_num - 1]
     click.echo(f"You selected branch: {selected_branch.name}")
+
     code_review_schema = build_code_review_schema(folder, selected_branch.name)
+
     ticket_number = parse_for_ticket(selected_branch.name)
 
     ticket = ticket_number or click.prompt("Select a ticket by number", type=str)
@@ -43,11 +45,6 @@ def make(folder: Path) -> None:
 
     display_review(code_review_schema)
 
-    updated = requirements_updated(folder)
-    if updated:
-        CLI_CONSOLE.print("[green]Updated packages:[/green]")
-        for pkg in updated:
-            CLI_CONSOLE.print(f"- {pkg['library']}: -> {pkg['file'].name}")
 
     new_file, backup_file = write_review_to_file(review=code_review_schema, folder=OUTPUT_FOLDER)
     CLI_CONSOLE.print("[bold blue]Code review written to:[/bold blue] " + str(new_file))

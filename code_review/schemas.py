@@ -4,6 +4,8 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from code_review.dependencies.pip.schemas import RequirementInfo
+
 logger = logging.getLogger(__name__)
 
 
@@ -47,6 +49,8 @@ class BranchSchema(BaseModel):
     changelog_versions: list[SemanticVersion] = Field(
         default_factory=list, description="List of last 5 semantic versions found in the changelog"
     )
+    requirements_to_update: list[RequirementInfo] = Field(default_factory=list,
+                                                          description="List of dependencies that can be updated")
 
     def __lt__(self, other) -> bool:
         if not isinstance(other, BranchSchema):
