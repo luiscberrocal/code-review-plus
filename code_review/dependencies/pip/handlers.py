@@ -62,9 +62,10 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[Requirement
             # Process the output line by line
             splitlines = result.stdout.splitlines()
             for line in splitlines:
-                if not line.startswith("==>") or not len(level_flag) == 0:
-                    logger.debug("Pur output line: %s", line)
-                    updated_packages.append(RequirementInfo(line=line.strip(), file=req_file))
+                if not line.startswith("==>"):
+                    if len(line.strip()) > 0:
+                        logger.debug("Pur output line: %s", line)
+                        updated_packages.append(RequirementInfo(line=line.strip(), file=req_file))
         except FileNotFoundError:
             logger.error("Error: 'pur' command not found. Please ensure it is installed and in your PATH.")
             return []
