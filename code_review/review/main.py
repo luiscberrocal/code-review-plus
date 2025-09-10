@@ -40,10 +40,13 @@ def make(folder: Path) -> None:
     ticket = ticket_number or click.prompt("Select a ticket by number", type=str)
 
     code_review_schema.ticket = ticket
+    base_branch_to_check = "develop"
+    if code_review_schema.target_branch.name.startswith("hotfix"):
+        base_branch_to_check = "master"
 
-    code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, "develop")
+    code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, base_branch_to_check)
 
-    display_review(code_review_schema)
+    display_review(code_review_schema, base_branch_name=base_branch_to_check)
 
 
     new_file, backup_file = write_review_to_file(review=code_review_schema, folder=OUTPUT_FOLDER)

@@ -6,14 +6,14 @@ from code_review.review.schemas import CodeReviewSchema
 from code_review.settings import CLI_CONSOLE
 
 
-def display_review(review: CodeReviewSchema):
+def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") -> None:
     """Display the details of a code review."""
     CLI_CONSOLE.print(f"[bold blue]Code Review for Project:[/bold blue] {review.name}")
     CLI_CONSOLE.print(f"[bold blue]Branch: {review.target_branch.name}[/bold blue]")
     if review.is_rebased:
-        CLI_CONSOLE.print(f"[bold green]Branch {review.target_branch.name} is rebased on develop.[/bold green]")
+        CLI_CONSOLE.print(f"[bold green]Branch {review.target_branch.name} is rebased on {base_branch_name}.[/bold green]")
     else:
-        CLI_CONSOLE.print(f"[bold red]Branch {review.target_branch.name} is not rebased on develop![/bold red]")
+        CLI_CONSOLE.print(f"[bold red]Branch {review.target_branch.name} is not rebased on {base_branch_name}![/bold red]")
         
     if  review.target_branch.linting_errors > review.base_branch.linting_errors:
         CLI_CONSOLE.print(f"[bold red]Linting Issues Increased![/bold red] base has "
