@@ -24,6 +24,14 @@ def display_review(review: CodeReviewSchema):
                           f"{review.base_branch.linting_errors} while {review.target_branch.name} "
                           f"has {review.target_branch.linting_errors}" )
 
+    requirements_pending_update_count = len(review.target_branch.requirements_to_update)
+    if requirements_pending_update_count > 0:
+        CLI_CONSOLE.print(f"[bold red]Dependencies to Update:[/bold red] "
+                          f"{requirements_pending_update_count} need updates.")
+    else:
+        CLI_CONSOLE.print(f"[bold green]No Dependencies to Update![/bold green]")
+
+
 def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:
     """Write the code review details to a JSON file."""
     file = folder / f"{review.ticket}-{review.name}_code_review.json"
