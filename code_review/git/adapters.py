@@ -1,5 +1,7 @@
 import logging
 import re
+import subprocess
+import sys
 from datetime import datetime
 
 from code_review.schemas import BranchSchema
@@ -15,7 +17,8 @@ def create_branch_schema(git_line: str) -> BranchSchema:
     regex_pattern = re.compile(
         r"^(?P<name>[\w\s.]+) "  # Match the name (one or more words and spaces, with periods)
         r"(?P<date>[A-Za-z]{3}\s+[A-Za-z]{3}\s+\d+\s+\d{2}:\d{2}:\d{2}\s+\d{4}\s+[-+]\d{4}) "  # Match the full date format
-        r"Merge\s+(?:branch|tag)\s+'?(?P<branch>[^']+)'?\s+into\s+'?(?P<target_branch>.*)'?$"  # Match 'Merge branch/tag 'branch' into 'target''
+        r"Merge\s+(?:branch|tag)\s+'?(?P<branch>[^']+)'?\s+into\s+'?(?P<target_branch>.*)'?$"
+        # Match 'Merge branch/tag 'branch' into 'target''
     )
     match = regex_pattern.match(git_line)
     if match:
@@ -28,7 +31,8 @@ def create_branch_schema(git_line: str) -> BranchSchema:
             # Use strptime to parse the date string based on the known format.
             parsed_date = datetime.strptime(date_string, "%a %b %d %H:%M:%S %Y %z")
         except ValueError as e:
-            print(f"Error parsing date string '{date_string}': {e}")
+            logger.error(f"Error parsing date string '%s': %s",
+                         date_string, e)
             parsed_date = None
         return BranchSchema(name=branch, author=name, date=parsed_date)
     raise ValueError(f"Invalid git line format: {git_line}")
@@ -60,12 +64,6 @@ def parse_git_date(date_str: str) -> datetime | None:
         # If parsing fails, print an error message and return None.
         logger.debug("Error parsing date string '%s': %s", date_str, e)
         return None
-
-
-#!/usr/bin/env python3
-
-import subprocess
-import sys
 
 
 def is_rebased(target_branch: str, base_branch: str) -> bool:
@@ -104,10 +102,9 @@ def is_rebased(target_branch: str, base_branch: str) -> bool:
 
     except subprocess.CalledProcessError as e:
         # Handle cases where a branch does not exist or git command fails.
-        print(f"Error executing git command: {e.cmd}", file=sys.stderr)
-        print(f"Stdout: {e.stdout}", file=sys.stderr)
-        print(f"Stderr: {e.stderr}", file=sys.stderr)
+        logger.error(f"Error executing git command: %s",
+                     e)
         return False
     except FileNotFoundError:
-        print("Error: 'git' command not found. Please ensure Git is installed and in your PATH.", file=sys.stderr)
+        logger.error("Error: 'git' command not found. Please ensure Git is installed and in your PATH.")
         return False
