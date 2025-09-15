@@ -40,6 +40,14 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
     else:
         CLI_CONSOLE.print("[bold green]No Dependencies to Update![/bold green]")
 
+    for dockerfile in review.docker_files or []:
+        if dockerfile.version != dockerfile.expected_version:
+            CLI_CONSOLE.print(
+                f"[bold red]Dockerfile {dockerfile.file} need to be updated {dockerfile.version} -> {dockerfile.expected_version}:[/bold red]"
+            )
+        else:
+            CLI_CONSOLE.print(f"[bold green]Dockerfile {dockerfile.file} has is up to date ![/bold green]")
+
 
 def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:
     """Write the code review details to a JSON file."""
