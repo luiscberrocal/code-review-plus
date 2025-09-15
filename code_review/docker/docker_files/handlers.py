@@ -1,4 +1,10 @@
+import logging
 import re
+from pathlib import Path
+
+from code_review.docker.schemas import DockerfileSchema
+
+logger = logging.getLogger(__name__)
 
 
 def get_versions_from_dockerfile(dockerfile_content: str) -> dict:
@@ -50,3 +56,25 @@ def get_versions_from_dockerfile(dockerfile_content: str) -> dict:
         versions["product"] = "node"
 
     return versions
+
+
+def parse_dockerfile(dockerfile_path: Path) -> DockerfileSchema | None:
+    """Reads a Dockerfile and extracts version information.
+
+    Args:
+        dockerfile_path (str): The file path to the Dockerfile.
+
+    Returns:
+        dict: A dictionary containing the extracted versions.
+    """
+    try:
+        content = dockerfile_path.read_text()
+        version_info = get_versions_from_dockerfile(content)
+        version_info["file"] = dockerfile_path
+        return DockerfileSchema(**version_info)
+    except FileNotFoundError:
+        logger.error("Dockerfile not found at path: %s", dockerfile_path)
+        return None
+    except Exception as e:
+        logger.error("An error occurred while reading the Dockerfile: %s", e)
+        return None
