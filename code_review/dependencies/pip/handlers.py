@@ -23,14 +23,7 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[Requirement
                      Defaults to "minor".
 
     Returns:
-        list[dict[str, str]]: A list of dictionaries, where each dictionary
-                              represents an updated package. Each dictionary
-                              has the following keys:
-                              - 'library': The name of the updated package.
-                              - 'old_version': The previous version.
-                              - 'new_version': The new updated version.
-                              Returns an empty list if no packages were updated or
-                              if the 'requirements' folder does not exist.
+        list[RequirementInfo]: A list of RequirementInfo 
     """  # noqa: D205
     updated_packages = []
     requirements_folder = folder / "requirements"
