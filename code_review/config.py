@@ -9,10 +9,15 @@ DEFAULT_CONFIG = {
     "doc_folder": Path.home() / "Documents" / "code_review_plus",
     "date_format": "%Y-%m-%d %H:%M:%S",
     "max_lines_to_display": 100,
+    "docker_images": {
+        "python": "3.12.11-slim-bookworm",
+        "node": "20.19.4-alpine3",
+        "postgres": "postgres:16.10-bookworm",
+    }
 }
 
 
-def get_config() -> Dict[str, Any]:
+def get_config() -> dict[str, Any]:
     """
     Reads the application's configuration from a TOML file.
 
@@ -57,14 +62,3 @@ def get_config() -> Dict[str, Any]:
     return config
 
 
-if __name__ == "__main__":
-    # Get the complete application configuration
-    settings = get_config()
-
-    print("Final configuration loaded:")
-    print(f"  - DOC_FOLDER: {settings['doc_folder']}")
-    print(f"  - DATE_FORMAT: {settings['date_format']}")
-    print(f"  - MAX_LINES_TO_DISPLAY: {settings['max_lines_to_display']}")
-
-    # Example: create the documentation directory if it doesn't exist
-    settings["doc_folder"].mkdir(parents=True, exist_ok=True)

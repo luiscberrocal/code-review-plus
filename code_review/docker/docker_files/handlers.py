@@ -1,6 +1,6 @@
 import re
 
-def get_versions_from_dockerfile(dockerfile_content):
+def get_versions_from_dockerfile(dockerfile_content: str) -> dict:
     """
     Parses a Dockerfile to extract Python, Postgres, and Node.js versions.
 
