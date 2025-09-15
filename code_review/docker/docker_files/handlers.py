@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 
 from code_review.docker.schemas import DockerfileSchema
+from code_review.settings import CURRENT_CONFIGURATION
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +72,11 @@ def parse_dockerfile(dockerfile_path: Path) -> DockerfileSchema | None:
         content = dockerfile_path.read_text()
         version_info = get_versions_from_dockerfile(content)
         version_info["file"] = dockerfile_path
+        images = CURRENT_CONFIGURATION.get("docker_images", {})
+        print(">>>>>>> Images", images)
+        print(">>>>>>> Version Info", version_info)
+
+        version_info["expected_version"] = images.get(version_info["product"], None)
         return DockerfileSchema(**version_info)
     except FileNotFoundError:
         logger.error("Dockerfile not found at path: %s", dockerfile_path)
