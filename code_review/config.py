@@ -6,7 +6,7 @@ from typing import Dict, Any
 # These values will be used if the TOML file is not found or
 # specific settings are missing.
 DEFAULT_CONFIG = {
-    "doc_folder": Path.home() / "Documents" / "code_review",
+    "doc_folder": Path.home() / "Documents" / "code_review_plus",
     "date_format": "%Y-%m-%d %H:%M:%S",
     "max_lines_to_display": 100,
 }
@@ -24,7 +24,7 @@ def get_config() -> Dict[str, Any]:
     Returns:
         dict: A dictionary containing the complete application configuration.
     """
-    config_dir = Path.home() / ".config" / "my_cli_app"
+    config_dir = Path.home() / ".config" / "code_review_plus"
     config_file = config_dir / "config.toml"
 
     # Use a copy of the defaults to avoid modifying the original dictionary.
