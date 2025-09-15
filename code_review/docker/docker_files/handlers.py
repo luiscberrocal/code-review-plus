@@ -1,38 +1,52 @@
 import re
 
 
-def get_python_version_from_dockerfile(dockerfile_content:str) -> str | None:
-    """Parses a Dockerfile to extract the Python version.
+def get_versions_from_dockerfile(dockerfile_content):
+    """
+    Parses a Dockerfile to extract a Python and Postgres version.
 
     Args:
         dockerfile_content (str): The content of the Dockerfile as a string.
 
     Returns:
-        str or None: The Python version string if found, otherwise None.
+        dict: A dictionary containing the extracted versions.
+              Keys are 'python_version' and 'postgres_version'.
+              Values are the version strings or None if not found.
     """
-    # Regex to find ARG statements that define PYTHON_VERSION
-    arg_pattern = re.compile(r"ARG\s+PYTHON_VERSION=([\d.]+[\w-]*)")
+    versions = {
+        "python_version": None,
+        "postgres_version": None,
+    }
 
-    # Regex to find the FROM statement that uses PYTHON_VERSION
-    from_pattern = re.compile(r"FROM.*python:\$\{{0,1}PYTHON_VERSION\}{0,1}")
+    # Regex to find ARG statements for PYTHON_VERSION
+    python_arg_pattern = re.compile(r"ARG\s+PYTHON_VERSION=([\d.]+[\w-]*)")
 
-    # Check for the ARG PYTHON_VERSION first
-    match_arg = arg_pattern.search(dockerfile_content)
-    if match_arg:
-        return match_arg.group(1)
+    # Regex to find FROM statements for python with a specific version.
+    # This acts as a fallback if no ARG is found.
+    python_from_pattern = re.compile(r"FROM.*python:([\d.]+[\w-]*)")
 
-    # If ARG is not found, check for a direct FROM statement with a version
-    # This is a fallback for cases where the version isn't in an ARG.
-    # This is a more general pattern, but the ARG is more specific and reliable
-    # for the user's example.
-    from_with_version_pattern = re.compile(r"FROM.*python:([\d.]+[\w-]*)")
-    match_from = from_with_version_pattern.search(dockerfile_content)
-    if match_from:
-        # We need to make sure this isn't the FROM statement using the variable
-        if not from_pattern.search(dockerfile_content):
-            return match_from.group(1)
+    # Regex to find FROM statements for postgres with a specific version.
+    # We look for `postgres:` followed by the version string.
+    postgres_from_pattern = re.compile(r"FROM.*postgres:([\d.]+[\w-]*)")
 
-    return None
+    # Search for Python version using ARG first
+    match_python_arg = python_arg_pattern.search(dockerfile_content)
+    if match_python_arg:
+        versions["python_version"] = match_python_arg.group(1)
+    else:
+        # Fallback to checking the FROM statement directly
+        match_python_from = python_from_pattern.search(dockerfile_content)
+        if match_python_from:
+            # Ensure it's not a FROM statement using a variable, like python:${PYTHON_VERSION}
+            if not re.search(r"FROM.*python:\$\{{0,1}PYTHON_VERSION\}{0,1}", dockerfile_content):
+                versions["python_version"] = match_python_from.group(1)
+
+    # Search for Postgres version
+    match_postgres_from = postgres_from_pattern.search(dockerfile_content)
+    if match_postgres_from:
+        versions["postgres_version"] = match_postgres_from.group(1)
+
+    return versions
 
 
 
