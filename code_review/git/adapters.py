@@ -1,7 +1,6 @@
 import logging
 import re
 import subprocess
-import sys
 from datetime import datetime
 
 from code_review.schemas import BranchSchema
@@ -31,8 +30,7 @@ def create_branch_schema(git_line: str) -> BranchSchema:
             # Use strptime to parse the date string based on the known format.
             parsed_date = datetime.strptime(date_string, "%a %b %d %H:%M:%S %Y %z")
         except ValueError as e:
-            logger.error(f"Error parsing date string '%s': %s",
-                         date_string, e)
+            logger.error("Error parsing date string '%s': %s", date_string, e)
             parsed_date = None
         return BranchSchema(name=branch, author=name, date=parsed_date)
     raise ValueError(f"Invalid git line format: {git_line}")
@@ -102,8 +100,7 @@ def is_rebased(target_branch: str, base_branch: str) -> bool:
 
     except subprocess.CalledProcessError as e:
         # Handle cases where a branch does not exist or git command fails.
-        logger.error(f"Error executing git command: %s",
-                     e)
+        logger.error("Error executing git command: %s", e)
         return False
     except FileNotFoundError:
         logger.error("Error: 'git' command not found. Please ensure Git is installed and in your PATH.")

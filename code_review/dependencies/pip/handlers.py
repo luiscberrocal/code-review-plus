@@ -23,7 +23,7 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[Requirement
                      Defaults to "minor".
 
     Returns:
-        list[RequirementInfo]: A list of RequirementInfo 
+        list[RequirementInfo]: A list of RequirementInfo
     """  # noqa: D205
     updated_packages = []
     requirements_folder = folder / "requirements"
@@ -56,7 +56,7 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[Requirement
             splitlines = result.stdout.splitlines()
             for line in splitlines:
                 if not line.startswith("==>"):
-                    if 0 < len(line.strip()):
+                    if len(line.strip()) > 0:
                         logger.debug("Pur output line: %s", line)
 
                         requirement_info = RequirementInfo(line=line.strip(), file=req_file)

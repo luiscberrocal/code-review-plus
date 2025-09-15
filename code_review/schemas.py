@@ -17,7 +17,7 @@ class SemanticVersion(BaseModel):
     patch: int
     source: Path
 
-    def __str__(self): # noqa D105
+    def __str__(self):  # noqa D105
         return f"{self.major}.{self.minor}.{self.patch}"
 
     @classmethod
@@ -49,8 +49,9 @@ class BranchSchema(BaseModel):
     changelog_versions: list[SemanticVersion] = Field(
         default_factory=list, description="List of last 5 semantic versions found in the changelog"
     )
-    requirements_to_update: list[RequirementInfo] = Field(default_factory=list,
-                                                          description="List of dependencies that can be updated")
+    requirements_to_update: list[RequirementInfo] = Field(
+        default_factory=list, description="List of dependencies that can be updated"
+    )
 
     def __lt__(self, other) -> bool:
         if not isinstance(other, BranchSchema):

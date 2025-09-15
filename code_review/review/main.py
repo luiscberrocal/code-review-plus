@@ -4,7 +4,6 @@ import click
 
 from code_review.adapters.generics import parse_for_ticket
 from code_review.cli import cli
-from code_review.dependencies.pip.handlers import requirements_updated
 from code_review.git.adapters import is_rebased
 from code_review.git.handlers import _get_unmerged_branches, display_branches
 from code_review.handlers import ch_dir
@@ -47,7 +46,6 @@ def make(folder: Path) -> None:
     code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, base_branch_to_check)
 
     display_review(code_review_schema, base_branch_name=base_branch_to_check)
-
 
     new_file, backup_file = write_review_to_file(review=code_review_schema, folder=OUTPUT_FOLDER)
     CLI_CONSOLE.print("[bold blue]Code review written to:[/bold blue] " + str(new_file))

@@ -1,6 +1,7 @@
-import tomllib
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any
+
+import tomllib
 
 # Define a dictionary of default configuration settings.
 # These values will be used if the TOML file is not found or
@@ -13,13 +14,12 @@ DEFAULT_CONFIG = {
         "python": "3.12.11-slim-bookworm",
         "node": "20.19.4-alpine3",
         "postgres": "postgres:16.10-bookworm",
-    }
+    },
 }
 
 
 def get_config() -> dict[str, Any]:
-    """
-    Reads the application's configuration from a TOML file.
+    """Reads the application's configuration from a TOML file.
 
     The function looks for a 'config.toml' file in the user's
     recommended configuration directory (~/.config/my_cli_app).
@@ -60,5 +60,3 @@ def get_config() -> dict[str, Any]:
         print(f"An unexpected error occurred while reading the config: {e}. Using default settings.")
 
     return config
-
-
