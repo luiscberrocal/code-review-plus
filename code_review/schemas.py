@@ -21,13 +21,17 @@ class SemanticVersion(BaseModel):
         return f"{self.major}.{self.minor}.{self.patch}"
 
     @classmethod
-    def parse_version(cls, version: str, file_path: Path) -> "SemanticVersion":
+    def parse_version(cls, version: str, file_path: Path, raise_error:bool=False) -> "SemanticVersion":
         """Parse a version string into a SemanticVersion object."""
         logger.debug("Parsing version '%s' from file '%s'", version, file_path)
         parts = version.split(".")
 
         if len(parts) != 3:
-            raise ValueError(f"Invalid version format: {version}")
+            logger.error("Invalid version '%s'", version)
+            if raise_error:
+                raise ValueError(f"Invalid version format: {version}")
+            major, minor, patch = 0, 0, 0
+            return cls(major=major, minor=minor, patch=patch, source=file_path)
         try:
             major, minor, patch = map(int, parts)
         except ValueError:
