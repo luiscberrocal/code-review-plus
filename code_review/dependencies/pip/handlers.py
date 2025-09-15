@@ -30,7 +30,8 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[Requirement
 
     # Check if the requirements folder exists
     if not requirements_folder.is_dir():
-        raise FileNotFoundError(f"Could not find '{requirements_folder}'")
+        logger.error("Could not find requirements folder at %s", requirements_folder)
+        return updated_packages
 
     # Iterate over all .txt files in the requirements directory
     for req_file in requirements_folder.glob("*.txt"):
