@@ -43,10 +43,12 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
     for dockerfile in review.docker_files or []:
         if dockerfile.version != dockerfile.expected_version:
             CLI_CONSOLE.print(
-                f"[bold red]Dockerfile {dockerfile.file} need to be updated {dockerfile.version} -> {dockerfile.expected_version}:[/bold red]"
+                f"[bold red]Dockerfile {dockerfile.file.relative_to(review.source_folder)} need to be "
+                f"updated {dockerfile.version} -> {dockerfile.expected_version}:[/bold red]"
             )
         else:
-            CLI_CONSOLE.print(f"[bold green]Dockerfile {dockerfile.file} has is up to date ![/bold green]")
+            CLI_CONSOLE.print(f"[bold green]Dockerfile {dockerfile.file.relative_to(review.source_folder)} has "
+                              f"is up to date ![/bold green]")
 
 
 def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:
