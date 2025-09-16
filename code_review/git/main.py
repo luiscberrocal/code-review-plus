@@ -182,10 +182,7 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
 
         # Change to the specified directory if provided
         ch_dir(folder)
-        try:
-            subprocess.run(["git", "fetch"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except subprocess.CalledProcessError:
-            raise SimpleGitToolError(f"Base branch '{base}' does not exist")
+        refresh_from_remote("origin")
         # Check if the base branch exists
         try:
             subprocess.run(
@@ -253,3 +250,5 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
         # Change back to the original directory if we changed it
         if folder:
             os.chdir(original_dir)
+
+

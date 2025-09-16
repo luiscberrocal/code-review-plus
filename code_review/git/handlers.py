@@ -245,6 +245,9 @@ def _get_merged_branches(base: str) -> list:
 
 def _get_unmerged_branches(base: str, author_pattern:str = None) -> list[BranchSchema]:
     unmerged_branches = []
+
+    refresh_from_remote("origin")
+
     command_list = ["git", "branch", "-r", "--no-merged", base]
     logger.debug("Running command: %s", " ".join(command_list))
     result = subprocess.run(
@@ -290,3 +293,9 @@ def branch_line_to_dict(branch_name: str) -> dict[str, Any]:
 def display_branches(branches: list[BranchSchema]) -> None:
     for i, branch in enumerate(branches, 1):
         CLI_CONSOLE.print(f" {i} [yellow]{branch.name}[/yellow] {branch.date}(by [blue]{branch.author}[/blue])")
+
+def refresh_from_remote(source: str) -> None:
+    try:
+        subprocess.run(["git", "fetch", source], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except subprocess.CalledProcessError:
+        raise SimpleGitToolError(f"Could not refresh from remote '{source}'")
