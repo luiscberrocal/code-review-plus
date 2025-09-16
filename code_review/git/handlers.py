@@ -2,6 +2,7 @@ import json
 import logging
 import re
 import subprocess
+from re import search
 from typing import Any
 
 from code_review.exceptions import SimpleGitToolError
@@ -242,7 +243,7 @@ def _get_merged_branches(base: str) -> list:
     return merged_branches
 
 
-def _get_unmerged_branches(base: str) -> list[BranchSchema]:
+def _get_unmerged_branches(base: str, author_pattern:str = None) -> list[BranchSchema]:
     unmerged_branches = []
     command_list = ["git", "branch", "-r", "--no-merged", base]
     logger.debug("Running command: %s", " ".join(command_list))
@@ -263,7 +264,12 @@ def _get_unmerged_branches(base: str) -> list[BranchSchema]:
                 continue
             branch_dict = branch_line_to_dict(clean_line)
 
-            unmerged_branches.append(BranchSchema(**branch_dict))
+            branch_schema = BranchSchema(**branch_dict)
+            if author_pattern:
+                if author_pattern.lower() in branch_schema.author.lower():
+                    unmerged_branches.append(branch_schema)
+            else:
+                unmerged_branches.append(branch_schema)
     except ValueError as e:
         logger.error("Branch not found: %s", e)
     sorted_branches = sorted(unmerged_branches, reverse=True)
