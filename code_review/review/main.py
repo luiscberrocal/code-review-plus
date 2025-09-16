@@ -20,10 +20,11 @@ def review() -> None:
 
 @review.command()
 @click.option("--folder", "-f", type=Path, help="Path to the git repository", default=None)
-def make(folder: Path) -> None:
+@click.option("--author", "-a", type=str, help="Name of the author", default=None)
+def make(folder: Path, author:str) -> None:
     """List branches in the specified Git repository."""
     ch_dir(folder)
-    unmerged_branches = _get_unmerged_branches("master")
+    unmerged_branches = _get_unmerged_branches("master", author_pattern=author)
     if not unmerged_branches:
         click.echo("No unmerged branches found.")
         return
