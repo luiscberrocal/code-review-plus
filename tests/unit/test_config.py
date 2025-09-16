@@ -1,9 +1,6 @@
 import pytest
-import toml
-import tomllib
-from pathlib import Path
-from datetime import datetime
-from code_review.config import TomlConfigManager, DEFAULT_CONFIG
+
+from code_review.config import DEFAULT_CONFIG, TomlConfigManager
 
 
 class TestTomlConfigManager:
@@ -23,14 +20,10 @@ class TestTomlConfigManager:
     def test_init_with_custom_config(self, tmp_path):
         """Test initialization with custom configuration."""
         custom_config = {"test_key": "test_value"}
-        manager = TomlConfigManager(
-            config_dir=tmp_path,
-            config_file_name="custom.toml",
-            default_config=custom_config
-        )
+        manager = TomlConfigManager(config_dir=tmp_path, config_file_name="custom.toml", default_config=custom_config)
 
     def test_save_and_load_config(self, config_manager, tmp_path):
         """Test saving and loading configuration."""
-        config_manager.save_config()# Create a sample config file
+        config_manager.save_config()  # Create a sample config file
         print("Configuration file saved.", config_manager.config_file)
         assert config_manager.config_file.exists()
