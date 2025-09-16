@@ -1,7 +1,8 @@
 import re
 import subprocess
 from pathlib import Path
-
+import logging
+logger = logging.getLogger(__name__)
 
 def count_ruff_issues(path: Path) -> int:
     """Runs `ruff check` on a specified path and returns the total number of issues found.
@@ -47,22 +48,22 @@ def count_ruff_issues(path: Path) -> int:
         # ruff outputs "Found 0 issues" or similar, but let's be safe and
         # handle the case where it's a different summary message.
         # In the absence of a clear number, assume 0 issues.
-        print("No issue count found in output. Assuming 0 issues.")
+        logger.debug("No issue count found in output. Assuming 0 issues.")
         return 0
 
     except FileNotFoundError:
         # This error occurs if the `ruff` command is not found in the system's PATH.
-        print("Error: `ruff` command not found. Please ensure it is installed and in your PATH.")
+        logger.error("Error: `ruff` command not found. Please ensure it is installed and in your PATH.")
         return -1
     except subprocess.CalledProcessError as e:
         # This error occurs if the subprocess command returns a non-zero exit code,
         # which can happen if `ruff check` fails for reasons other than finding issues
         # (e.g., invalid path).
-        print(f"Error running `ruff`: {e.stderr} {e}")
+        logger.error("Error running `ruff`: %s %s", e.stderr, e)
         return -1
     except Exception as e:
         # Catch any other unexpected errors.
-        print(f"An unexpected error occurred: {e}")
+        logger.error(f"An unexpected error occurred: %s", e)
         return -1
 
 

@@ -73,8 +73,6 @@ def parse_dockerfile(dockerfile_path: Path) -> DockerfileSchema | None:
         version_info = get_versions_from_dockerfile(content)
         version_info["file"] = dockerfile_path
         images = CURRENT_CONFIGURATION.get("docker_images", {})
-        print(">>>>>>> Images", images)
-        print(">>>>>>> Version Info", version_info)
 
         version_info["expected_version"] = images.get(version_info["product"], None)
         return DockerfileSchema(**version_info)

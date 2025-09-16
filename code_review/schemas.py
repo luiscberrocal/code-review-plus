@@ -56,6 +56,9 @@ class BranchSchema(BaseModel):
     requirements_to_update: list[RequirementInfo] = Field(
         default_factory=list, description="List of dependencies that can be updated"
     )
+    formatting_errors: int = Field(
+        default=-1, description="Number of formatting errors found by black. -1 means not checked"
+    )
 
     def __lt__(self, other) -> bool:
         if not isinstance(other, BranchSchema):
