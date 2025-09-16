@@ -6,7 +6,7 @@ from code_review.adapters.generics import parse_for_ticket
 from code_review.cli import cli
 from code_review.git.adapters import is_rebased
 from code_review.git.handlers import _get_unmerged_branches, display_branches
-from code_review.handlers import ch_dir
+from code_review.handlers.file_handlers import ch_dir
 from code_review.review.adapters import build_code_review_schema
 from code_review.review.handlers import display_review, write_review_to_file
 from code_review.settings import CLI_CONSOLE, OUTPUT_FOLDER

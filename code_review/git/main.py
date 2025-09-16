@@ -19,7 +19,7 @@ from code_review.git.handlers import (
     display_branches,
     get_current_git_branch,
 )
-from code_review.handlers import ch_dir
+from code_review.handlers.file_handlers import ch_dir
 from code_review.settings import CLI_CONSOLE
 
 logger = logging.getLogger(__name__)
