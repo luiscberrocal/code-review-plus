@@ -1,0 +1,9 @@
+[tool.cli_app]
+doc_folder = "PosixPath('/home/luiscberrocal/Documents/code_review_plus')"
+date_format = "%Y-%m-%d %H:%M:%S"
+max_lines_to_display = 100
+
+[tool.cli_app.docker_images]
+python = "3.12.11-slim-bookworm"
+node = "20.19.4-alpine3"
+postgres = "postgres:16.10-bookworm"
