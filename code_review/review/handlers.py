@@ -25,6 +25,12 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
             f"{review.base_branch.linting_errors} while {review.target_branch.name} "
             f"has {review.target_branch.linting_errors}"
         )
+    elif review.target_branch.linting_errors == review.base_branch.linting_errors and review.target_branch.linting_errors != 0:
+        CLI_CONSOLE.print(
+            f"[bold yellow]Linting Issues Stayed the Same![/bold yellow] base has "
+            f"{review.base_branch.linting_errors} while {review.target_branch.name} "
+            f"has {review.target_branch.linting_errors}"
+        )
     else:
         CLI_CONSOLE.print(
             f"[bold green]Linting Issues Decreased or Stayed the Same.[/bold green] base has "
@@ -49,6 +55,13 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
         else:
             CLI_CONSOLE.print(f"[bold green]Dockerfile {dockerfile.file.relative_to(review.source_folder)} has "
                               f"is up to date ![/bold green]")
+
+    if review.target_branch.formatting_errors != 0:
+        CLI_CONSOLE.print(
+            f"[bold red]Code Formatting Issues Detected![/bold red] {review.target_branch.formatting_errors} files need formatting."
+        )
+    else:
+        CLI_CONSOLE.print("[bold green]All Files Properly Formatted![/bold green]")
 
 
 def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:

@@ -8,7 +8,7 @@ from code_review.dependencies.pip.handlers import requirements_updated
 from code_review.docker.docker_files.handlers import parse_dockerfile
 from code_review.git.handlers import branch_line_to_dict, check_out_and_pull, get_branch_info
 from code_review.handlers.file_handlers import ch_dir, get_not_ignored
-from code_review.linting.ruff.handlers import count_ruff_issues
+from code_review.linting.ruff.handlers import count_ruff_issues, _check_and_format_ruff
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
 
@@ -42,14 +42,16 @@ def build_code_review_schema(folder: Path, target_branch_name: str):
     target_branch.changelog_versions = parse_changelog(folder / "CHANGELOG.md")
     target_branch.requirements_to_update = requirements_updated(folder)
 
+    target_branch.formatting_errors = _check_and_format_ruff(folder)
+
     # Dockerfiles
-    docker_files = (
-        get_not_ignored(folder, "Dockerfile"))
+    docker_files =  get_not_ignored(folder, "Dockerfile")
     docker_info_list = []
     for file in docker_files:
         docker_info  = parse_dockerfile(file)
         if docker_info:
             docker_info_list.append(docker_info)
+
 
     return CodeReviewSchema(
         name=folder.name,
