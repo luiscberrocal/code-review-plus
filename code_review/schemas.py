@@ -4,6 +4,8 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from code_review.dependencies.pip.schemas import RequirementInfo
+
 logger = logging.getLogger(__name__)
 
 
@@ -15,17 +17,21 @@ class SemanticVersion(BaseModel):
     patch: int
     source: Path
 
-    def __str__(self): # noqa D105
+    def __str__(self):  # noqa D105
         return f"{self.major}.{self.minor}.{self.patch}"
 
     @classmethod
-    def parse_version(cls, version: str, file_path: Path) -> "SemanticVersion":
+    def parse_version(cls, version: str, file_path: Path, raise_error:bool=False) -> "SemanticVersion":
         """Parse a version string into a SemanticVersion object."""
         logger.debug("Parsing version '%s' from file '%s'", version, file_path)
         parts = version.split(".")
 
         if len(parts) != 3:
-            raise ValueError(f"Invalid version format: {version}")
+            logger.error("Invalid version '%s'", version)
+            if raise_error:
+                raise ValueError(f"Invalid version format: {version}")
+            major, minor, patch = 0, 0, 0
+            return cls(major=major, minor=minor, patch=patch, source=file_path)
         try:
             major, minor, patch = map(int, parts)
         except ValueError:
@@ -46,6 +52,12 @@ class BranchSchema(BaseModel):
     version: SemanticVersion | None = Field(default=None, description="Semantic version from the version file")
     changelog_versions: list[SemanticVersion] = Field(
         default_factory=list, description="List of last 5 semantic versions found in the changelog"
+    )
+    requirements_to_update: list[RequirementInfo] = Field(
+        default_factory=list, description="List of dependencies that can be updated"
+    )
+    formatting_errors: int = Field(
+        default=-1, description="Number of formatting errors found by black. -1 means not checked"
     )
 
     def __lt__(self, other) -> bool:

@@ -23,21 +23,15 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[Requirement
                      Defaults to "minor".
 
     Returns:
-        list[dict[str, str]]: A list of dictionaries, where each dictionary
-                              represents an updated package. Each dictionary
-                              has the following keys:
-                              - 'library': The name of the updated package.
-                              - 'old_version': The previous version.
-                              - 'new_version': The new updated version.
-                              Returns an empty list if no packages were updated or
-                              if the 'requirements' folder does not exist.
+        list[RequirementInfo]: A list of RequirementInfo
     """  # noqa: D205
     updated_packages = []
     requirements_folder = folder / "requirements"
 
     # Check if the requirements folder exists
     if not requirements_folder.is_dir():
-        raise FileNotFoundError(f"Could not find '{requirements_folder}'")
+        logger.error("Could not find requirements folder at %s", requirements_folder)
+        return updated_packages
 
     # Iterate over all .txt files in the requirements directory
     for req_file in requirements_folder.glob("*.txt"):
@@ -62,9 +56,13 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[Requirement
             # Process the output line by line
             splitlines = result.stdout.splitlines()
             for line in splitlines:
-                if not line.startswith("==>") or not len(level_flag) == 0:
-                    logger.debug("Pur output line: %s", line)
-                    updated_packages.append(RequirementInfo(line=line.strip(), file=req_file))
+                if not line.startswith("==>"):
+                    if len(line.strip()) > 0:
+                        logger.debug("Pur output line: %s", line)
+
+                        requirement_info = RequirementInfo(line=line.strip(), file=req_file)
+                        if requirement_info not in updated_packages:
+                            updated_packages.append(requirement_info)
         except FileNotFoundError:
             logger.error("Error: 'pur' command not found. Please ensure it is installed and in your PATH.")
             return []

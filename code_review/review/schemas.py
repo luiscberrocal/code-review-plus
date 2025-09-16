@@ -3,6 +3,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from code_review.docker.schemas import DockerfileSchema
 from code_review.schemas import BranchSchema
 
 
@@ -19,3 +20,6 @@ class CodeReviewSchema(BaseModel):
     ticket: str | None = Field(default=None, description="Ticket associated with the code review")
     target_branch: BranchSchema
     base_branch: BranchSchema
+    docker_files: list[DockerfileSchema] | None = Field(
+        default_factory=list, description="List of Dockerfiles found in the project"
+    )

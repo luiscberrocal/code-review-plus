@@ -1,0 +1,14 @@
+# PRECAUTION: avoid production dependencies that aren't in development
+
+-r base.txt
+
+gunicorn==23.0.0  # https://github.com/benoitc/gunicorn
+psycopg[c, pool]==3.2.9  # https://github.com/psycopg/psycopg
+sentry-sdk==2.35.2  # https://github.com/getsentry/sentry-python
+
+# Django
+# ------------------------------------------------------------------------------
+django-storages[boto3]==1.14.6  # https://github.com/jschneier/django-storages
+django-anymail[mailgun]==13.0.1  # https://github.com/anymail/django-anymail
+
+watchtower==3.4.0  # Send logs to AWS CloudWatch

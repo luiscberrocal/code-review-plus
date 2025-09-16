@@ -3,9 +3,9 @@ from pathlib import Path
 
 import requests
 
-from code_review.docker_hub.filters.exclusions import exclude_by_content
-from code_review.docker_hub.filters.inclusions import include_by_regex
-from code_review.docker_hub.schemas import ImageTag
+from code_review.docker.docker_hub.filters.exclusions import exclude_by_content
+from code_review.docker.docker_hub.filters.inclusions import include_by_regex
+from code_review.docker.docker_hub.schemas import ImageTag
 
 
 def get_image_versions(image_name: str, cache_folder: Path, ignore_cache: bool = False) -> list[ImageTag]:

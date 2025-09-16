@@ -3,6 +3,8 @@ from pathlib import Path
 
 from rich.console import Console
 
+from code_review.config import get_config
+
 CLI_CONSOLE = Console()
 
 CODE_REVIEW_FOLDER = Path(__file__).home() / "Documents" / "code_review"
@@ -82,3 +84,5 @@ LOGGING = {
 
 # Configure logging when the module is imported
 logging.config.dictConfig(LOGGING)
+
+CURRENT_CONFIGURATION = get_config()
