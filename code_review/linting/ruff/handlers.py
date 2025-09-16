@@ -67,7 +67,7 @@ def count_ruff_issues(path: Path) -> int:
         return -1
 
 
-def _check_and_format_ruff(folder_path: Path) -> bool:
+def _check_and_format_ruff(folder_path: Path) -> int:
     """Runs `ruff format` on a specified folder.
 
     First, it checks if any files need formatting without applying changes.
@@ -93,11 +93,24 @@ def _check_and_format_ruff(folder_path: Path) -> bool:
 
         # Check the return code. A non-zero code from `ruff format --check`
         # indicates that there are unformatted files.
-        return check_result.returncode != 0
+        if check_result.returncode == 0:
+            # No files need formatting.
+            return 0
+        else:
+            lines = check_result.stdout.splitlines()
+            reformat_count = 0
+            for line in lines:
+                if "Would reformat" in line:
+                    logger.debug("Ruff needs to format file: %s", line)
+                    reformat_count += 1
+            return reformat_count
 
     except FileNotFoundError:
+        logger.error("Error: `ruff` command not found. Please ensure it is installed and in your PATH.")
         return False
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        logger.error("Error running `ruff format --check` on folder %s. Error: %s", folder_path, e)
         return False
-    except Exception:
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: %s", e)
         return False
