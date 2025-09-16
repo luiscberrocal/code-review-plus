@@ -41,7 +41,7 @@ class TestGetNotIgnored:
         Test case where a specific file is ignored by .gitignore.
         """
         # Create the .gitignore file
-        (tmp_path / ".gitignore").write_text("app/Dockerfile")
+        (tmp_path / ".gitignore").write_text("app/")
 
         # Create the files
         (tmp_path / "app").mkdir()
