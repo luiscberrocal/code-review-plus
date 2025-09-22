@@ -3,7 +3,8 @@ from pathlib import Path
 
 from code_review.schemas import SemanticVersion
 from code_review.settings import OUTPUT_FOLDER
-
+import logging
+logger = logging.getLogger(__name__)
 
 def parse_changelog(changelog_file: Path, min_count: int = 2) -> list[SemanticVersion]:
     """Parses a markdown changelog and returns a list of dictionaries
@@ -18,6 +19,10 @@ def parse_changelog(changelog_file: Path, min_count: int = 2) -> list[SemanticVe
     """
     # Regex to find lines like "## [11.4.0] - 2025-08-28"
     # It captures the version string inside the brackets and the date
+    if not changelog_file.exists():
+        logger.error("File %s does not exist", changelog_file)
+        return []
+
     with open(changelog_file, encoding="utf-8") as f:
         changelog_content = f.read()
 
