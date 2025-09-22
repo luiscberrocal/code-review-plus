@@ -38,6 +38,16 @@ class SemanticVersion(BaseModel):
             major, minor, patch = 0, 0, 0
         return cls(major=major, minor=minor, patch=patch, source=file_path)
 
+    def __lt__(self, other):
+        if not isinstance(other, SemanticVersion):
+            return NotImplemented
+
+        if self.major != other.major:
+            return self.major < other.major
+        if self.minor != other.minor:
+            return self.minor < other.minor
+        return self.patch < other.patch
+
 
 class BranchSchema(BaseModel):
     """Schema for branch information."""
