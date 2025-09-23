@@ -5,6 +5,9 @@ from pathlib import Path
 from code_review.review.schemas import CodeReviewSchema
 from code_review.settings import CLI_CONSOLE
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") -> None:
     """Display the details of a code review."""
@@ -63,12 +66,20 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
     else:
         CLI_CONSOLE.print("[bold green]All Files Properly Formatted![/bold green]")
 
-    if review.target_branch.version < review.base_branch.changelog_versions[0]:
+
+    logger.info("Review Details: %s", review.target_branch.changelog_versions)
+    logger.info("Review version: %s", review.target_branch.version)
+
+    if len(review.target_branch.requirements_to_update) == 0 or review.target_branch.version is None:
+        return
+
+    changelog_latest_version = review.target_branch.changelog_versions[0]
+    if review.target_branch.version < changelog_latest_version:
         CLI_CONSOLE.print(f"[bold green]Versioning is correct expected to move from {review.target_branch.version} "
-                          f"to {review.base_branch.changelog_versions[0]}![/bold green] ")
+                          f"to {changelog_latest_version}![/bold green] ")
     else:
         CLI_CONSOLE.print(f"[bold red]Versioning is not correct expected to move from {review.target_branch.version} "
-                          f"to {review.base_branch.changelog_versions[0]}![/bold red] ")
+                          f"to {review.base_branch.target_branch[0]}![/bold red] ")
 
 
 def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:

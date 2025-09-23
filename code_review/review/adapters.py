@@ -67,6 +67,8 @@ def build_code_review_schema(folder: Path, target_branch_name: str):
 def get_version_from_file(folder: Path) -> SemanticVersion | None:
     """Extract the version string from a given file."""
     setup_file = folder / "setup.cfg"
+    if not setup_file.exists():
+        setup_file = folder / ".bumpversion.cfg"
 
     setup_dict = setup_to_dict(setup_file)
     if setup_dict.get("bumpversion", {}).get("current_version"):
