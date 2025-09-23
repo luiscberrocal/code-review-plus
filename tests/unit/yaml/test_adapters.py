@@ -12,4 +12,7 @@ def test_parse_yaml_file(fixtures_folder):
     for key, value in result.items():
         if isinstance(value, dict) and  "only" in value:
             assert isinstance(value["only"], list)
-            print(f"{key}: {value['only']}")
+            if "production" in key:
+                assert len(value["only"]) == 1
+            else:
+                assert len(value["only"]) == 2
