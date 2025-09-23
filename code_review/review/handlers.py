@@ -70,10 +70,12 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
     logger.info("Review Details: %s", review.target_branch.changelog_versions)
     logger.info("Review version: %s", review.target_branch.version)
 
-    if len(review.target_branch.requirements_to_update) == 0 or review.target_branch.version is None:
+    if len(review.target_branch.changelog_versions) == 0 or review.target_branch.version is None:
+        logger.error("Skipping version check due to missing information")
         return
 
     changelog_latest_version = review.target_branch.changelog_versions[0]
+    logger.debug("Latest changelog version: %s", changelog_latest_version)
     if review.target_branch.version < changelog_latest_version:
         CLI_CONSOLE.print(f"[bold green]Versioning is correct expected to move from {review.target_branch.version} "
                           f"to {changelog_latest_version}![/bold green] ")
