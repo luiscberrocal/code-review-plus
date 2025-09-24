@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from email.policy import default
 from pathlib import Path
 from typing import Any
 import toml
@@ -18,6 +19,7 @@ DEFAULT_CONFIG = {
         "node": "20.19.4-alpine3",
         "postgres": "16.10-bookworm",
     },
+    "default_branches": ["master", "develop"],
 }
 
 
