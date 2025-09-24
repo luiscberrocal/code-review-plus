@@ -119,3 +119,8 @@ class TestGetNotIgnored:
         found_files = get_not_ignored(tmp_path, "Dockerfile")
 
         assert found_files == []
+
+def test_get_all_project_folder(load_environment_vars):
+    getenv = os.getenv("PROJECTS_FOLDER")
+    assert getenv == "~/adelantos"
+    assert Path(getenv).exists()
