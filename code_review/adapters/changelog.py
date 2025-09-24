@@ -3,9 +3,10 @@ from pathlib import Path
 
 from code_review.schemas import SemanticVersion
 from code_review.settings import OUTPUT_FOLDER
+import logging
+logger = logging.getLogger(__name__)
 
-
-def parse_changelog(changelog_file: Path, min_count: int = 2) -> list[SemanticVersion]:
+def parse_changelog(changelog_file: Path, app_name:str,  min_count: int = 2) -> list[SemanticVersion]:
     """Parses a markdown changelog and returns a list of dictionaries
     with the version and date for each entry.
 
@@ -18,6 +19,10 @@ def parse_changelog(changelog_file: Path, min_count: int = 2) -> list[SemanticVe
     """
     # Regex to find lines like "## [11.4.0] - 2025-08-28"
     # It captures the version string inside the brackets and the date
+    if not changelog_file.exists():
+        logger.error("File %s does not exist", changelog_file)
+        return []
+
     with open(changelog_file, encoding="utf-8") as f:
         changelog_content = f.read()
 
@@ -33,20 +38,8 @@ def parse_changelog(changelog_file: Path, min_count: int = 2) -> list[SemanticVe
         version = match.group(1).strip()
         date = match.group(2).strip()
         data_dict = {"version": version, "date": date, "source": changelog_file}
-        versions.append(SemanticVersion.parse_version(data_dict.get("version"), file_path=changelog_file))
+        versions.append(SemanticVersion.parse_version(data_dict.get("version"), app_name, file_path=changelog_file))
     if len(versions) > min_count:
         return versions[:min_count]
     return versions
 
-
-if __name__ == "__main__":
-    cl = OUTPUT_FOLDER / "CHANGELOG-v.md"
-    parsed_data = parse_changelog(cl)
-
-    # Print the result
-    if parsed_data:
-        print("Found changelog entries:")
-        for entry in parsed_data:
-            print(f"  Version: {entry}")
-    else:
-        print("No changelog entries found.")

@@ -27,12 +27,12 @@ def get_not_ignored(folder: Path, global_patten: str) -> list[Path]:
     else:
         matches = lambda x: False  # No .gitignore file, so nothing is ignored
 
-    dockerfiles = []
+    files_found = []
     for dockerfile_path in folder.rglob(global_patten):
         if not matches(dockerfile_path):
-            dockerfiles.append(dockerfile_path)
+            files_found.append(dockerfile_path)
 
-    return dockerfiles
+    return files_found
 
 
 def ch_dir(folder: Path) -> None:

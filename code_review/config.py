@@ -16,7 +16,7 @@ DEFAULT_CONFIG = {
     "docker_images": {
         "python": "3.12.11-slim-bookworm",
         "node": "20.19.4-alpine3",
-        "postgres": "postgres:16.10-bookworm",
+        "postgres": "16.10-bookworm",
     },
 }
 

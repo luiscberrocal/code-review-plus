@@ -3,6 +3,8 @@ from typing import Any
 
 import yaml
 
+import logging
+logger = logging.getLogger(__name__)
 
 def parse_yaml_file(file_path: Path) -> dict[str, Any] | None:
     """Parses a YAML file and returns a Python dictionary.
@@ -18,8 +20,8 @@ def parse_yaml_file(file_path: Path) -> dict[str, Any] | None:
             data = yaml.safe_load(file)
         return data
     except FileNotFoundError:
-        print(f"Error: The file at {file_path} was not found.")
+        logger.error("YAML file not found: %s", file_path)
         return None
-    except yaml.YAMLError as exc:
-        print(f"Error parsing YAML file: {exc}")
+    except yaml.YAMLError as e:
+        logger.error("Error parsing YAML file %s: %s", file_path, e)
         return None
