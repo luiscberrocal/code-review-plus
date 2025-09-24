@@ -44,3 +44,12 @@ def ch_dir(folder: Path) -> None:
 
         CLI_CONSOLE.print(f"Changing to directory: [cyan]{folder}[/cyan]")
         os.chdir(folder)
+
+def get_all_project_folder(base_folder: Path, exclusion_list: list[str]) -> list[Path]:
+    """Get all project folders in the base folder."""
+    project_folders = []
+    for item in base_folder.iterdir():
+        if item.is_dir() and (item / ".git").exists():
+            if item.name not in exclusion_list:
+                project_folders.append(item)
+    return project_folders
