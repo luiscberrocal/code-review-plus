@@ -1,0 +1,66 @@
+image: docker/compose:latest
+services:
+  - docker:dind
+
+stages:
+  - build_staging
+  - deploy_staging
+  - build_production
+  - deploy_production
+
+variables:
+  DJANGO_IMAGE: mydocker/production-repo:myproj_django_production_${CI_COMMIT_SHORT_SHA}
+
+build_staging:
+  before_script:
+    - mkdir -p .envs/.staging/
+    - echo ${DJANGO_STAGING} | base64 -d > .envs/.staging/.django
+    - echo ${POSTGRES_STAGING} | base64 -d > .envs/.staging/.postgres
+    - docker-compose -f production.yml build --build-arg PYPI_TOKEN=${PYPI_TOKEN}
+  stage: build_staging
+  script:
+    - docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}
+    - docker tag my_project_staging_django ${DJANGO_IMAGE}
+    - docker push ${DJANGO_IMAGE}
+  only:
+    - develop
+    - feature/myproj-50_deactivate_flag
+
+deploy_staging:
+  stage: deploy_staging
+  image: dtzar/helm-kubectl
+  before_script:
+    - mkdir -p .envs/.staging/
+    - echo ${DJANGO_STAGING} | base64 -d > .envs/.staging/.django
+    - echo ${POSTGRES_STAGING} | base64 -d > .envs/.staging/.postgres
+  script:
+    - ./k8s/deploy_staging.sh
+  only:
+    - develop
+    - feature/myproj-50_deactivate_flag
+
+build_production:
+  before_script:
+    - mkdir -p .envs/.production/
+    - echo ${DJANGO_PRODUCTION} | base64 -d > .envs/.production/.django
+    - echo ${POSTGRES_PRODUCTION} | base64 -d > .envs/.production/.postgres
+    - docker-compose -f production.yml build --build-arg PYPI_TOKEN=${PYPI_TOKEN}
+  stage: build_production
+  script:
+    - docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}
+    - docker tag my_project_production_django ${DJANGO_IMAGE}
+    - docker push ${DJANGO_IMAGE}
+  only:
+    - master
+
+deploy_production:
+  stage: deploy_production
+  image: dtzar/helm-kubectl
+  before_script:
+    - mkdir -p .envs/.production/
+    - echo ${DJANGO_PRODUCTION} | base64 -d > .envs/.production/.django
+    - echo ${POSTGRES_PRODUCTION} | base64 -d > .envs/.production/.postgres
+  script:
+    - ./k8s/deploy_production.sh
+  only:
+    - master

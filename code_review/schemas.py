@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class SemanticVersion(BaseModel):
     """Schema for semantic versioning."""
-
+    name: str = Field(title="Name of the library or application")
     major: int
     minor: int
     patch: int
@@ -21,7 +21,7 @@ class SemanticVersion(BaseModel):
         return f"{self.major}.{self.minor}.{self.patch}"
 
     @classmethod
-    def parse_version(cls, version: str, file_path: Path, raise_error:bool=False) -> "SemanticVersion":
+    def parse_version(cls, version: str, name:str,  file_path: Path, raise_error:bool=False) -> "SemanticVersion":
         """Parse a version string into a SemanticVersion object."""
         logger.debug("Parsing version '%s' from file '%s'", version, file_path)
         parts = version.split(".")
@@ -31,12 +31,22 @@ class SemanticVersion(BaseModel):
             if raise_error:
                 raise ValueError(f"Invalid version format: {version}")
             major, minor, patch = 0, 0, 0
-            return cls(major=major, minor=minor, patch=patch, source=file_path)
+            return cls(major=major, minor=minor, patch=patch, source=file_path, name=name)
         try:
             major, minor, patch = map(int, parts)
         except ValueError:
             major, minor, patch = 0, 0, 0
-        return cls(major=major, minor=minor, patch=patch, source=file_path)
+        return cls(major=major, minor=minor, patch=patch, source=file_path, name=name)
+
+    def __lt__(self, other):
+        if not isinstance(other, SemanticVersion):
+            return NotImplemented
+
+        if self.major != other.major:
+            return self.major < other.major
+        if self.minor != other.minor:
+            return self.minor < other.minor
+        return self.patch < other.patch
 
 
 class BranchSchema(BaseModel):
