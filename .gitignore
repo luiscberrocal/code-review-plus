@@ -176,3 +176,4 @@ output
 .idea
 .aider*
 cleanups.db
+.envs
