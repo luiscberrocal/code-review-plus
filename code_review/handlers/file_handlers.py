@@ -36,6 +36,10 @@ def get_not_ignored(folder: Path, global_patten: str) -> list[Path]:
 
 
 def ch_dir(folder: Path) -> None:
+    """Change the current working directory to the specified folder.
+    Args:
+        folder: The Path object for the directory to change to.
+    """
     if folder:
         if not folder.exists():
             raise SimpleGitToolError(f"Directory does not exist: {folder}")
@@ -46,7 +50,12 @@ def ch_dir(folder: Path) -> None:
         os.chdir(folder)
 
 def get_all_project_folder(base_folder: Path, exclusion_list: list[str] = None) -> list[Path]:
-    """Get all project folders in the base folder."""
+    """Get all project folders in the base folder that have a .git folder in them.
+
+    Args:
+        base_folder: The Path object for the base directory to search.
+        exclusion_list: A list of folder names to exclude from the results.
+    """
     if exclusion_list is None:
         exclusion_list = []
     project_folders = []

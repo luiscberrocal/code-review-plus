@@ -301,6 +301,12 @@ def refresh_from_remote(branch_name: str) -> None:
         raise SimpleGitToolError(f"Could not refresh from remote '{branch_name}'")
 
 def compare_branches(base: str, target: str) -> str:
+    """Compare two branches and return how many commits one is ahead or behind the other.
+
+    Args:
+        base (str): The base branch to compare against (e.g., "master").
+        target (str): The target branch to compare (e.g., "feature-branch").
+    """
     try:
         result = subprocess.run(
             ["git", "rev-list", "--left-right", "--count", f"{base}...{target}"],
