@@ -81,7 +81,7 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
                           f"to {changelog_latest_version}![/bold green] ")
     else:
         CLI_CONSOLE.print(f"[bold red]Versioning is not correct expected to move from {review.target_branch.version} "
-                          f"to {review.base_branch.target_branch[0]}![/bold red] ")
+                          f"to {changelog_latest_version}![/bold red] ")
 
 
 def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:
