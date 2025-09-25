@@ -300,7 +300,7 @@ def refresh_from_remote(branch_name: str) -> None:
     except subprocess.CalledProcessError:
         raise SimpleGitToolError(f"Could not refresh from remote '{branch_name}'")
 
-def compare_branches(base: str, target: str) -> str:
+def compare_branches(base: str, target: str) -> dict[str, int]:
     """Compare two branches and return how many commits one is ahead or behind the other.
 
     Args:
@@ -319,3 +319,4 @@ def compare_branches(base: str, target: str) -> str:
         return {"ahead": ahead, "behind": behind}
         # return f"Branch '{target}' is {ahead} commits ahead and {behind} commits behind '{base}'."
     except subprocess.CalledProcessError as e:
+        raise SimpleGitToolError(f"Error comparing branches: {e.stderr.strip()}") from e
