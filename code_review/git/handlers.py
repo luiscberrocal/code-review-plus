@@ -316,6 +316,6 @@ def compare_branches(base: str, target: str) -> str:
         )
         behind_ahead = result.stdout.strip()
         behind, ahead = map(int, behind_ahead.split())
-        return f"Branch '{target}' is {ahead} commits ahead and {behind} commits behind '{base}'."
+        return {"ahead": ahead, "behind": behind}
+        # return f"Branch '{target}' is {ahead} commits ahead and {behind} commits behind '{base}'."
     except subprocess.CalledProcessError as e:
-        raise SimpleGitToolError(f"Could not compare branches '{base}' and '{target}': {e}") from e
