@@ -35,7 +35,7 @@ def get_not_ignored(folder: Path, global_patten: str) -> list[Path]:
     return files_found
 
 
-def ch_dir(folder: Path) -> None:
+def change_directory(folder: Path) -> None:
     """Change the current working directory to the specified folder.
     Args:
         folder: The Path object for the directory to change to.
@@ -46,7 +46,7 @@ def ch_dir(folder: Path) -> None:
         if not folder.is_dir():
             raise SimpleGitToolError(f"Not a directory: {folder}")
 
-        CLI_CONSOLE.print(f"Changing to directory: [cyan]{folder}[/cyan]")
+        # CLI_CONSOLE.print(f"Changing to directory: [cyan]{folder}[/cyan]")
         os.chdir(folder)
 
 def get_all_project_folder(base_folder: Path, exclusion_list: list[str] = None) -> list[Path]:
