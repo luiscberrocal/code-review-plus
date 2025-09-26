@@ -71,7 +71,8 @@ LOGGING = {
         "code_review.git": {
             "level": "DEBUG",
             "handlers": [
-                "console",  "file"
+               # "console",
+                "file"
             ],
             "propagate": False,
         },
