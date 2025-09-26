@@ -23,7 +23,7 @@ DEFAULT_CONFIG = {
 }
 
 
-def get_config() -> dict[str, Any]:
+def get_config_legacy() -> dict[str, Any]:
     """Reads the application's configuration from a TOML file.
 
     The function looks for a 'config.toml' file in the user's
@@ -66,7 +66,21 @@ def get_config() -> dict[str, Any]:
 
     return config
 
+def get_config() -> dict[str, Any]:
+    """Reads the application's configuration from a TOML file.
 
+    The function looks for a 'config.toml' file in the user's
+    recommended configuration directory. It merges the settings from the file
+    with a set of default values, ensuring all variables are always set.
+
+    Returns:
+        dict: A dictionary containing the complete application configuration.
+    """
+    manager = TomlConfigManager()
+    config = manager.load_config()
+    if not manager.config_file.exists():
+        manager.save_config(config, create_backup=True)
+    return config
 
 class TomlConfigManager:
     """A class to manage reading and writing TOML configuration files."""
