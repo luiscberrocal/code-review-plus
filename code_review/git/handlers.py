@@ -320,3 +320,8 @@ def compare_branches(base: str, target: str) -> dict[str, int]:
         # return f"Branch '{target}' is {ahead} commits ahead and {behind} commits behind '{base}'."
     except subprocess.CalledProcessError as e:
         raise SimpleGitToolError(f"Error comparing branches: {e.stderr.strip()}") from e
+
+def sync_branches(branches: list[str]) -> None:
+    for branch in branches:
+        refresh_from_remote(branch)
+        check_out_and_pull(branch)
