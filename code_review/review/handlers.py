@@ -67,8 +67,8 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
         CLI_CONSOLE.print("[bold green]All Files Properly Formatted![/bold green]")
 
 
-    logger.info("Review Details: %s", review.target_branch.changelog_versions)
-    logger.info("Review version: %s", review.target_branch.version)
+    logger.debug("Review Details: %s", review.target_branch.changelog_versions)
+    logger.debug("Review version: %s", review.target_branch.version)
 
     if len(review.target_branch.changelog_versions) == 0 or review.target_branch.version is None:
         logger.error("Skipping version check due to missing information")
