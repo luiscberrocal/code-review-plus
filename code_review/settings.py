@@ -11,13 +11,13 @@ CODE_REVIEW_FOLDER = Path(__file__).home() / "Documents" / "code_review"
 if not CODE_REVIEW_FOLDER.exists():
     CODE_REVIEW_FOLDER.mkdir(parents=True, exist_ok=True)
 
-# Define log directory
-LOG_DIR = CODE_REVIEW_FOLDER / "logs"
-if not LOG_DIR.exists():
-    LOG_DIR.mkdir(parents=True, exist_ok=True)
-
 BASE_FOLDER = Path(__file__).parent.parent
 OUTPUT_FOLDER = BASE_FOLDER / "output"
+
+# Define log directory
+LOG_DIR = OUTPUT_FOLDER / "logs"
+if not LOG_DIR.exists():
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 LOGGING = {
     "version": 1,
@@ -69,9 +69,9 @@ LOGGING = {
             "propagate": False,
         },
         "code_review.git": {
-            "level": "INFO",
+            "level": "DEBUG",
             "handlers": [
-                "console",
+                "console",  "file"
             ],
             "propagate": False,
         },
