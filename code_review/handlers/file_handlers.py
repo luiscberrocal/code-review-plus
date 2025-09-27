@@ -35,12 +35,32 @@ def get_not_ignored(folder: Path, global_patten: str) -> list[Path]:
     return files_found
 
 
-def ch_dir(folder: Path) -> None:
+def change_directory(folder: Path) -> None:
+    """Change the current working directory to the specified folder.
+    Args:
+        folder: The Path object for the directory to change to.
+    """
     if folder:
         if not folder.exists():
             raise SimpleGitToolError(f"Directory does not exist: {folder}")
         if not folder.is_dir():
             raise SimpleGitToolError(f"Not a directory: {folder}")
 
-        CLI_CONSOLE.print(f"Changing to directory: [cyan]{folder}[/cyan]")
+        # CLI_CONSOLE.print(f"Changing to directory: [cyan]{folder}[/cyan]")
         os.chdir(folder)
+
+def get_all_project_folder(base_folder: Path, exclusion_list: list[str] = None) -> list[Path]:
+    """Get all project folders in the base folder that have a .git folder in them.
+
+    Args:
+        base_folder: The Path object for the base directory to search.
+        exclusion_list: A list of folder names to exclude from the results.
+    """
+    if exclusion_list is None:
+        exclusion_list = []
+    project_folders = []
+    for item in base_folder.iterdir():
+        if item.is_dir() and (item / ".git").exists():
+            if item.name not in exclusion_list:
+                project_folders.append(item)
+    return project_folders

@@ -2,7 +2,7 @@ import pytest
 import os
 from pathlib import Path
 
-from code_review.handlers.file_handlers import get_not_ignored
+from code_review.handlers.file_handlers import get_not_ignored, get_all_project_folder
 
 
 # Assuming your function is in a file named `my_module.py`
@@ -119,3 +119,17 @@ class TestGetNotIgnored:
         found_files = get_not_ignored(tmp_path, "Dockerfile")
 
         assert found_files == []
+
+def test_env_vars_set(load_environment_vars):
+    folder_var = os.getenv("PROJECTS_FOLDER")
+    folder = Path(folder_var).expanduser().resolve()
+    print(">>>>", folder)
+    assert folder_var == "~/adelantos"
+    assert folder.exists()
+
+def test_get_all_project_folder(load_environment_vars):
+    folder_var = os.getenv("PROJECTS_FOLDER")
+    folder = Path(folder_var).expanduser().resolve()
+    project_folders = get_all_project_folder(folder)
+
+    assert len(project_folders) > 0

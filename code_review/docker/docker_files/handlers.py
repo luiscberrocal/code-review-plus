@@ -59,11 +59,12 @@ def get_versions_from_dockerfile(dockerfile_content: str) -> dict:
     return versions
 
 
-def parse_dockerfile(dockerfile_path: Path) -> DockerfileSchema | None:
+def parse_dockerfile(dockerfile_path: Path, raise_error: bool=False) -> DockerfileSchema | None:
     """Reads a Dockerfile and extracts version information.
 
     Args:
-        dockerfile_path (str): The file path to the Dockerfile.
+        dockerfile_path (Path): The file path to the Dockerfile.
+        raise_error (bool, optional): Whether to raise an exception when parsing errors.
 
     Returns:
         dict: A dictionary containing the extracted versions.
@@ -78,7 +79,12 @@ def parse_dockerfile(dockerfile_path: Path) -> DockerfileSchema | None:
         return DockerfileSchema(**version_info)
     except FileNotFoundError:
         logger.error("Dockerfile not found at path: %s", dockerfile_path)
+        if raise_error:
+            raise FileNotFoundError(f"Error: The file '{dockerfile_path}' was not found.")
         return None
     except Exception as e:
+
         logger.error("An error occurred while reading the Dockerfile: %s", e)
+        if raise_error:
+            raise e
         return None

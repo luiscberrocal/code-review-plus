@@ -16,3 +16,12 @@ def test_parse_dockerfile(fixtures_folder):
     for dockerfile in dockerfiles:
         dockerfile_schema = parse_dockerfile(dockerfile)
         print(dockerfile, " schema:", dockerfile_schema)
+
+def test_parse_dockerfile_using_from(fixtures_folder):
+    compose_folder = fixtures_folder / "compose_from"
+    
+    dockerfiles = list(compose_folder.glob("**/Dockerfile"))
+
+    for dockerfile in dockerfiles:
+        dockerfile_schema = parse_dockerfile(dockerfile)
+        print(dockerfile, " schema:", dockerfile_schema)

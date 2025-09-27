@@ -7,7 +7,7 @@ from code_review.coverage.main import get_makefile, get_minimum_coverage
 from code_review.dependencies.pip.handlers import requirements_updated
 from code_review.docker.docker_files.handlers import parse_dockerfile
 from code_review.git.handlers import branch_line_to_dict, check_out_and_pull, get_branch_info
-from code_review.handlers.file_handlers import ch_dir, get_not_ignored
+from code_review.handlers.file_handlers import change_directory, get_not_ignored
 from code_review.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
@@ -20,7 +20,8 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
         folder: Path to the folder containing the code review data.
         target_branch_name: Name of the target branch to compare against the base branch.
     """
-    ch_dir(folder)
+    change_directory(folder)
+
     makefile = get_makefile(folder)  # Assuming this function is defined elsewhere to get the makefile path
     base_name = "master"
     check_out_and_pull(base_name, check=False)
