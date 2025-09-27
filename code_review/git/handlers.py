@@ -294,8 +294,34 @@ def display_branches(branches: list[BranchSchema]) -> None:
     for i, branch in enumerate(branches, 1):
         CLI_CONSOLE.print(f" {i} [yellow]{branch.name}[/yellow] {branch.date}(by [blue]{branch.author}[/blue])")
 
-def refresh_from_remote(source: str) -> None:
+def refresh_from_remote(remote_source: str) -> None:
     try:
-        subprocess.run(["git", "fetch", source], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["git", "fetch", remote_source], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except subprocess.CalledProcessError:
-        raise SimpleGitToolError(f"Could not refresh from remote '{source}'")
+        raise SimpleGitToolError(f"Could not refresh from remote '{remote_source}'")
+
+def compare_branches(base: str, target: str) -> dict[str, int]:
+    """Compare two branches and return how many commits one is ahead or behind the other.
+
+    Args:
+        base (str): The base branch to compare against (e.g., "master").
+        target (str): The target branch to compare (e.g., "feature-branch").
+    """
+    try:
+        result = subprocess.run(
+            ["git", "rev-list", "--left-right", "--count", f"{base}...{target}"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        behind_ahead = result.stdout.strip()
+        behind, ahead = map(int, behind_ahead.split())
+        return {"ahead": ahead, "behind": behind}
+        # return f"Branch '{target}' is {ahead} commits ahead and {behind} commits behind '{base}'."
+    except subprocess.CalledProcessError as e:
+        raise SimpleGitToolError(f"Error comparing branches: {e.stderr.strip()}") from e
+
+def sync_branches(branches: list[str]) -> None:
+    refresh_from_remote("origin")
+    for branch in branches:
+        check_out_and_pull(branch)

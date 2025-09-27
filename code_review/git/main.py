@@ -17,9 +17,9 @@ from code_review.git.handlers import (
     _get_unmerged_branches,
     check_out_and_pull,
     display_branches,
-    get_current_git_branch,
+    get_current_git_branch, refresh_from_remote,
 )
-from code_review.handlers.file_handlers import ch_dir
+from code_review.handlers.file_handlers import change_directory
 from code_review.settings import CLI_CONSOLE
 
 logger = logging.getLogger(__name__)
@@ -181,7 +181,9 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
             raise SimpleGitToolError("--delete option requires --merged flag")
 
         # Change to the specified directory if provided
-        ch_dir(folder)
+        change_directory(folder)
+        CLI_CONSOLE.print(f"Changing to directory: [cyan]{folder}[/cyan]")
+
         refresh_from_remote("origin")
         # Check if the base branch exists
         try:

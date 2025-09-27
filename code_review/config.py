@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from email.policy import default
 from pathlib import Path
 from typing import Any
 import toml
@@ -18,10 +19,11 @@ DEFAULT_CONFIG = {
         "node": "20.19.4-alpine3",
         "postgres": "16.10-bookworm",
     },
+    "default_branches": ["master", "develop"],
 }
 
 
-def get_config() -> dict[str, Any]:
+def get_config_legacy() -> dict[str, Any]:
     """Reads the application's configuration from a TOML file.
 
     The function looks for a 'config.toml' file in the user's
@@ -64,7 +66,21 @@ def get_config() -> dict[str, Any]:
 
     return config
 
+def get_config() -> dict[str, Any]:
+    """Reads the application's configuration from a TOML file.
 
+    The function looks for a 'config.toml' file in the user's
+    recommended configuration directory. It merges the settings from the file
+    with a set of default values, ensuring all variables are always set.
+
+    Returns:
+        dict: A dictionary containing the complete application configuration.
+    """
+    manager = TomlConfigManager()
+    config = manager.load_config()
+    if not manager.config_file.exists():
+        manager.save_config(config, create_backup=True)
+    return config
 
 class TomlConfigManager:
     """A class to manage reading and writing TOML configuration files."""
