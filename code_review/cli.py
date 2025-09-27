@@ -1,6 +1,6 @@
 import click
 
-from code_review.handlers.display_handlers import show_banner
+from code_review.handlers.display_handlers import show_banner, display_about_table
 
 
 @click.group()
@@ -13,3 +13,4 @@ def cli() -> None:
 def about() -> None:
     """About the CLI."""
     show_banner()
+    display_about_table()
