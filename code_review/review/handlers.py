@@ -37,7 +37,7 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
         )
     else:
         CLI_CONSOLE.print(
-            f"[bold green]Linting Issues Decreased or Stayed the Same.[/bold green] base has "
+            f"[bold green]{ReviewRuleLevelIcon.INFO.value} Linting Issues Decreased or Stayed the Same.[/bold green] base has "
             f"{review.base_branch.linting_errors} while {review.target_branch.name} "
             f"has {review.target_branch.linting_errors}"
         )
@@ -48,7 +48,7 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
             f"[bold red]Dependencies to Update:[/bold red] {requirements_pending_update_count} need updates."
         )
     else:
-        CLI_CONSOLE.print("[bold green]No Dependencies to Update![/bold green]")
+        CLI_CONSOLE.print("[bold green]{ReviewRuleLevelIcon.INFO.value} No Dependencies to Update![/bold green]")
 
     for dockerfile in review.docker_files or []:
         if dockerfile.version != dockerfile.expected_version:
@@ -57,7 +57,7 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
                 f"updated {dockerfile.version} -> {dockerfile.expected_version}:[/bold red]"
             )
         else:
-            CLI_CONSOLE.print(f"[bold green]Dockerfile {dockerfile.file.relative_to(review.source_folder)} has "
+            CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} Dockerfile {dockerfile.file.relative_to(review.source_folder)} has "
                               f"is up to date ![/bold green]")
 
     if review.target_branch.formatting_errors != 0:
@@ -65,7 +65,7 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
             f"[bold red]Code Formatting Issues Detected![/bold red] {review.target_branch.formatting_errors} files need formatting."
         )
     else:
-        CLI_CONSOLE.print("[bold green]All Files Properly Formatted![/bold green]")
+        CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} All Files Properly Formatted![/bold green]")
 
 
     logger.debug("Review Details: %s", review.target_branch.changelog_versions)
@@ -78,7 +78,7 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
     changelog_latest_version = review.target_branch.changelog_versions[0]
     logger.debug("Latest changelog version: %s", changelog_latest_version)
     if review.target_branch.version < changelog_latest_version:
-        CLI_CONSOLE.print(f"[bold green]Versioning is correct expected to move from {review.target_branch.version} "
+        CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} Versioning is correct expected to move from {review.target_branch.version} "
                           f"to {changelog_latest_version}![/bold green] ")
     else:
         CLI_CONSOLE.print(f"[bold red]Versioning is not correct expected to move from {review.target_branch.version} "

@@ -79,6 +79,9 @@ if __name__ == "__main__":
         tests_to_run = "payment_collector.api.tests.unit payment_collector.users.tests payment_collector.reconciliation.tests"
         min_coverage = 85
 
+        target_folder = Path.home() / "adelantos" / "wu-integration"
+        tests_to_run = "wu_integration.rest.tests.unit"
+        min_coverage = 85
 
         coverage = run_tests_and_get_coverage(target_folder, tests_to_run, min_coverage)
         print(f"\nSuccessfully completed. Final coverage: {coverage}%")
