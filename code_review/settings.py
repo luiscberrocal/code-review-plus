@@ -18,6 +18,7 @@ OUTPUT_FOLDER = BASE_FOLDER / "output"
 LOG_DIR = OUTPUT_FOLDER / "logs"
 if not LOG_DIR.exists():
     LOG_DIR.mkdir(parents=True, exist_ok=True)
+
 BANNER ="""
  ██████╗ ██████╗ ██████╗ ███████╗    ██████╗ ███████╗██╗   ██╗██╗███████╗██╗    ██╗    ██████╗ ██╗     ██╗   ██╗███████╗
 ██╔════╝██╔═══██╗██╔══██╗██╔════╝    ██╔══██╗██╔════╝██║   ██║██║██╔════╝██║    ██║    ██╔══██╗██║     ██║   ██║██╔════╝

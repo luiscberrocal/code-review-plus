@@ -26,11 +26,14 @@ def show_banner():
 
 def display_about_table():
     from code_review import __version__ as c
-    table = Table.grid(padding=(10, 20))
+    from code_review.config import CONFIG_MANAGER
+
+    table = Table.grid(padding=(0, 2))
     table.add_column(style="cyan", justify="left",)
     table.add_column(style="white", justify="left")
 
     table.add_row("Version:", c)
+    table.add_row("Configuration:", str(CONFIG_MANAGER.config_file))
     # table.add_row("Configuration file:", )
     centered_table =  Align.center(table)
 

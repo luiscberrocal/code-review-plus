@@ -1,9 +1,11 @@
 import os
 import subprocess
 import re
+from pathlib import Path
+
 
 def run_tests_and_get_coverage(
-    folder: str,
+    folder: Path,
     unit_tests: str,
     minimum_coverage: int
 ) -> float:
@@ -69,9 +71,14 @@ def run_tests_and_get_coverage(
 if __name__ == "__main__":
     try:
         # Replace these with your actual folder, test paths, and desired coverage
-        target_folder = "."  # e.g., "/path/to/your/project"
-        tests_to_run = "apps.users.tests apps.products.tests"
+        target_folder = Path.home() / "adelantos" / "payment-options-vue"
+        tests_to_run = "pay_options_middleware.middleware.tests.unit pay_options_middleware.users.tests"
         min_coverage = 85
+
+        target_folder = Path.home() / "adelantos" / "payment-collector"
+        tests_to_run = "payment_collector.api.tests.unit payment_collector.users.tests payment_collector.reconciliation.tests"
+        min_coverage = 85
+
 
         coverage = run_tests_and_get_coverage(target_folder, tests_to_run, min_coverage)
         print(f"\nSuccessfully completed. Final coverage: {coverage}%")

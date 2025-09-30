@@ -23,65 +23,6 @@ DEFAULT_CONFIG = {
 }
 
 
-def get_config_legacy() -> dict[str, Any]:
-    """Reads the application's configuration from a TOML file.
-
-    The function looks for a 'config.toml' file in the user's
-    recommended configuration directory (~/.config/my_cli_app).
-    It merges the settings from the file with a set of default
-    values, ensuring all variables are always set.
-
-    Returns:
-        dict: A dictionary containing the complete application configuration.
-    """
-    config_dir = Path.home() / ".config" / "code_review_plus"
-    config_file = config_dir / "config.toml"
-
-    # Use a copy of the defaults to avoid modifying the original dictionary.
-    config = DEFAULT_CONFIG.copy()
-
-    # Check if the TOML file exists
-    if not config_file.is_file():
-        logger.debug("Configuration file not found. Using default settings.")
-        return config
-
-    try:
-        with open(config_file, "rb") as f:
-            toml_data = tomllib.load(f)
-
-            # Extract the settings for our application.
-            app_settings = toml_data.get("tool", {}).get("cli_app", {})
-
-            # Update the configuration with values from the TOML file.
-            # Using get() with a default value prevents KeyErrors if a setting is missing.
-            config["doc_folder"] = Path(app_settings.get("doc_folder", config["doc_folder"])).expanduser()
-            config["date_format"] = app_settings.get("date_format", config["date_format"])
-            config["max_lines_to_display"] = app_settings.get("max_lines_to_display", config["max_lines_to_display"])
-
-    except tomllib.TOMLDecodeError as e:
-        logger.error("Error decoding TOML file: %s. Using default settings.", e)
-
-    except Exception as e:
-        logger.error("An unexpected error occurred while reading the config: %s. Using default settings.", e)
-
-    return config
-
-def get_config() -> dict[str, Any]:
-    """Reads the application's configuration from a TOML file.
-
-    The function looks for a 'config.toml' file in the user's
-    recommended configuration directory. It merges the settings from the file
-    with a set of default values, ensuring all variables are always set.
-
-    Returns:
-        dict: A dictionary containing the complete application configuration.
-    """
-    manager = TomlConfigManager()
-    config = manager.load_config()
-    if not manager.config_file.exists():
-        manager.save_config(config, create_backup=True)
-    return config
-
 class TomlConfigManager:
     """A class to manage reading and writing TOML configuration files."""
 
@@ -183,3 +124,20 @@ class TomlConfigManager:
             logger.info("Configuration saved to %s", self.config_file)
         except Exception as e:
             logger.error("An unexpected error occurred while saving the config: %s", e)
+
+CONFIG_MANAGER = TomlConfigManager()
+
+def get_config(manager: TomlConfigManager = CONFIG_MANAGER) -> dict[str, Any]:
+    """Reads the application's configuration from a TOML file.
+
+    The function looks for a 'config.toml' file in the user's
+    recommended configuration directory. It merges the settings from the file
+    with a set of default values, ensuring all variables are always set.
+
+    Returns:
+        dict: A dictionary containing the complete application configuration.
+    """
+    config = manager.load_config()
+    if not manager.config_file.exists():
+        manager.save_config(config, create_backup=True)
+    return config
