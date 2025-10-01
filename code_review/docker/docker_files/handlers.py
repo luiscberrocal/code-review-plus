@@ -83,8 +83,7 @@ def parse_dockerfile(dockerfile_path: Path, raise_error: bool=False) -> Dockerfi
             raise FileNotFoundError(f"Error: The file '{dockerfile_path}' was not found.")
         return None
     except Exception as e:
-
-        logger.error("An error occurred while reading the Dockerfile: %s", e)
+        logger.error("An error occurred while reading the Dockerfile %s: %s", dockerfile_path, e)
         if raise_error:
             raise e
         return None

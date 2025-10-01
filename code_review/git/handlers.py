@@ -2,7 +2,6 @@ import json
 import logging
 import re
 import subprocess
-from re import search
 from typing import Any
 
 from code_review.exceptions import SimpleGitToolError
@@ -324,4 +323,4 @@ def compare_branches(base: str, target: str) -> dict[str, int]:
 def sync_branches(branches: list[str]) -> None:
     refresh_from_remote("origin")
     for branch in branches:
-        check_out_and_pull(branch)
+        check_out_and_pull(branch,check=False)
