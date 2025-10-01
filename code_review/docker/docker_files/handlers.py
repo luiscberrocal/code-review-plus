@@ -8,7 +8,7 @@ from code_review.settings import CURRENT_CONFIGURATION
 logger = logging.getLogger(__name__)
 
 
-def get_versions_from_dockerfile(dockerfile_content: str) -> dict:
+def get_versions_from_dockerfile_legacy(dockerfile_content: str) -> dict:
     """Parses a Dockerfile to extract Python, Postgres, and Node.js versions.
 
     Args:
@@ -55,6 +55,40 @@ def get_versions_from_dockerfile(dockerfile_content: str) -> dict:
     if match_node_from:
         versions["version"] = match_node_from.group(1)
         versions["product"] = "node"
+
+    return versions
+def get_versions_from_dockerfile(dockerfile_content: str) -> dict:
+    """Parses a Dockerfile to extract product and version information using multiple patterns per product."""
+    versions = {
+        "version": None,
+        "product": None,
+    }
+
+    # Define patterns for each product
+    product_patterns = {
+        "python": [
+            re.compile(r"ARG\s+PYTHON_VERSION=([\d.]+[\w-]*)"),
+            re.compile(r"FROM.*python:([\d.]+[\w-]*)"),
+        ],
+        "postgres": [
+            re.compile(r"FROM.*postgres:([\d.]+[\w-]*)"),
+        ],
+        "node": [
+            re.compile(r"FROM.*node:([\d.]+[\w-]*)"),
+        ],
+    }
+
+    for product, patterns in product_patterns.items():
+        for pattern in patterns:
+            match = pattern.search(dockerfile_content)
+            if match:
+                # For python, skip FROM with variable
+                if product == "python" and "FROM" in pattern.pattern:
+                    if re.search(r"FROM.*python:\$\{{0,1}PYTHON_VERSION\}{0,1}", dockerfile_content):
+                        continue
+                versions["version"] = match.group(1)
+                versions["product"] = product
+                return versions  # Return on first match
 
     return versions
 
