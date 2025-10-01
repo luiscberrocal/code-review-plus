@@ -26,7 +26,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     base_name = "master"
     check_out_and_pull(base_name, check=False)
     base_count = count_ruff_issues(folder)
-    base_line = get_branch_info(base_name)
+    get_branch_info(base_name)
     base_branch_info = branch_line_to_dict(base_name)
     base_cov = get_minimum_coverage(makefile)
     base_branch_info["linting_errors"] = base_count
@@ -37,7 +37,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     base_branch.changelog_versions = parse_changelog(folder / "CHANGELOG.md", folder.stem)
 
     check_out_and_pull(target_branch_name, check=False)
-    target_line = get_branch_info(target_branch_name)
+    get_branch_info(target_branch_name)
     target_branch_info = branch_line_to_dict(target_branch_name)
     target_count = count_ruff_issues(folder)
     target_cov = get_minimum_coverage(makefile)
@@ -52,13 +52,12 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     target_branch.formatting_errors = _check_and_format_ruff(folder)
 
     # Dockerfiles
-    docker_files =  get_not_ignored(folder, "Dockerfile")
+    docker_files = get_not_ignored(folder, "Dockerfile")
     docker_info_list = []
     for file in docker_files:
-        docker_info  = parse_dockerfile(file)
+        docker_info = parse_dockerfile(file)
         if docker_info:
             docker_info_list.append(docker_info)
-
 
     return CodeReviewSchema(
         name=folder.name,
@@ -80,6 +79,6 @@ def get_version_from_config_file(folder: Path, app_name: str) -> SemanticVersion
     setup_dict = setup_to_dict(setup_file)
     if setup_dict.get("bumpversion", {}).get("current_version"):
         version_str = setup_dict["bumpversion"]["current_version"]
-        return SemanticVersion.parse_version(version_str,app_name, setup_file)
+        return SemanticVersion.parse_version(version_str, app_name, setup_file)
 
     return None

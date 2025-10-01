@@ -1,7 +1,5 @@
 import configparser
-import json
 import logging
-import os
 from pathlib import Path
 from typing import Any
 
@@ -46,4 +44,3 @@ def setup_to_dict(file_path: Path, raise_error: bool = False) -> dict[str, Any]:
             pass  # Keep original string values if parsing fails
 
     return parsed_config
-

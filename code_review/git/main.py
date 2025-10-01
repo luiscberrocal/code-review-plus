@@ -17,7 +17,8 @@ from code_review.git.handlers import (
     _get_unmerged_branches,
     check_out_and_pull,
     display_branches,
-    get_current_git_branch, refresh_from_remote,
+    get_current_git_branch,
+    refresh_from_remote,
 )
 from code_review.handlers.file_handlers import change_directory
 from code_review.settings import CLI_CONSOLE
@@ -252,5 +253,3 @@ def branch(folder: Path, merged: bool, un_merged: bool, delete: bool, base: str,
         # Change back to the original directory if we changed it
         if folder:
             os.chdir(original_dir)
-
-

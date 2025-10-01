@@ -1,8 +1,10 @@
+import logging
 import re
 import subprocess
 from pathlib import Path
-import logging
+
 logger = logging.getLogger(__name__)
+
 
 def count_ruff_issues(path: Path) -> int:
     """Runs `ruff check` on a specified path and returns the total number of issues found.
@@ -63,7 +65,7 @@ def count_ruff_issues(path: Path) -> int:
         return -1
     except Exception as e:
         # Catch any other unexpected errors.
-        logger.error(f"An unexpected error occurred: %s", e)
+        logger.error("An unexpected error occurred: %s", e)
         return -1
 
 
@@ -96,14 +98,13 @@ def _check_and_format_ruff(folder_path: Path) -> int:
         if check_result.returncode == 0:
             # No files need formatting.
             return 0
-        else:
-            lines = check_result.stdout.splitlines()
-            reformat_count = 0
-            for line in lines:
-                if "Would reformat" in line:
-                    logger.debug("Ruff needs to format file: %s", line)
-                    reformat_count += 1
-            return reformat_count
+        lines = check_result.stdout.splitlines()
+        reformat_count = 0
+        for line in lines:
+            if "Would reformat" in line:
+                logger.debug("Ruff needs to format file: %s", line)
+                reformat_count += 1
+        return reformat_count
 
     except FileNotFoundError:
         logger.error("Error: `ruff` command not found. Please ensure it is installed and in your PATH.")
@@ -112,5 +113,5 @@ def _check_and_format_ruff(folder_path: Path) -> int:
         logger.error("Error running `ruff format --check` on folder %s. Error: %s", folder_path, e)
         return False
     except Exception as e:
-        logger.error(f"An unexpected error occurred: %s", e)
+        logger.error("An unexpected error occurred: %s", e)
         return False

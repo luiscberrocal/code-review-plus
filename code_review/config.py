@@ -1,8 +1,8 @@
 import logging
 from datetime import datetime
-from email.policy import default
 from pathlib import Path
 from typing import Any
+
 import toml
 import tomllib
 
@@ -31,7 +31,7 @@ class TomlConfigManager:
         config_dir: Path = Path.home() / ".config" / "code_review_plus",
         config_file_name: str = "config.toml",
         default_config: dict[str, Any] = None,
-    ):
+    ) -> None:
         """Initializes the TomlConfigManager.
 
         Args:
@@ -125,7 +125,9 @@ class TomlConfigManager:
         except Exception as e:
             logger.error("An unexpected error occurred while saving the config: %s", e)
 
+
 CONFIG_MANAGER = TomlConfigManager()
+
 
 def get_config(manager: TomlConfigManager = CONFIG_MANAGER) -> dict[str, Any]:
     """Reads the application's configuration from a TOML file.

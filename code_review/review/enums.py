@@ -7,6 +7,7 @@ class ReviewRuleLevel(Enum):
     ERROR = "error"
     CRITICAL = "critical"
 
+
 class ReviewRuleLevelIcon(Enum):
     INFO = "✅"
     WARNING = "⚠"

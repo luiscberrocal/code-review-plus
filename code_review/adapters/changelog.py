@@ -1,12 +1,13 @@
+import logging
 import re
 from pathlib import Path
 
 from code_review.schemas import SemanticVersion
-from code_review.settings import OUTPUT_FOLDER
-import logging
+
 logger = logging.getLogger(__name__)
 
-def parse_changelog(changelog_file: Path, app_name:str,  min_count: int = 2) -> list[SemanticVersion]:
+
+def parse_changelog(changelog_file: Path, app_name: str, min_count: int = 2) -> list[SemanticVersion]:
     """Parses a markdown changelog and returns a list of dictionaries
     with the version and date for each entry.
 
@@ -42,4 +43,3 @@ def parse_changelog(changelog_file: Path, app_name:str,  min_count: int = 2) -> 
     if len(versions) > min_count:
         return versions[:min_count]
     return versions
-

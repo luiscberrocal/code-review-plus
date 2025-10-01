@@ -23,7 +23,7 @@ def create_branch_schema(git_line: str) -> BranchSchema:
     if match:
         data = match.groupdict()
         name = match.group("name").strip()
-        date = match.group("date").strip()
+        match.group("date").strip()
         branch = match.group("branch").strip()
         date_string = data["date"]
         try:
@@ -56,8 +56,7 @@ def parse_git_date(date_str: str) -> datetime | None:
 
     try:
         # Attempt to parse the date string using the specified format.
-        parsed_date = datetime.strptime(date_str, format_string)
-        return parsed_date
+        return datetime.strptime(date_str, format_string)
     except ValueError as e:
         # If parsing fails, print an error message and return None.
         logger.debug("Error parsing date string '%s': %s", date_str, e)

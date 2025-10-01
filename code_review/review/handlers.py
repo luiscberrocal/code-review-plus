@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime
 from pathlib import Path
 
@@ -6,7 +7,6 @@ from code_review.review.enums import ReviewRuleLevelIcon
 from code_review.review.schemas import CodeReviewSchema
 from code_review.settings import CLI_CONSOLE
 
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -29,7 +29,10 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
             f"{review.base_branch.linting_errors} while {review.target_branch.name} "
             f"has {review.target_branch.linting_errors}"
         )
-    elif review.target_branch.linting_errors == review.base_branch.linting_errors and review.target_branch.linting_errors != 0:
+    elif (
+        review.target_branch.linting_errors == review.base_branch.linting_errors
+        and review.target_branch.linting_errors != 0
+    ):
         CLI_CONSOLE.print(
             f"[bold yellow]{ReviewRuleLevelIcon.WARNING.value} Linting Issues Stayed the Same![/bold yellow] base has "
             f"{review.base_branch.linting_errors} while {review.target_branch.name} "
@@ -57,8 +60,10 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
                 f"updated {dockerfile.version} -> {dockerfile.expected_version}:[/bold red]"
             )
         else:
-            CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} Dockerfile {dockerfile.file.relative_to(review.source_folder)} has "
-                              f"is up to date ![/bold green]")
+            CLI_CONSOLE.print(
+                f"[bold green]{ReviewRuleLevelIcon.INFO.value} Dockerfile {dockerfile.file.relative_to(review.source_folder)} has "
+                f"is up to date ![/bold green]"
+            )
 
     if review.target_branch.formatting_errors != 0:
         CLI_CONSOLE.print(
@@ -66,7 +71,6 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
         )
     else:
         CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} All Files Properly Formatted![/bold green]")
-
 
     logger.debug("Review Details: %s", review.target_branch.changelog_versions)
     logger.debug("Review version: %s", review.target_branch.version)
@@ -78,11 +82,15 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
     changelog_latest_version = review.target_branch.changelog_versions[0]
     logger.debug("Latest changelog version: %s", changelog_latest_version)
     if review.target_branch.version < changelog_latest_version:
-        CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} Versioning is correct expected to move from {review.target_branch.version} "
-                          f"to {changelog_latest_version}![/bold green] ")
+        CLI_CONSOLE.print(
+            f"[bold green]{ReviewRuleLevelIcon.INFO.value} Versioning is correct expected to move from {review.target_branch.version} "
+            f"to {changelog_latest_version}![/bold green] "
+        )
     else:
-        CLI_CONSOLE.print(f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Versioning is not correct expected to move from {review.target_branch.version} "
-                          f"to {changelog_latest_version}![/bold red] ")
+        CLI_CONSOLE.print(
+            f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Versioning is not correct expected to move from {review.target_branch.version} "
+            f"to {changelog_latest_version}![/bold red] "
+        )
 
 
 def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:

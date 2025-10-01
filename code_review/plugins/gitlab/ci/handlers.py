@@ -6,8 +6,8 @@ from code_review.yaml.adapters import parse_yaml_file
 
 logger = logging.getLogger(__name__)
 
-def handle_mult_targets(folder: Path, filename:str=".gitlab-ci,tml") -> dict[str, list] | None:
 
+def handle_mult_targets(folder: Path, filename: str = ".gitlab-ci,tml") -> dict[str, list] | None:
     files = get_not_ignored(folder, filename)
     if not files:
         return None
@@ -16,11 +16,8 @@ def handle_mult_targets(folder: Path, filename:str=".gitlab-ci,tml") -> dict[str
         return None
     ci_file = files[0]
     result = parse_yaml_file(ci_file)
-    data ={}
+    data = {}
     for key, value in result.items():
-        if isinstance(value, dict) and  "only" in value:
-            if isinstance(value["only"], list):
-                data[key] = value["only"]
+        if isinstance(value, dict) and "only" in value and isinstance(value["only"], list):
+            data[key] = value["only"]
     return data
-
-    

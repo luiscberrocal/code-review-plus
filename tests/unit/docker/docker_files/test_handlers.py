@@ -17,9 +17,10 @@ def test_parse_dockerfile(fixtures_folder):
         dockerfile_schema = parse_dockerfile(dockerfile)
         print(dockerfile, " schema:", dockerfile_schema)
 
+
 def test_parse_dockerfile_using_from(fixtures_folder):
     compose_folder = fixtures_folder / "compose_from"
-    
+
     dockerfiles = list(compose_folder.glob("**/Dockerfile"))
 
     for dockerfile in dockerfiles:
@@ -28,7 +29,7 @@ def test_parse_dockerfile_using_from(fixtures_folder):
 
 
 import pytest
-from code_review.docker.docker_files.handlers import get_versions_from_dockerfile
+
 
 class TestGetVersionsFromDockerfile:
     @pytest.mark.parametrize(

@@ -14,10 +14,12 @@ def requirements_folder() -> Path:
     """Return the path to the requirement_folders folder."""
     return Path(__file__).parent / "fixtures" / "requirements"
 
+
 @pytest.fixture
 def load_environment_vars():
     """Load environment variables for testing."""
     load_environment_variables("local.txt")
+
 
 def load_environment_variables(environment_filename: str, source_folder_name: str = ".envs"):
     from pathlib import Path

@@ -57,6 +57,8 @@ def get_versions_from_dockerfile_legacy(dockerfile_content: str) -> dict:
         versions["product"] = "node"
 
     return versions
+
+
 def get_versions_from_dockerfile(dockerfile_content: str) -> dict:
     """Parses a Dockerfile to extract product and version information using multiple patterns per product."""
     versions = {
@@ -93,7 +95,7 @@ def get_versions_from_dockerfile(dockerfile_content: str) -> dict:
     return versions
 
 
-def parse_dockerfile(dockerfile_path: Path, raise_error: bool=False) -> DockerfileSchema | None:
+def parse_dockerfile(dockerfile_path: Path, raise_error: bool = False) -> DockerfileSchema | None:
     """Reads a Dockerfile and extracts version information.
 
     Args:
