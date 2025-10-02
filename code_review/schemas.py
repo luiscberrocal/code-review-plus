@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class SemanticVersion(BaseModel):
     """Schema for semantic versioning."""
+
     name: str = Field(title="Name of the library or application")
     major: int
     minor: int
@@ -21,7 +22,7 @@ class SemanticVersion(BaseModel):
         return f"{self.major}.{self.minor}.{self.patch}"
 
     @classmethod
-    def parse_version(cls, version: str, name:str,  file_path: Path, raise_error:bool=False) -> "SemanticVersion":
+    def parse_version(cls, version: str, name: str, file_path: Path, raise_error: bool = False) -> "SemanticVersion":
         """Parse a version string into a SemanticVersion object."""
         logger.debug("Parsing version '%s' from file '%s'", version, file_path)
         parts = version.split(".")

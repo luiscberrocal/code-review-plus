@@ -4,7 +4,6 @@ from pathlib import Path
 from gitignore_parser import parse_gitignore
 
 from code_review.exceptions import SimpleGitToolError
-from code_review.settings import CLI_CONSOLE
 
 
 def get_not_ignored(folder: Path, global_patten: str) -> list[Path]:
@@ -25,7 +24,8 @@ def get_not_ignored(folder: Path, global_patten: str) -> list[Path]:
     if gitignore_path.exists():
         matches = parse_gitignore(gitignore_path)
     else:
-        matches = lambda x: False  # No .gitignore file, so nothing is ignored
+        def matches(x) -> bool:
+            return False  # No .gitignore file, so nothing is ignored
 
     files_found = []
     for dockerfile_path in folder.rglob(global_patten):
@@ -37,6 +37,7 @@ def get_not_ignored(folder: Path, global_patten: str) -> list[Path]:
 
 def change_directory(folder: Path) -> None:
     """Change the current working directory to the specified folder.
+
     Args:
         folder: The Path object for the directory to change to.
     """
@@ -49,6 +50,7 @@ def change_directory(folder: Path) -> None:
         # CLI_CONSOLE.print(f"Changing to directory: [cyan]{folder}[/cyan]")
         os.chdir(folder)
 
+
 def get_all_project_folder(base_folder: Path, exclusion_list: list[str] = None) -> list[Path]:
     """Get all project folders in the base folder that have a .git folder in them.
 
@@ -60,7 +62,6 @@ def get_all_project_folder(base_folder: Path, exclusion_list: list[str] = None) 
         exclusion_list = []
     project_folders = []
     for item in base_folder.iterdir():
-        if item.is_dir() and (item / ".git").exists():
-            if item.name not in exclusion_list:
-                project_folders.append(item)
+        if item.is_dir() and (item / ".git").exists() and item.name not in exclusion_list:
+            project_folders.append(item)
     return project_folders

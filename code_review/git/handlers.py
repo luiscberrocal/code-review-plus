@@ -2,7 +2,6 @@ import json
 import logging
 import re
 import subprocess
-from re import search
 from typing import Any
 
 from code_review.exceptions import SimpleGitToolError
@@ -201,7 +200,6 @@ def get_author(branch_name: str) -> str:
 
         # Step 2: Get the author of the commit.
         # The `--pretty=format:'%an'` flag formats the output to just the author's name.
-        formatting = "%an"
         author_result = subprocess.run(
             ["git", "log", "-1", "--pretty=format:%an", commit_hash],
             capture_output=True,
@@ -243,7 +241,7 @@ def _get_merged_branches(base: str) -> list:
     return merged_branches
 
 
-def _get_unmerged_branches(base: str, author_pattern:str = None) -> list[BranchSchema]:
+def _get_unmerged_branches(base: str, author_pattern: str = None) -> list[BranchSchema]:
     unmerged_branches = []
 
     refresh_from_remote("origin")
@@ -275,8 +273,7 @@ def _get_unmerged_branches(base: str, author_pattern:str = None) -> list[BranchS
                 unmerged_branches.append(branch_schema)
     except ValueError as e:
         logger.error("Branch not found: %s", e)
-    sorted_branches = sorted(unmerged_branches, reverse=True)
-    return sorted_branches
+    return sorted(unmerged_branches, reverse=True)
 
 
 def branch_line_to_dict(branch_name: str) -> dict[str, Any]:
@@ -294,11 +291,15 @@ def display_branches(branches: list[BranchSchema]) -> None:
     for i, branch in enumerate(branches, 1):
         CLI_CONSOLE.print(f" {i} [yellow]{branch.name}[/yellow] {branch.date}(by [blue]{branch.author}[/blue])")
 
+
 def refresh_from_remote(remote_source: str) -> None:
     try:
-        subprocess.run(["git", "fetch", remote_source], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(
+            ["git", "fetch", remote_source], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
     except subprocess.CalledProcessError:
         raise SimpleGitToolError(f"Could not refresh from remote '{remote_source}'")
+
 
 def compare_branches(base: str, target: str) -> dict[str, int]:
     """Compare two branches and return how many commits one is ahead or behind the other.
@@ -321,7 +322,8 @@ def compare_branches(base: str, target: str) -> dict[str, int]:
     except subprocess.CalledProcessError as e:
         raise SimpleGitToolError(f"Error comparing branches: {e.stderr.strip()}") from e
 
+
 def sync_branches(branches: list[str]) -> None:
     refresh_from_remote("origin")
     for branch in branches:
-        check_out_and_pull(branch)
+        check_out_and_pull(branch, check=False)
