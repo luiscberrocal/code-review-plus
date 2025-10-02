@@ -8,6 +8,15 @@ logger = logging.getLogger(__name__)
 
 
 def handle_mult_targets(folder: Path, filename: str = ".gitlab-ci,tml") -> dict[str, list] | None:
+    """
+
+    Args:
+        folder:
+        filename:
+
+    Returns:
+
+    """
     files = get_not_ignored(folder, filename)
     if not files:
         return None

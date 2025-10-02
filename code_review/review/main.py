@@ -21,16 +21,19 @@ def review() -> None:
 @review.command()
 @click.option("--folder", "-f", type=Path, help="Path to the git repository", default=None)
 @click.option("--author", "-a", type=str, help="Name of the author", default=None)
-def make(folder: Path, author: str) -> None:
+@click.option("--page-size", "-p", type=int, help="Page size. If zero all", default= 0)
+def make(folder: Path, author: str, page_size: int) -> None:
     """List branches in the specified Git repository."""
     change_directory(folder)
     CLI_CONSOLE.print(f"Changing to directory: [cyan]{folder}[/cyan]")
+
     sync_branches(CURRENT_CONFIGURATION["default_branches"])
+
     unmerged_branches = _get_unmerged_branches("master", author_pattern=author)
     if not unmerged_branches:
         click.echo("No unmerged branches found.")
         return
-    display_branches(unmerged_branches)
+    display_branches(unmerged_branches, page_size=page_size)
     branch_num = click.prompt("Select a branch by number", type=int)
     selected_branch = unmerged_branches[branch_num - 1]
     click.echo(f"You selected branch: {selected_branch.name}")
