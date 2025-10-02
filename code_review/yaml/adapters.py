@@ -1,10 +1,11 @@
+import logging
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-import logging
 logger = logging.getLogger(__name__)
+
 
 def parse_yaml_file(file_path: Path) -> dict[str, Any] | None:
     """Parses a YAML file and returns a Python dictionary.
@@ -17,8 +18,7 @@ def parse_yaml_file(file_path: Path) -> dict[str, Any] | None:
     """
     try:
         with open(file_path) as file:
-            data = yaml.safe_load(file)
-        return data
+            return yaml.safe_load(file)
     except FileNotFoundError:
         logger.error("YAML file not found: %s", file_path)
         return None

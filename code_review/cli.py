@@ -1,6 +1,6 @@
 import click
 
-from code_review.handlers.display_handlers import show_banner, display_about_table
+from code_review.handlers.display_handlers import display_about_table, show_banner
 
 
 @click.group()

@@ -9,7 +9,7 @@ from code_review.git.handlers import _get_unmerged_branches, display_branches, s
 from code_review.handlers.file_handlers import change_directory
 from code_review.review.adapters import build_code_review_schema
 from code_review.review.handlers import display_review, write_review_to_file
-from code_review.settings import CLI_CONSOLE, OUTPUT_FOLDER, CURRENT_CONFIGURATION
+from code_review.settings import CLI_CONSOLE, CURRENT_CONFIGURATION, OUTPUT_FOLDER
 
 
 @cli.group()
@@ -21,7 +21,7 @@ def review() -> None:
 @review.command()
 @click.option("--folder", "-f", type=Path, help="Path to the git repository", default=None)
 @click.option("--author", "-a", type=str, help="Name of the author", default=None)
-def make(folder: Path, author:str) -> None:
+def make(folder: Path, author: str) -> None:
     """List branches in the specified Git repository."""
     change_directory(folder)
     CLI_CONSOLE.print(f"Changing to directory: [cyan]{folder}[/cyan]")

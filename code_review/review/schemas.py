@@ -23,3 +23,10 @@ class CodeReviewSchema(BaseModel):
     docker_files: list[DockerfileSchema] | None = Field(
         default_factory=list, description="List of Dockerfiles found in the project"
     )
+
+
+class CodeProject(BaseModel):
+    """Schema for code projects."""
+
+    path: Path = Field(description="Path to the project directory")
+    tests_to_run: list[str] = Field(default_factory=list, description="List of test commands to run for the project")

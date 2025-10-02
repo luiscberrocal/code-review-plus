@@ -20,7 +20,7 @@ class TestTomlConfigManager:
     def test_init_with_custom_config(self, tmp_path):
         """Test initialization with custom configuration."""
         custom_config = {"test_key": "test_value"}
-        manager = TomlConfigManager(config_dir=tmp_path, config_file_name="custom.toml", default_config=custom_config)
+        TomlConfigManager(config_dir=tmp_path, config_file_name="custom.toml", default_config=custom_config)
 
     def test_save_and_load_config(self, config_manager, tmp_path):
         """Test saving and loading configuration."""

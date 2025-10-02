@@ -1,9 +1,9 @@
-import pytest
 import os
 from pathlib import Path
 
-from code_review.handlers.file_handlers import get_not_ignored, get_all_project_folder
+import pytest
 
+from code_review.handlers.file_handlers import get_all_project_folder, get_not_ignored
 
 # Assuming your function is in a file named `my_module.py`
 
@@ -120,12 +120,14 @@ class TestGetNotIgnored:
 
         assert found_files == []
 
+
 def test_env_vars_set(load_environment_vars):
     folder_var = os.getenv("PROJECTS_FOLDER")
     folder = Path(folder_var).expanduser().resolve()
     print(">>>>", folder)
     assert folder_var == "~/adelantos"
     assert folder.exists()
+
 
 def test_get_all_project_folder(load_environment_vars):
     folder_var = os.getenv("PROJECTS_FOLDER")

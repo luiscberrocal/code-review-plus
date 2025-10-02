@@ -18,7 +18,8 @@ OUTPUT_FOLDER = BASE_FOLDER / "output"
 LOG_DIR = OUTPUT_FOLDER / "logs"
 if not LOG_DIR.exists():
     LOG_DIR.mkdir(parents=True, exist_ok=True)
-BANNER ="""
+
+BANNER = """
  ██████╗ ██████╗ ██████╗ ███████╗    ██████╗ ███████╗██╗   ██╗██╗███████╗██╗    ██╗    ██████╗ ██╗     ██╗   ██╗███████╗
 ██╔════╝██╔═══██╗██╔══██╗██╔════╝    ██╔══██╗██╔════╝██║   ██║██║██╔════╝██║    ██║    ██╔══██╗██║     ██║   ██║██╔════╝
 ██║     ██║   ██║██║  ██║█████╗      ██████╔╝█████╗  ██║   ██║██║█████╗  ██║ █╗ ██║    ██████╔╝██║     ██║   ██║███████╗
@@ -80,7 +81,7 @@ LOGGING = {
         "code_review.git": {
             "level": "DEBUG",
             "handlers": [
-               # "console",
+                # "console",
                 "file"
             ],
             "propagate": False,

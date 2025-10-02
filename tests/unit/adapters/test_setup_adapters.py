@@ -1,12 +1,10 @@
+
 import pytest
-import configparser
-from pathlib import Path
 
 from code_review.adapters.setup_adapters import setup_to_dict
 
 
 class TestSetupToDict:
-
     # Pytest fixture to create a temporary directory and files
     @pytest.fixture
     def setup_config_files(self, tmp_path):
@@ -41,7 +39,7 @@ class TestSetupToDict:
             "valid": valid_file,
             "bumpversion": bumpversion_file,
             "invalid": invalid_file,
-            "non_existent": tmp_path / "non_existent.cfg"
+            "non_existent": tmp_path / "non_existent.cfg",
         }
 
     def test_valid_file_parsing(self, setup_config_files):
@@ -58,9 +56,7 @@ class TestSetupToDict:
         """Tests that the 'bumpversion' section's boolean values are parsed correctly."""
         file_path = setup_config_files["bumpversion"]
         result = setup_to_dict(file_path)
-        expected = {
-            "bumpversion": {"tag": True, "commit": False}
-        }
+        expected = {"bumpversion": {"tag": True, "commit": False}}
         assert result == expected, "The function should parse 'bumpversion' boolean values correctly."
 
     def test_file_not_found_no_error(self, setup_config_files):
