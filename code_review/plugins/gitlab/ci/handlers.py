@@ -7,13 +7,13 @@ from code_review.yaml.adapters import parse_yaml_file
 logger = logging.getLogger(__name__)
 
 
-def handle_multi_targets(folder: Path, filename: str = ".gitlab-ci,tml") -> dict[str, list] | None:
+def handle_multi_targets(folder: Path, filename: str = ".gitlab-ci.yml") -> dict[str, list] | None:
     """
     Parse the .gitlab-ci.yml file to extract jobs with 'only' conditions.
 
     Args:
-        folder:
-        filename:
+        folder: Project folder path.
+        filename: Name of the GitLab CI configuration file.
 
     Returns:
 
