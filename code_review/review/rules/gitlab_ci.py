@@ -1,4 +1,4 @@
-from code_review.review.enums import ReviewRuleLevel
+from code_review.enums import ReviewRuleLevel
 
 
 def check_multiple_targets(ci_data: dict):

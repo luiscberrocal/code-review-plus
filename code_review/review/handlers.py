@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
-from code_review.review.enums import ReviewRuleLevelIcon
+from code_review.enums import ReviewRuleLevelIcon
 from code_review.review.schemas import CodeReviewSchema
 from code_review.settings import CLI_CONSOLE
 
@@ -79,7 +79,6 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
         logger.error("Skipping version check due to missing information")
         return
 
-    # Changelog version comparison
     changelog_latest_version = review.target_branch.changelog_versions[0]
     logger.debug("Latest changelog version: %s", changelog_latest_version)
     if review.target_branch.version < changelog_latest_version:
@@ -92,8 +91,6 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
             f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Versioning is not correct expected to move from {review.target_branch.version} "
             f"to {changelog_latest_version}![/bold red] "
         )
-
-     # Gitlab CI link
 
 
 def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:
