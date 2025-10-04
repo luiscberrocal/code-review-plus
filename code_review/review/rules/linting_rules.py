@@ -20,6 +20,18 @@ def compare_linting_error_rules(base_branch: BranchSchema, target_branch: Branch
     rules = []
     target_count = getattr(target_branch, linting_attribute)
     name = linting_attribute.replace("_", " ").title()
+    if linting_attribute == "formatting_errors" and target_count > 0:
+        rules.append(
+            RulesResult(
+                name=name,
+                level="ERROR",
+                passed=False,
+                message=f"Target branch has {target_count} formatting errors.",
+                details=(
+                    f"Target branch has {target_branch.formatting_errors} formatting errors."
+                ),
+            )
+        )
     if target_count == 0:
         rules.append(
             RulesResult(
@@ -29,15 +41,6 @@ def compare_linting_error_rules(base_branch: BranchSchema, target_branch: Branch
                 message="Base branch has no versions in the changelog.",
             )
         )
-    # if target_branch.formatting_errors == 0:
-    #     rules.append(
-    #         RulesResult(
-    #             name="Ruff Formatting",
-    #             level="INFO",
-    #             passed=True,
-    #             message="Target branch has no formatting errors.",
-    #         )
-    #     )
 
     base_count = getattr(base_branch, linting_attribute)
     if target_count > base_count:
@@ -46,7 +49,7 @@ def compare_linting_error_rules(base_branch: BranchSchema, target_branch: Branch
                 name=name,
                 passed=False,
                 level="ERROR",
-                message="Target branch has more linting errors than the base branch.",
+                message=f"Target branch has more linting errors than the base branch {target_count} > {base_count}.",
                 details=(
                     f"Base branch has {base_branch.linting_errors} linting errors, "
                     f"while target branch has {target_branch.linting_errors}."
@@ -54,12 +57,13 @@ def compare_linting_error_rules(base_branch: BranchSchema, target_branch: Branch
             )
         )
     elif target_count < base_count:
+        percent_reduction = ((base_count - target_count) / base_count) * 100 if base_count > 0 else 100
         rules.append(
             RulesResult(
                 name=name,
                 passed=True,
                 level="INFO",
-                message="Target branch has fewer linting errors than the base branch.",
+                message=f"Target branch has fewer linting errors than the base branch {target_count} < {base_count} ({percent_reduction:.2f} %).",
                 details=(
                     f"Base branch has {base_branch.linting_errors} linting errors, "
                     f"while target branch has {target_branch.linting_errors}."
@@ -72,7 +76,7 @@ def compare_linting_error_rules(base_branch: BranchSchema, target_branch: Branch
                 name=name,
                 level="WARNING",
                 passed=True,
-                message="Target branch has the same number of linting errors as the base branch.",
+                message=f"Target branch has the same number of linting errors as the base branch {target_count} = {base_count}.",
                 details=(
                     f"Both branches have {base_branch.linting_errors} linting errors."
                 ),
