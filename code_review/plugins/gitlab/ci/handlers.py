@@ -9,8 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def handle_multi_targets(folder: Path, filename: str = ".gitlab-ci.yml") -> dict[str, list] | None:
-    """
-    Parse the .gitlab-ci.yml file to extract jobs with 'only' conditions.
+    """Parse the .gitlab-ci.yml file to extract jobs with 'only' conditions.
 
     Args:
         folder: Project folder path.

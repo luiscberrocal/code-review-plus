@@ -287,7 +287,7 @@ def branch_line_to_dict(branch_name: str) -> dict[str, Any]:
     return branch_dict
 
 
-def display_branches(branches: list[BranchSchema], page_size:int) -> None:
+def display_branches(branches: list[BranchSchema], page_size: int) -> None:
     if page_size:
         branches = branches[:page_size]
     for i, branch in enumerate(branches, 1):
@@ -325,7 +325,7 @@ def compare_branches(base: str, target: str) -> dict[str, int]:
         raise SimpleGitToolError(f"Error comparing branches: {e.stderr.strip()}") from e
 
 
-def sync_branches(branches: list[str], verbose:bool=True) -> None:
+def sync_branches(branches: list[str], verbose: bool = True) -> None:
     if verbose:
         CLI_CONSOLE.print("[bold blue]Syncing branches...[/bold blue]")
 

@@ -81,8 +81,10 @@ class BranchSchema(BaseModel):
 
         return self_date < other_date
 
+
 class RulesResult(BaseModel):
     """Schema for rules result."""
+
     name: str = Field(description="Name of the rule")
     passed: bool = Field(description="Indicates if the rule passed or failed", default=False)
     level: str = Field(description="Level of the rule", default="info")

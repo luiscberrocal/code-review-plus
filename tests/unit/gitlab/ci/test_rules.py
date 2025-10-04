@@ -2,9 +2,6 @@ from pathlib import Path
 
 from code_review.plugins.gitlab.ci.rules import validate_ci_rules
 
-import pytest
-from pathlib import Path
-from code_review.plugins.gitlab.ci.rules import validate_ci_rules
 
 class TestValidateCIRules:
     def test_valid_ci_rules(self, fixtures_folder: Path):

@@ -24,6 +24,7 @@ def get_not_ignored(folder: Path, global_patten: str) -> list[Path]:
     if gitignore_path.exists():
         matches = parse_gitignore(gitignore_path)
     else:
+
         def matches(x) -> bool:
             return False  # No .gitignore file, so nothing is ignored
 

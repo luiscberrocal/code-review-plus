@@ -21,7 +21,7 @@ def review() -> None:
 @review.command()
 @click.option("--folder", "-f", type=Path, help="Path to the git repository", default=None)
 @click.option("--author", "-a", type=str, help="Name of the author", default=None)
-@click.option("--page-size", "-p", type=int, help="Page size. If zero all", default= 0)
+@click.option("--page-size", "-p", type=int, help="Page size. If zero all", default=0)
 def make(folder: Path, author: str, page_size: int) -> None:
     """List branches in the specified Git repository."""
     change_directory(folder)

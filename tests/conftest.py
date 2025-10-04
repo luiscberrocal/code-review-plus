@@ -21,5 +21,3 @@ def requirements_folder() -> Path:
 def load_environment_vars():
     """Load environment variables for testing."""
     load_environment_variables("local.txt")
-
-

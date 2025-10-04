@@ -24,7 +24,7 @@ class TestSemanticVersion:
     def test_parse_valid_version(self):
         """Test parsing a valid version string."""
         version_str = "1.2.3"
-        version = SemanticVersion.parse_version(version_str, "my-lib", self.test_path )
+        version = SemanticVersion.parse_version(version_str, "my-lib", self.test_path)
         assert version.major == 1
         assert version.minor == 2
         assert version.patch == 3
