@@ -94,9 +94,9 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
     if review.rules_validated:
         for rule in review.rules_validated:
             if rule.passed:
-                CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} Rule Passed: {rule.name}[/bold green]")
+                CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} Rule Passed: {rule.name} {rule.message}[/bold green]")
             else:
-                CLI_CONSOLE.print(f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Rule Failed: {rule.name}[/bold red]")
+                CLI_CONSOLE.print(f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Rule Failed: {rule.name} {rule.message}[/bold red]")
 
 
 def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:
