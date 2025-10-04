@@ -9,6 +9,7 @@ from code_review.docker.docker_files.handlers import parse_dockerfile
 from code_review.git.handlers import branch_line_to_dict, check_out_and_pull, get_branch_info
 from code_review.handlers.file_handlers import change_directory, get_not_ignored
 from code_review.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
+from code_review.plugins.gitlab.ci.rules import validate_ci_rules
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
 
@@ -59,6 +60,12 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
         if docker_info:
             docker_info_list.append(docker_info)
 
+    rules = []
+    ci_rules = validate_ci_rules(folder / ".gitlab-ci.yml")
+
+    if ci_rules:
+        rules.extend(ci_rules)
+
     return CodeReviewSchema(
         name=folder.name,
         source_folder=folder,
@@ -67,6 +74,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
         base_branch=base_branch,
         date_created=datetime.now(),
         docker_files=docker_info_list,
+        rules_validated=rules,
     )
 
 
