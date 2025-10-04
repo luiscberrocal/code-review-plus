@@ -1,22 +1,29 @@
 from code_review.schemas import BranchSchema, RulesResult
 
+def check_and_format_ruff(base_branch: BranchSchema, target_branch: BranchSchema) -> list[RulesResult]:
+    results = compare_linting_error_rules(base_branch, target_branch, "linting_errors")
+    results.extend(compare_linting_error_rules(base_branch, target_branch, "formatting_errors"))
+    return results
 
-def compare_linting_rules(base_branch: BranchSchema, target_branch: BranchSchema, linting_attribute:str) -> list[RulesResult]:
+def compare_linting_error_rules(base_branch: BranchSchema, target_branch: BranchSchema, linting_attribute:str) -> list[RulesResult]:
     """Compare linting rules between two branches.
 
     Args:
         base_branch: The base branch schema.
         target_branch: The target branch schema.
+        linting_attribute: The attribute name to compare (e.g., 'linting_errors').
 
     Returns:
         A dictionary with the comparison results.
     """
 
     rules = []
-    if getattr(target_branch, linting_attribute) == 0:
+    target_count = getattr(target_branch, linting_attribute)
+    name = linting_attribute.replace("_", " ").title()
+    if target_count == 0:
         rules.append(
             RulesResult(
-                name="Ruff Linting",
+                name=name,
                 level="INFO",
                 passed=True,
                 message="Base branch has no versions in the changelog.",
@@ -32,10 +39,11 @@ def compare_linting_rules(base_branch: BranchSchema, target_branch: BranchSchema
     #         )
     #     )
 
-    if getattr(target_branch, linting_attribute) > getattr(base_branch, linting_attribute):
+    base_count = getattr(base_branch, linting_attribute)
+    if target_count > base_count:
         rules.append(
             RulesResult(
-                name="Ruff Linting",
+                name=name,
                 passed=False,
                 level="ERROR",
                 message="Target branch has more linting errors than the base branch.",
@@ -45,10 +53,10 @@ def compare_linting_rules(base_branch: BranchSchema, target_branch: BranchSchema
                 ),
             )
         )
-    elif getattr(target_branch, linting_attribute) < getattr(base_branch, linting_attribute):
+    elif target_count < base_count:
         rules.append(
             RulesResult(
-                name="Ruff Linting",
+                name=name,
                 passed=True,
                 level="INFO",
                 message="Target branch has fewer linting errors than the base branch.",
@@ -61,7 +69,7 @@ def compare_linting_rules(base_branch: BranchSchema, target_branch: BranchSchema
     else:
         rules.append(
             RulesResult(
-                name="Ruff Linting",
+                name=name,
                 level="WARNING",
                 passed=True,
                 message="Target branch has the same number of linting errors as the base branch.",

@@ -10,6 +10,7 @@ from code_review.git.handlers import branch_line_to_dict, check_out_and_pull, ge
 from code_review.handlers.file_handlers import change_directory, get_not_ignored
 from code_review.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
 from code_review.plugins.gitlab.ci.rules import validate_ci_rules
+from code_review.review.rules.linting_rules import check_and_format_ruff
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
 
@@ -65,6 +66,9 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
 
     if ci_rules:
         rules.extend(ci_rules)
+    linting_rules =  check_and_format_ruff(base_branch, target_branch)
+    if linting_rules:
+        rules.extend(linting_rules)
 
     return CodeReviewSchema(
         name=folder.name,
