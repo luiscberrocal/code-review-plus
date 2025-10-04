@@ -1,9 +1,12 @@
 from pathlib import Path
 
+from code_review.enums import ReviewRuleLevel
+from code_review.exceptions import CodeReviewError
 from code_review.plugins.gitlab.ci.handlers import handle_multi_targets
+from code_review.schemas import RulesResult
 
 
-def validate_ci_rules(file: Path) -> None:
+def validate_ci_rules(file: Path) -> RulesResult:
     """Validate GitLab CI rules in the given file.
 
     Args:
@@ -12,19 +15,19 @@ def validate_ci_rules(file: Path) -> None:
     Raises:
         ValueError: If invalid rules are found.
     """
+    try:
+        rules = handle_multi_targets(file.parent, file.name)
+        for key, item in rules.items():
+            if not isinstance(item, list):
+                return RulesResult(name="gitlab-ci", passed=False, level=ReviewRuleLevel.CRITICAL.value,
+                                   message=f"Invalid 'only' condition for job '{key}': {item}")
+            if len(item) > 1:
+                return RulesResult(name="gitlab-ci", passed=False, level=ReviewRuleLevel.CRITICAL.value,
+                                   message=f"Multiple 'only' conditions for job '{key}': {item}")
+        return RulesResult(name="gitlab-ci", passed=True, level=ReviewRuleLevel.INFO.value, message="All CI rules are valid.")
 
-    rules = handle_multi_targets(file.parent, file.name)
-    if not rules:
-        return
 
-    for job, conditions in rules.items():
-        for condition in conditions:
-            if not isinstance(condition, str):
-                raise ValueError(f"Invalid condition type in job '{job}': {condition} (type: {type(condition)})")
-            if not condition.startswith("refs/heads/"):
-                raise ValueError(f"Invalid condition format in job '{job}': {condition}. Must start with 'refs/heads/'")
-            branch = condition[len("refs/heads/") :]
-            if not branch:
-                raise ValueError(f"Empty branch name in job '{job}' condition: {condition}")
-            if " " in branch or "\t" in branch:
-                raise ValueError(f"Invalid whitespace in branch name for job '{job}': '{branch}'")
+    except CodeReviewError as e:
+        return RulesResult(name="gitlab-ci", passed=False, level=ReviewRuleLevel.ERROR.value, message=str(e))
+    except Exception as e:
+        return RulesResult(name="gitlab-ci", passed=False, level=ReviewRuleLevel.CRITICAL.value, message=f"Unexpected error: {e}")
