@@ -20,18 +20,30 @@ def compare_linting_error_rules(base_branch: BranchSchema, target_branch: Branch
     rules = []
     target_count = getattr(target_branch, linting_attribute)
     name = linting_attribute.replace("_", " ").title()
-    if linting_attribute == "formatting_errors" and target_count > 0:
-        rules.append(
-            RulesResult(
-                name=name,
-                level="ERROR",
-                passed=False,
-                message=f"Target branch has {target_count} formatting errors.",
-                details=(
-                    f"Target branch has {target_branch.formatting_errors} formatting errors."
-                ),
+    if linting_attribute == "formatting_errors":
+        if target_count > 0:
+            rules.append(
+                RulesResult(
+                    name=name,
+                    level="ERROR",
+                    passed=False,
+                    message=f"Target branch has {target_count} formatting errors.",
+                    details=(
+                        f"Target branch has {target_branch.formatting_errors} formatting errors."
+                    ),
+                )
             )
-        )
+        else:
+            rules.append(
+                RulesResult(
+                    name=name,
+                    level="INFO",
+                    passed=True,
+                    message="All files are properly formatted in the target branch.",
+                )
+            )
+        return rules
+
     if target_count == 0:
         rules.append(
             RulesResult(
