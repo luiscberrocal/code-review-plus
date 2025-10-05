@@ -3,7 +3,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from code_review.docker.schemas import DockerfileSchema
+from code_review.plugins.docker.schemas import DockerfileSchema
 from code_review.schemas import BranchSchema, RulesResult
 
 

@@ -1,4 +1,4 @@
-from code_review.docker.docker_files.handlers import get_versions_from_dockerfile, parse_dockerfile
+from code_review.plugins.docker.docker_files.handlers import get_versions_from_dockerfile, parse_dockerfile
 
 
 def test_dockerfile_handler(fixtures_folder):
