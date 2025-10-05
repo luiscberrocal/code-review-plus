@@ -74,6 +74,15 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
 
     logger.debug("Review Details: %s", review.target_branch.changelog_versions)
     logger.debug("Review version: %s", review.target_branch.version)
+    print("-"*80)
+    # Rules validated
+    CLI_CONSOLE.print("[bold blue]>>> Rules Validated <<<[/bold blue]")
+    if review.rules_validated:
+        for rule in review.rules_validated:
+            if rule.passed:
+                CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} Rule Passed: {rule.name} {rule.message}[/bold green]")
+            else:
+                CLI_CONSOLE.print(f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Rule Failed: {rule.name} {rule.message}[/bold red]")
 
     if len(review.target_branch.changelog_versions) == 0 or review.target_branch.version is None:
         logger.error("Skipping version check due to missing information")
@@ -91,14 +100,6 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
             f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Versioning is not correct expected to move from {review.target_branch.version} "
             f"to {changelog_latest_version}![/bold red] "
         )
-    # Rules validated
-    CLI_CONSOLE.print("[bold blue]>>> Rules Validated <<<[/bold blue]")
-    if review.rules_validated:
-        for rule in review.rules_validated:
-            if rule.passed:
-                CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} Rule Passed: {rule.name} {rule.message}[/bold green]")
-            else:
-                CLI_CONSOLE.print(f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Rule Failed: {rule.name} {rule.message}[/bold red]")
 
 
 def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:

@@ -1,7 +1,6 @@
 from datetime import datetime
 from pathlib import Path
 
-from build.lib.code_review.settings import CURRENT_CONFIGURATION
 from code_review.adapters.changelog import parse_changelog
 from code_review.adapters.setup_adapters import setup_to_dict
 from code_review.coverage.main import get_makefile, get_minimum_coverage
@@ -73,9 +72,9 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     if linting_rules:
         rules.extend(linting_rules)
     # Git rules
-    # git_rules = validate_master_develop_sync(CURRENT_CONFIGURATION)
-    #if git_rules:
-    #    rules.extend(git_rules)
+    git_rules = validate_master_develop_sync(["master", "develop"])
+    if git_rules:
+       rules.extend(git_rules)
 
 
     return CodeReviewSchema(

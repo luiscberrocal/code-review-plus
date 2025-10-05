@@ -2,7 +2,7 @@ from code_review.git.handlers import compare_branches
 from code_review.schemas import RulesResult
 
 
-def validate_master_develop_sync(config: dict) -> list[RulesResult]:
+def validate_master_develop_sync(default_branches: list[str]) -> list[RulesResult]:
     """Validates that 'master' and 'develop' branches are included in the default branches.
 
     This function checks if both 'master' and 'develop' branches are present
@@ -18,7 +18,6 @@ def validate_master_develop_sync(config: dict) -> list[RulesResult]:
               False otherwise.
     """
     rules = []
-    default_branches = config.get("default_branches", [])
     results = compare_branches(*default_branches)
 
     if results.get("ahead") == 0 and results.get("behind") == 0:
