@@ -303,13 +303,14 @@ def refresh_from_remote(remote_source: str) -> None:
         raise SimpleGitToolError(f"Could not refresh from remote '{remote_source}'")
 
 
-def compare_branches(base: str, target: str) -> dict[str, int]:
+def compare_branches(base: str, target: str, raise_error:bool=False) -> dict[str, int]:
     """Compare two branches and return how many commits one is ahead or behind the other.
 
     Args:
         base (str): The base branch to compare against (e.g., "master").
         target (str): The target branch to compare (e.g., "feature-branch").
     """
+    status = {"ahead": -1, "behind": -1}
     try:
         result = subprocess.run(
             ["git", "rev-list", "--left-right", "--count", f"{base}...{target}"],
@@ -319,10 +320,15 @@ def compare_branches(base: str, target: str) -> dict[str, int]:
         )
         behind_ahead = result.stdout.strip()
         behind, ahead = map(int, behind_ahead.split())
-        return {"ahead": ahead, "behind": behind}
+        status["ahead"] = ahead
+        status["behind"] = behind
+        return status
         # return f"Branch '{target}' is {ahead} commits ahead and {behind} commits behind '{base}'."
     except subprocess.CalledProcessError as e:
-        raise SimpleGitToolError(f"Error comparing branches: {e.stderr.strip()}") from e
+        logger.error("Error comparing branches: %s", e.stderr.strip())
+        if raise_error:
+            raise SimpleGitToolError(f"Error comparing branches: {e.stderr.strip()}") from e
+        return status
 
 
 def sync_branches(branches: list[str], verbose: bool = True) -> None:
