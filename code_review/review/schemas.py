@@ -4,7 +4,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 
 from code_review.docker.schemas import DockerfileSchema
-from code_review.schemas import BranchSchema
+from code_review.schemas import BranchSchema, RulesResult
 
 
 class CodeReviewSchema(BaseModel):
@@ -22,6 +22,9 @@ class CodeReviewSchema(BaseModel):
     base_branch: BranchSchema
     docker_files: list[DockerfileSchema] | None = Field(
         default_factory=list, description="List of Dockerfiles found in the project"
+    )
+    rules_validated: list[RulesResult] | None = Field(
+        default_factory=list, description="List of rule validation results"
     )
 
 

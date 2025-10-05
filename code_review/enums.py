@@ -2,10 +2,10 @@ from enum import Enum
 
 
 class ReviewRuleLevel(Enum):
-    INFO = "info"
-    WARNING = "warning"
-    ERROR = "error"
-    CRITICAL = "critical"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    ERROR = "ERROR"
+    CRITICAL = "CRITICAL"
 
 
 class ReviewRuleLevelIcon(Enum):

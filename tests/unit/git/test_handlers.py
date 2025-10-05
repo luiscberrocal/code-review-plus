@@ -1,4 +1,4 @@
-from code_review.git.handlers import compare_branches
+from code_review.plugins.git import compare_branches
 
 
 class TestCompareBranches:

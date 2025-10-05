@@ -8,7 +8,7 @@ import click
 
 from code_review.cli import cli
 from code_review.exceptions import SimpleGitToolError
-from code_review.git.handlers import (
+from code_review.plugins.git.handlers import (
     _are_there_uncommited_changes,
     _compare_versions,
     _get_git_version,
