@@ -1,4 +1,3 @@
-
 import pytest
 
 from code_review.adapters.setup_adapters import setup_to_dict

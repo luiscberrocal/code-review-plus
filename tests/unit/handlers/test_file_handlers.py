@@ -124,8 +124,7 @@ class TestGetNotIgnored:
 def test_env_vars_set(load_environment_vars):
     folder_var = os.getenv("PROJECTS_FOLDER")
     folder = Path(folder_var).expanduser().resolve()
-    print(">>>>", folder)
-    assert folder_var == "~/adelantos"
+    assert folder_var == "~/PycharmProjects"
     assert folder.exists()
 
 

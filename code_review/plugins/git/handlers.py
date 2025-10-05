@@ -5,7 +5,7 @@ import subprocess
 from typing import Any
 
 from code_review.exceptions import SimpleGitToolError
-from code_review.git.adapters import parse_git_date
+from code_review.plugins.git.adapters import parse_git_date
 from code_review.schemas import BranchSchema
 from code_review.settings import CLI_CONSOLE
 
@@ -287,7 +287,9 @@ def branch_line_to_dict(branch_name: str) -> dict[str, Any]:
     return branch_dict
 
 
-def display_branches(branches: list[BranchSchema]) -> None:
+def display_branches(branches: list[BranchSchema], page_size: int) -> None:
+    if page_size:
+        branches = branches[:page_size]
     for i, branch in enumerate(branches, 1):
         CLI_CONSOLE.print(f" {i} [yellow]{branch.name}[/yellow] {branch.date}(by [blue]{branch.author}[/blue])")
 
@@ -301,13 +303,14 @@ def refresh_from_remote(remote_source: str) -> None:
         raise SimpleGitToolError(f"Could not refresh from remote '{remote_source}'")
 
 
-def compare_branches(base: str, target: str) -> dict[str, int]:
+def compare_branches(base: str, target: str, raise_error:bool=False) -> dict[str, int]:
     """Compare two branches and return how many commits one is ahead or behind the other.
 
     Args:
         base (str): The base branch to compare against (e.g., "master").
         target (str): The target branch to compare (e.g., "feature-branch").
     """
+    status = {"ahead": -1, "behind": -1}
     try:
         result = subprocess.run(
             ["git", "rev-list", "--left-right", "--count", f"{base}...{target}"],
@@ -317,13 +320,25 @@ def compare_branches(base: str, target: str) -> dict[str, int]:
         )
         behind_ahead = result.stdout.strip()
         behind, ahead = map(int, behind_ahead.split())
-        return {"ahead": ahead, "behind": behind}
+        status["ahead"] = ahead
+        status["behind"] = behind
+        return status
         # return f"Branch '{target}' is {ahead} commits ahead and {behind} commits behind '{base}'."
     except subprocess.CalledProcessError as e:
-        raise SimpleGitToolError(f"Error comparing branches: {e.stderr.strip()}") from e
+        logger.error("Error comparing branches: %s", e.stderr.strip())
+        if raise_error:
+            raise SimpleGitToolError(f"Error comparing branches: {e.stderr.strip()}") from e
+        return status
 
 
-def sync_branches(branches: list[str]) -> None:
+def sync_branches(branches: list[str], verbose: bool = True) -> None:
+    if verbose:
+        CLI_CONSOLE.print("[bold blue]Syncing branches...[/bold blue]")
+
     refresh_from_remote("origin")
+    if verbose:
+        CLI_CONSOLE.print("Refreshed from remote 'origin'.")
     for branch in branches:
+        if verbose:
+            CLI_CONSOLE.print(f"Checking out and pulling branch: [yellow]{branch}[/yellow]")
         check_out_and_pull(branch, check=False)
