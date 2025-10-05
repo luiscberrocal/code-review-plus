@@ -12,6 +12,7 @@ from code_review.plugins.git.handlers import check_out_and_pull, get_branch_info
 from code_review.plugins.gitlab.ci.rules import validate_ci_rules
 from code_review.review.rules.git_rules import validate_master_develop_sync
 from code_review.review.rules.linting_rules import check_and_format_ruff
+from code_review.review.rules.version_rules import check_change_log_version
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
 
@@ -75,7 +76,10 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     git_rules = validate_master_develop_sync(["master", "develop"])
     if git_rules:
        rules.extend(git_rules)
-
+    # Changelog version rules
+    change_log_rules = check_change_log_version(base_branch, target_branch)
+    if change_log_rules:
+        rules.extend(change_log_rules)
 
     return CodeReviewSchema(
         name=folder.name,
