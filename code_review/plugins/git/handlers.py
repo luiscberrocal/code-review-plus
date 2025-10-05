@@ -5,7 +5,7 @@ import subprocess
 from typing import Any
 
 from code_review.exceptions import SimpleGitToolError
-from code_review.git.adapters import parse_git_date
+from code_review.plugins.git.adapters import parse_git_date
 from code_review.schemas import BranchSchema
 from code_review.settings import CLI_CONSOLE
 

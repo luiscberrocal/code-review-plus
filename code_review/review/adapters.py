@@ -6,9 +6,9 @@ from code_review.adapters.setup_adapters import setup_to_dict
 from code_review.coverage.main import get_makefile, get_minimum_coverage
 from code_review.dependencies.pip.handlers import requirements_updated
 from code_review.docker.docker_files.handlers import parse_dockerfile
-from code_review.git.handlers import branch_line_to_dict, check_out_and_pull, get_branch_info
 from code_review.handlers.file_handlers import change_directory, get_not_ignored
 from code_review.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
+from code_review.plugins.git.handlers import check_out_and_pull, get_branch_info, branch_line_to_dict
 from code_review.plugins.gitlab.ci.rules import validate_ci_rules
 from code_review.review.rules.git_rules import validate_master_develop_sync
 from code_review.review.rules.linting_rules import check_and_format_ruff
