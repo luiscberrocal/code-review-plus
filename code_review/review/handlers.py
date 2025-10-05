@@ -91,6 +91,8 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
             f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Versioning is not correct expected to move from {review.target_branch.version} "
             f"to {changelog_latest_version}![/bold red] "
         )
+    # Rules validated
+    CLI_CONSOLE.print("[bold blue]>>> Rules Validated <<<[/bold blue]")
     if review.rules_validated:
         for rule in review.rules_validated:
             if rule.passed:
