@@ -1,5 +1,6 @@
 from code_review.plugins.git.adapters import is_rebased
 from code_review.plugins.git.handlers import compare_branches
+from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import RulesResult
 import logging
 
@@ -82,4 +83,40 @@ def validate_master_develop_sync_legacy(default_branches: list[str]) -> list[Rul
                 ),
             )
         )
+    return rules
+
+def rebase_rule(code_review_schema: CodeReviewSchema) -> list[RulesResult]:
+    """Check if the target branch has been rebased onto the base branch.
+
+    This function checks if the target branch in the provided code review schema
+    has been rebased onto the base branch. It returns a list of RulesResult
+    indicating whether the rebase check passed or failed.
+
+    Args:
+        code_review_schema: An instance of CodeReviewSchema containing branch information.
+
+    Returns:
+        list[RulesResult]: A list containing a single RulesResult object with the outcome of the rebase check.
+    """
+    rules = []
+    logger.info("Checking if 'master' branch has been rebased %s.", code_review_schema.is_rebased)
+    if code_review_schema.is_rebased:
+        rules.append(
+            RulesResult(
+                name="Git Rebase Check",
+                level="INFO",
+                passed=True,
+                message=f"Target branch '{code_review_schema.target_branch.name}' has been rebased onto base branch '{code_review_schema.base_branch.name}'.",
+            )
+        )
+    else:
+        rules.append(
+            RulesResult(
+                name="Git Rebase Check",
+                level="ERROR",
+                passed=False,
+                message=f"Target branch '{code_review_schema.target_branch.name}' has NOT been rebased onto base branch '{code_review_schema.base_branch.name}'.",
+            )
+        )
+    logger.info("Rebase rule results: %s", rules)
     return rules
