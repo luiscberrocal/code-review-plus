@@ -46,6 +46,8 @@ def run_tests_and_get_coverage(folder: Path, unit_tests: str, minimum_coverage: 
 
         # Extract coverage from the output
         coverage_output = result.stdout
+        with open(os.path.join(folder, "__coverage.txt"), "w") as f:
+            f.write(coverage_output)
 
         test_count_match = re.search(r"Ran\s+(?P<test_count>\d+)\s+tests\s+in\s+(?P<running_time>[\d\.]+)s", coverage_output)
 
