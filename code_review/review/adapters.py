@@ -17,6 +17,10 @@ from code_review.review.rules.version_rules import check_change_log_version
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 
 def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeReviewSchema:
     """Build a CodeReviewSchema for the given folder and target branch.
@@ -64,6 +68,9 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
         if docker_info:
             docker_info_list.append(docker_info)
     source_branch_name = get_git_flow_source_branch(target_branch.name)
+    if not source_branch_name:
+        logger.warning("No source branch in target branch for target branch. %s", target_branch.name)
+
     rules = []
     code_review_schema  =  CodeReviewSchema(
         name=folder.name,
