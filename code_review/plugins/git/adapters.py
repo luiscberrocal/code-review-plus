@@ -63,7 +63,7 @@ def parse_git_date(date_str: str) -> datetime | None:
         return None
 
 
-def is_rebased(target_branch_name: str, base_branch_name: str) -> bool:
+def is_rebased(target_branch_name: str, source_branch_name: str) -> bool:
     """Verifies if a target Git branch has been rebased against a base branch.
 
     This is determined by checking if the merge base (common ancestor) of the
@@ -73,7 +73,8 @@ def is_rebased(target_branch_name: str, base_branch_name: str) -> bool:
 
     Args:
         target_branch_name: The name of the branch to check (e.g., 'feature/my-branch').
-        base_branch_name: The name of the base branch (e.g., 'develop').
+        source_branch_name: The name of the source branch (e.g., 'develop') the branch from which the target branch
+        was created.
 
     Returns:
         True if the target branch has been rebased against the base branch,
@@ -83,13 +84,13 @@ def is_rebased(target_branch_name: str, base_branch_name: str) -> bool:
         # Get the commit hash of the merge base between the two branches.
         # This is the most recent common ancestor.
         merge_base_result = subprocess.run(
-            ["git", "merge-base", target_branch_name, base_branch_name], capture_output=True, text=True, check=True
+            ["git", "merge-base", target_branch_name, source_branch_name], capture_output=True, text=True, check=True
         )
         merge_base_hash = merge_base_result.stdout.strip()
 
         # Get the commit hash of the head of the base branch.
         base_branch_head_result = subprocess.run(
-            ["git", "rev-parse", base_branch_name], capture_output=True, text=True, check=True
+            ["git", "rev-parse", source_branch_name], capture_output=True, text=True, check=True
         )
         base_branch_head_hash = base_branch_head_result.stdout.strip()
 
@@ -104,3 +105,31 @@ def is_rebased(target_branch_name: str, base_branch_name: str) -> bool:
     except FileNotFoundError:
         logger.error("Error: 'git' command not found. Please ensure Git is installed and in your PATH.")
         return False
+
+
+def get_git_flow_source_branch(branch_name: str) -> str | None:
+    """Extracts the source branch name from a Git Flow style branch name.
+
+    This function checks if the provided branch name follows the Git Flow
+    naming conventions for feature, release, hotfix, or support branches.
+    If it does, it extracts and returns the source branch name.
+
+    Args:
+        branch_name: The full name of the Git branch (e.g., 'feature/my-feature').
+
+    Returns:
+        The extracted source branch name (e.g., 'my-feature') if the branch
+        follows Git Flow conventions, otherwise None.
+    """
+    git_flow_patterns = [
+        ( r"^feature/(?P<source_branch>.+)$", "develop" ),
+        (r"^release/(?P<source_branch>.+)$", "develop"),
+        (r"^hotfix/(?P<source_branch>.+)$", "master"),
+    ]
+
+    for pattern in git_flow_patterns:
+        match = re.match(pattern[0], branch_name)
+        if match:
+            return pattern[1]
+
+    return None

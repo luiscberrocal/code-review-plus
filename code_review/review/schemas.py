@@ -12,14 +12,17 @@ class CodeReviewSchema(BaseModel):
 
     name: str = Field(description="Name of the project to code review")
     is_rebased: bool = Field(
-        default=False, description="Indicates if the target branch has been rebased onto the base branch"
+        default=False, description="Indicates if the target branch has been rebased onto the source branch"
     )
     source_folder: Path
     makefile_path: Path | None
     date_created: datetime | None
     ticket: str | None = Field(default=None, description="Ticket associated with the code review")
-    target_branch: BranchSchema
-    base_branch: BranchSchema
+    target_branch: BranchSchema = Field(description="Details of the target branch. The branch to be reviewed.")
+    base_branch: BranchSchema = Field(description="Details of the base branch. The branch to compare against usually master.")
+    source_branch_name: str | None = Field(
+        default=None, description="Name of the source branch from which the target branch was created."
+    )
     docker_files: list[DockerfileSchema] | None = Field(
         default_factory=list, description="List of Dockerfiles found in the project"
     )

@@ -8,7 +8,7 @@ from code_review.dependencies.pip.handlers import requirements_updated
 from code_review.plugins.docker.docker_files.handlers import parse_dockerfile
 from code_review.handlers.file_handlers import change_directory, get_not_ignored
 from code_review.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
-from code_review.plugins.git.adapters import is_rebased
+from code_review.plugins.git.adapters import is_rebased, get_git_flow_source_branch
 from code_review.plugins.git.handlers import check_out_and_pull, get_branch_info, branch_line_to_dict
 from code_review.plugins.gitlab.ci.rules import validate_ci_rules
 from code_review.review.rules.git_rules import validate_master_develop_sync, rebase_rule
@@ -63,20 +63,21 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
         docker_info = parse_dockerfile(file)
         if docker_info:
             docker_info_list.append(docker_info)
-
+    source_branch_name = get_git_flow_source_branch(target_branch.name)
     rules = []
     code_review_schema  =  CodeReviewSchema(
         name=folder.name,
         source_folder=folder,
         makefile_path=makefile,
         target_branch=target_branch,
+        source_branch_name=source_branch_name,
         base_branch=base_branch,
         date_created=datetime.now(),
         docker_files=docker_info_list,
         rules_validated=rules,
     )
 
-    code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, target_branch_name)
+    code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, source_branch_name)
 
     # CI rules
     ci_rules = validate_ci_rules(folder / ".gitlab-ci.yml")

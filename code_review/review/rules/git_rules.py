@@ -22,7 +22,7 @@ def validate_master_develop_sync(base_branch_name:str, target_branch_name:str) -
               False otherwise.
     """
     rules = []
-    rebased = is_rebased(target_branch_name=target_branch_name, base_branch_name=base_branch_name)
+    rebased = is_rebased(target_branch_name=target_branch_name, source_branch_name=base_branch_name)
 
     if rebased:
         rules.append(
@@ -106,7 +106,7 @@ def rebase_rule(code_review_schema: CodeReviewSchema) -> list[RulesResult]:
                 name="Git Rebase Check",
                 level="INFO",
                 passed=True,
-                message=f"Target branch '{code_review_schema.target_branch.name}' has been rebased onto base branch '{code_review_schema.base_branch.name}'.",
+                message=f"Target branch '{code_review_schema.target_branch.name}' has been rebased onto base branch '{code_review_schema.source_branch_name}'.",
             )
         )
     else:
