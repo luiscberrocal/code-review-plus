@@ -2,9 +2,13 @@ import os
 import re
 import subprocess
 from pathlib import Path
+from typing import Any
+
+from code_review.handlers.file_handlers import change_directory
 
 
-def run_tests_and_get_coverage(folder: Path, unit_tests: str, minimum_coverage: int) -> float:
+def run_tests_and_get_coverage(folder: Path, unit_tests: str, minimum_coverage: int,
+                               settings_module:str="config.settings.test") -> dict[str, Any]:
     """Changes to a specified folder, runs a Django test suite with coverage,
     reports the coverage, and extracts the coverage percentage.
 
@@ -22,12 +26,12 @@ def run_tests_and_get_coverage(folder: Path, unit_tests: str, minimum_coverage: 
     """
     original_cwd = os.getcwd()
     try:
-        os.chdir(folder)
+        change_directory(folder)
 
         # Command to run unit tests with coverage
         test_command = (
             f"docker-compose -f local.yml run --rm django coverage run "
-            f"manage.py test {unit_tests} --settings=config.settings.test "
+            f"manage.py test {unit_tests} --settings={settings_module} "
             f"--exclude-tag=INTEGRATION"
         )
         print(f"Running command: {test_command}")
@@ -38,19 +42,31 @@ def run_tests_and_get_coverage(folder: Path, unit_tests: str, minimum_coverage: 
             f"docker-compose -f local.yml run --rm django coverage report -m --fail-under={minimum_coverage}"
         )
         print(f"Running command: {report_command}")
-        result = subprocess.run(report_command, shell=True, check=True, text=True, capture_output=True)
+        result = subprocess.run(report_command, shell=True, check=False, text=True, capture_output=True)
 
         # Extract coverage from the output
         coverage_output = result.stdout
+
+        test_count_match = re.search(r"Ran\s+(?P<test_count>\d+)\s+tests\s+in\s+(?P<running_time>[\d\.]+)s", coverage_output)
+
+        test_count = -1
+        running_time = -1.0
+        coverage_percentage = -1.0
+
+        if test_count_match:
+            test_count = int(test_count_match.group("test_count"))
+            running_time = float(test_count_match.group("running_time"))
         # Regular expression to find the total coverage percentage
         # It looks for a line with "TOTAL" and a number ending with "%"
         match = re.search(r"TOTAL\s+\d+\s+\d+\s+\d+\s+\d+\s+(\d+)%", coverage_output)
         if match:
             coverage_percentage = float(match.group(1))
-            print(f"Coverage extracted: {coverage_percentage}%")
-            return coverage_percentage
-        raise ValueError("Could not find coverage percentage in the output.")
 
+        return {
+            "test_count": test_count,
+            "running_time": running_time,
+            "coverage_percentage": coverage_percentage
+        }
     finally:
         os.chdir(original_cwd)
 
@@ -63,21 +79,23 @@ if __name__ == "__main__":
         tests_to_run = "pay_options_middleware.middleware.tests.unit pay_options_middleware.users.tests"
         min_coverage = 85
 
-        target_folder = Path.home() / "adelantos" / "payment-collector"
-        tests_to_run = (
-            "payment_collector.api.tests.unit payment_collector.users.tests payment_collector.reconciliation.tests"
-        )
-        min_coverage = 85
 
         target_folder = Path.home() / "adelantos" / "wu-integration"
         tests_to_run = "wu_integration.rest.tests.unit"
         min_coverage = 85
 
-        coverage = run_tests_and_get_coverage(target_folder, tests_to_run, min_coverage)
-        print(f"\nSuccessfully completed. Final coverage: {coverage}%")
+        target_folder = Path.home() / "adelantos" / "payment-collector"
+        tests_to_run = (
+            "payment_collector.api.tests.unit payment_collector.users.tests payment_collector.reconciliation.tests"
+        )
+        min_coverage = 85
+        settings_module_t = "config.settings.local"
+
+        coverage = run_tests_and_get_coverage(target_folder, tests_to_run, min_coverage, settings_module=settings_module_t)
+        print(f"\n>>>>>>>>>>>>>>>>>>>> Successfully completed. Final coverage: {coverage}%")
 
     except subprocess.CalledProcessError as e:
-        print("\nAn error occurred during a command execution:")
+        print("\nXXXXXXXXXXXXX An error occurred during a command execution:")
         print(f"Return code: {e.returncode}")
         print(f"Command: {e.cmd}")
         print(f"Stderr: {e.stderr}")
