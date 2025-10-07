@@ -1,8 +1,11 @@
+from code_review.plugins.git.adapters import is_rebased
 from code_review.plugins.git.handlers import compare_branches
 from code_review.schemas import RulesResult
+import logging
 
+logger = logging.getLogger(__name__)
 
-def validate_master_develop_sync(default_branches: list[str]) -> list[RulesResult]:
+def validate_master_develop_sync(base_branch_name:str, target_branch_name:str) -> list[RulesResult]:
     """Validates that 'master' and 'develop' branches are included in the default branches.
 
     This function checks if both 'master' and 'develop' branches are present
@@ -10,8 +13,45 @@ def validate_master_develop_sync(default_branches: list[str]) -> list[RulesResul
     It returns True if both branches are found, otherwise it returns False.
 
     Args:
-        config (dict): A configuration dictionary containing a key
-                       'default_branches' which is a list of branch names.
+        base_branch_name (str): The name of the default branch to check. Usually 'master'.
+        target_branch_name (str): The name of the target branch to check. Usually 'develop'.
+
+    Returns:
+        bool: True if both 'master' and 'develop' are in the default branches,
+              False otherwise.
+    """
+    rules = []
+    rebased = is_rebased(target_branch_name=target_branch_name, base_branch_name=base_branch_name)
+
+    if rebased:
+        rules.append(
+            RulesResult(
+                name="Git",
+                level="INFO",
+                passed=True,
+                message=f"'{base_branch_name}' and '{target_branch_name}' branches are in sync.",
+            )
+        )
+    else:
+        rules.append(
+            RulesResult(
+                name="Git",
+                level="ERROR",
+                passed=False,
+                message=f"'{base_branch_name}' and '{target_branch_name}' branches are not in sync.",
+            )
+        )
+    return rules
+
+def validate_master_develop_sync_legacy(default_branches: list[str]) -> list[RulesResult]:
+    """Validates that 'master' and 'develop' branches are included in the default branches.
+
+    This function checks if both 'master' and 'develop' branches are present
+    in the list of default branches specified in the configuration dictionary.
+    It returns True if both branches are found, otherwise it returns False.
+
+    Args:
+        default_branches (list[str]): List of default branch names from the configuration.
 
     Returns:
         bool: True if both 'master' and 'develop' are in the default branches,
@@ -19,6 +59,7 @@ def validate_master_develop_sync(default_branches: list[str]) -> list[RulesResul
     """
     rules = []
     results = compare_branches(*default_branches)
+    logger.debug("Comparison results between 'master' and 'develop': %s", results)
 
     if results.get("ahead") == 0 and results.get("behind") == 0:
         rules.append(

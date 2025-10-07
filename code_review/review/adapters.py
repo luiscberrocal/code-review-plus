@@ -73,7 +73,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     if linting_rules:
         rules.extend(linting_rules)
     # Git rules
-    git_rules = validate_master_develop_sync(["master", "develop"])
+    git_rules = validate_master_develop_sync(*["master", "develop"])
     if git_rules:
        rules.extend(git_rules)
     # Changelog version rules
