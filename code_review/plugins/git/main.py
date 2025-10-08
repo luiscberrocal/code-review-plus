@@ -8,6 +8,7 @@ import click
 
 from code_review.cli import cli
 from code_review.exceptions import SimpleGitToolError
+from code_review.handlers.file_handlers import change_directory
 from code_review.plugins.git.handlers import (
     _are_there_uncommited_changes,
     _compare_versions,
@@ -20,7 +21,6 @@ from code_review.plugins.git.handlers import (
     get_current_git_branch,
     refresh_from_remote,
 )
-from code_review.handlers.file_handlers import change_directory
 from code_review.settings import CLI_CONSOLE
 
 logger = logging.getLogger(__name__)

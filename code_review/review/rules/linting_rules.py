@@ -1,11 +1,15 @@
 from code_review.schemas import BranchSchema, RulesResult
 
+
 def check_and_format_ruff(base_branch: BranchSchema, target_branch: BranchSchema) -> list[RulesResult]:
     results = compare_linting_error_rules(base_branch, target_branch, "linting_errors")
     results.extend(compare_linting_error_rules(base_branch, target_branch, "formatting_errors"))
     return results
 
-def compare_linting_error_rules(base_branch: BranchSchema, target_branch: BranchSchema, linting_attribute:str) -> list[RulesResult]:
+
+def compare_linting_error_rules(
+    base_branch: BranchSchema, target_branch: BranchSchema, linting_attribute: str
+) -> list[RulesResult]:
     """Compare linting rules between two branches.
 
     Args:
@@ -16,7 +20,6 @@ def compare_linting_error_rules(base_branch: BranchSchema, target_branch: Branch
     Returns:
         A dictionary with the comparison results.
     """
-
     rules = []
     target_count = getattr(target_branch, linting_attribute)
     name = linting_attribute.replace("_", " ").title()
@@ -28,9 +31,7 @@ def compare_linting_error_rules(base_branch: BranchSchema, target_branch: Branch
                     level="ERROR",
                     passed=False,
                     message=f"Target branch has {target_count} formatting errors.",
-                    details=(
-                        f"Target branch has {target_branch.formatting_errors} formatting errors."
-                    ),
+                    details=(f"Target branch has {target_branch.formatting_errors} formatting errors."),
                 )
             )
         else:
@@ -89,9 +90,7 @@ def compare_linting_error_rules(base_branch: BranchSchema, target_branch: Branch
                 level="WARNING",
                 passed=True,
                 message=f"Target branch has the same number of linting errors as the base branch {target_count} = {base_count}.",
-                details=(
-                    f"Both branches have {base_branch.linting_errors} linting errors."
-                ),
+                details=(f"Both branches have {base_branch.linting_errors} linting errors."),
             )
         )
     return rules
