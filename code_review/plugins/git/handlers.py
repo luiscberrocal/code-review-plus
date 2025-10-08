@@ -303,7 +303,7 @@ def refresh_from_remote(remote_source: str) -> None:
         raise SimpleGitToolError(f"Could not refresh from remote '{remote_source}'")
 
 
-def compare_branches(base: str, target: str, raise_error:bool=False) -> dict[str, int]:
+def compare_branches(base: str, target: str, raise_error: bool = False) -> dict[str, int]:
     """Compare two branches and return how many commits one is ahead or behind the other.
 
     Args:

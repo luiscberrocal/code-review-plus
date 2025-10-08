@@ -1,12 +1,14 @@
+import logging
+
 from code_review.plugins.git.adapters import is_rebased
 from code_review.plugins.git.handlers import compare_branches
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import RulesResult
-import logging
 
 logger = logging.getLogger(__name__)
 
-def validate_master_develop_sync(base_branch_name:str, target_branch_name:str) -> list[RulesResult]:
+
+def validate_master_develop_sync(base_branch_name: str, target_branch_name: str) -> list[RulesResult]:
     """Validates that 'master' and 'develop' branches are included in the default branches.
 
     This function checks if both 'master' and 'develop' branches are present
@@ -43,6 +45,7 @@ def validate_master_develop_sync(base_branch_name:str, target_branch_name:str) -
             )
         )
     return rules
+
 
 def validate_master_develop_sync_legacy(default_branches: list[str]) -> list[RulesResult]:
     """Validates that 'master' and 'develop' branches are included in the default branches.
@@ -84,6 +87,7 @@ def validate_master_develop_sync_legacy(default_branches: list[str]) -> list[Rul
             )
         )
     return rules
+
 
 def rebase_rule(code_review_schema: CodeReviewSchema) -> list[RulesResult]:
     """Check if the target branch has been rebased onto the base branch.

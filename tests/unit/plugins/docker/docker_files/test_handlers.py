@@ -1,7 +1,10 @@
-from code_review.plugins.docker.docker_files.handlers import get_versions_from_dockerfile, parse_dockerfile
-
 import pytest
-from code_review.plugins.docker.docker_files.handlers import extract_using_from
+
+from code_review.plugins.docker.docker_files.handlers import (
+    extract_using_from,
+    get_versions_from_dockerfile,
+    parse_dockerfile,
+)
 
 
 def test_dockerfile_handler(fixtures_folder):
@@ -29,9 +32,6 @@ def test_parse_dockerfile_using_from(fixtures_folder):
     for dockerfile in dockerfiles:
         dockerfile_schema = parse_dockerfile(dockerfile)
         print(dockerfile, " schema:", dockerfile_schema)
-
-
-import pytest
 
 
 class TestGetVersionsFromDockerfile:
