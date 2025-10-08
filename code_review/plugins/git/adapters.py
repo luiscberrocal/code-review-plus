@@ -122,7 +122,7 @@ def get_git_flow_source_branch(branch_name: str) -> str | None:
         follows Git Flow conventions, otherwise None.
     """
     git_flow_patterns = [
-        ( r"^feature/(?P<source_branch>.+)$", "develop" ),
+        (r"^feature/(?P<source_branch>.+)$", "develop"),
         (r"^release/(?P<source_branch>.+)$", "develop"),
         (r"^hotfix/(?P<source_branch>.+)$", "master"),
     ]

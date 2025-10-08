@@ -19,7 +19,9 @@ class CodeReviewSchema(BaseModel):
     date_created: datetime | None
     ticket: str | None = Field(default=None, description="Ticket associated with the code review")
     target_branch: BranchSchema = Field(description="Details of the target branch. The branch to be reviewed.")
-    base_branch: BranchSchema = Field(description="Details of the base branch. The branch to compare against usually master.")
+    base_branch: BranchSchema = Field(
+        description="Details of the base branch. The branch to compare against usually master."
+    )
     source_branch_name: str | None = Field(
         default=None, description="Name of the source branch from which the target branch was created."
     )

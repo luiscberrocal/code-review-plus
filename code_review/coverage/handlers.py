@@ -10,8 +10,9 @@ from code_review.coverage.schemas import TestConfiguration
 from code_review.handlers.file_handlers import change_directory
 
 
-def run_tests_and_get_coverage(folder: Path, unit_tests: str, minimum_coverage: int,
-                               settings_module:str="config.settings.test") -> dict[str, Any]:
+def run_tests_and_get_coverage(
+    folder: Path, unit_tests: str, minimum_coverage: int, settings_module: str = "config.settings.test"
+) -> dict[str, Any]:
     """Changes to a specified folder, runs a Django test suite with coverage,
     reports the coverage, and extracts the coverage percentage.
 
@@ -52,7 +53,9 @@ def run_tests_and_get_coverage(folder: Path, unit_tests: str, minimum_coverage: 
         with open(os.path.join(folder, "__coverage.txt"), "w") as f:
             f.write(coverage_output)
 
-        test_count_match = re.search(r"Ran\s+(?P<test_count>\d+)\s+tests\s+in\s+(?P<running_time>[\d\.]+)s", coverage_output)
+        test_count_match = re.search(
+            r"Ran\s+(?P<test_count>\d+)\s+tests\s+in\s+(?P<running_time>[\d\.]+)s", coverage_output
+        )
 
         test_count = -1
         running_time = -1.0
@@ -67,11 +70,7 @@ def run_tests_and_get_coverage(folder: Path, unit_tests: str, minimum_coverage: 
         if match:
             coverage_percentage = float(match.group(1))
 
-        return {
-            "test_count": test_count,
-            "running_time": running_time,
-            "coverage_percentage": coverage_percentage
-        }
+        return {"test_count": test_count, "running_time": running_time, "coverage_percentage": coverage_percentage}
     finally:
         os.chdir(original_cwd)
 
@@ -84,7 +83,6 @@ if __name__ == "__main__":
         tests_to_run = "pay_options_middleware.middleware.tests.unit pay_options_middleware.users.tests"
         min_coverage = 85
 
-
         target_folder = Path.home() / "adelantos" / "wu-integration"
         tests_to_run = "wu_integration.rest.tests.unit"
         min_coverage = 85
@@ -92,29 +90,26 @@ if __name__ == "__main__":
         target_folder = Path.home() / "adelantos" / "payment-collector"
         tests_to_run = [
             "payment_collector.api.tests.unit payment_collector.users.tests",
-            " payment_collector.reconciliation.tests"
+            " payment_collector.reconciliation.tests",
         ]
         min_coverage = 85.0
         settings_module_t = "config.settings.local"
 
         test_configuration = TestConfiguration(
-            folder=target_folder,
-            unit_tests=tests_to_run,
-            min_coverage=min_coverage,
-            settings_module=settings_module_t
+            folder=target_folder, unit_tests=tests_to_run, min_coverage=min_coverage, settings_module=settings_module_t
         )
 
         config_data = test_configuration.model_dump()
         yaml_file_path: PosixPath = Path("test_configuration.yml")
-
 
         with open(yaml_file_path, "w") as file:
             # `sort_keys=False` is often used to maintain the order from the model/dictionary
             # `default_flow_style=False` ensures a block-style (multi-line) YAML output for readability
             yaml.dump(config_data, file, sort_keys=False, default_flow_style=False)
 
-
-        coverage = run_tests_and_get_coverage(target_folder, tests_to_run, min_coverage, settings_module=settings_module_t)
+        coverage = run_tests_and_get_coverage(
+            target_folder, tests_to_run, min_coverage, settings_module=settings_module_t
+        )
         print(f"\n>>>>>>>>>>>>>>>>>>>> Successfully completed. Final coverage: {coverage}%")
 
     except subprocess.CalledProcessError as e:
