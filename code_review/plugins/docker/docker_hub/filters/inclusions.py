@@ -1,6 +1,6 @@
 import re
 
-from code_review.docker.docker_hub.schemas import ImageTag
+from code_review.plugins.docker.docker_hub.schemas import ImageTag
 
 
 def include_by_regex(tag: ImageTag, regex: str) -> bool:
