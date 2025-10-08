@@ -1,4 +1,4 @@
-from code_review.docker.docker_hub.schemas import ImageTag
+from code_review.plugins.docker.docker_hub.schemas import ImageTag
 
 
 def exclude_by_content(tag: ImageTag, exclusion_criteria: list[str]) -> bool:

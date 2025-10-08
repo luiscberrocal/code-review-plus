@@ -49,7 +49,6 @@ def make(folder: Path, author: str, page_size: int) -> None:
     if code_review_schema.target_branch.name.startswith("hotfix"):
         base_branch_to_check = "master"
 
-    code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, base_branch_to_check)
 
     display_review(code_review_schema, base_branch_name=base_branch_to_check)
 

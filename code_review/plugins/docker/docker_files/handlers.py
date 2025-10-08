@@ -2,7 +2,7 @@ import logging
 import re
 from pathlib import Path
 
-from code_review.docker.schemas import DockerfileSchema
+from code_review.plugins.docker.schemas import DockerfileSchema
 from code_review.settings import CURRENT_CONFIGURATION
 
 logger = logging.getLogger(__name__)
@@ -94,6 +94,14 @@ def get_versions_from_dockerfile(dockerfile_content: str) -> dict:
 
     return versions
 
+def extract_using_from(dockerfile_content: str, product: str) -> dict | None:
+    """Extracts version using a FROM pattern for a specific product."""
+    pattern = re.compile(r"FROM\s(?P<source>.+)/(?P<product>\w+):(?P<version>[\w\.-]+)")
+    match = pattern.search(dockerfile_content)
+    if match:
+        return {"source": match.group("source"), "product": match.group("product"), "version": match.group("version")}
+
+    return None
 
 def parse_dockerfile(dockerfile_path: Path, raise_error: bool = False) -> DockerfileSchema | None:
     """Reads a Dockerfile and extracts version information.
