@@ -9,6 +9,8 @@ from code_review.plugins.git.adapters import parse_git_date
 from code_review.schemas import BranchSchema
 from code_review.settings import CLI_CONSOLE
 
+from rich.console import Console
+from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn, TimeElapsedColumn
 logger = logging.getLogger(__name__)
 
 
@@ -331,7 +333,7 @@ def compare_branches(base: str, target: str, raise_error: bool = False) -> dict[
         return status
 
 
-def sync_branches(branches: list[str], verbose: bool = True) -> None:
+def sync_branches_legacy(branches: list[str], verbose: bool = True) -> None:
     if verbose:
         CLI_CONSOLE.print("[bold blue]Syncing branches...[/bold blue]")
 
@@ -342,3 +344,58 @@ def sync_branches(branches: list[str], verbose: bool = True) -> None:
         if verbose:
             CLI_CONSOLE.print(f"Checking out and pulling branch: [yellow]{branch}[/yellow]")
         check_out_and_pull(branch, check=False)
+
+
+
+def sync_branches(branches: list[str], verbose: bool = True) -> None:
+    """Syncs a list of Git branches, showing a rich progress bar including the fetch step.
+    """
+    if verbose:
+        CLI_CONSOLE.print("[bold blue]Starting branch sync process...[/bold blue]")
+
+    with Progress(
+            SpinnerColumn(), # Shows a spinning indicator
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeElapsedColumn(),
+            console=CLI_CONSOLE,
+            transient=True
+    ) as progress:
+
+        # --- 1. Refresh from remote Task ---
+        fetch_task = progress.add_task("[yellow]Fetching from remote 'origin'[/yellow]", total=1)
+
+        # Perform the remote refresh
+        refresh_from_remote("origin")
+
+        # Mark the fetch task as completed
+        progress.update(fetch_task, completed=1, description="[green]✅ Refreshed from remote 'origin'[/green]")
+
+
+        # --- 2. Iterate and sync branches Task ---
+        total_branches = len(branches)
+        # Use a new task with a different appearance for the main work
+        sync_task = progress.add_task(f"[cyan]Syncing {total_branches} branches[/cyan]", total=total_branches)
+
+        for branch in branches:
+            # Update the description for the current branch
+            progress.update(sync_task, description=f"[cyan]Syncing branch: [yellow]{branch}[/yellow][/cyan]")
+
+            # Perform the sync action
+            check_out_and_pull(branch, check=False)
+
+            # Advance the progress bar for the completed branch
+            progress.advance(sync_task)
+
+            # Optional: Print a status update (will appear below the progress bar)
+            # if verbose:
+            #     CLI_CONSOLE.print(f"   [green]Synced[/green] [yellow]{branch}[/yellow]")
+
+    if verbose:
+        CLI_CONSOLE.print("🎉 [bold green]All branches synced successfully![/bold green]")
+
+# Example usage:
+if __name__ == '__main__':
+    branch_list = ["feature/a", "bugfix/b", "hotfix/c", "release/d", "develop"]
+    sync_branches(branch_list)
