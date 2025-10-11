@@ -51,8 +51,10 @@ description: "Task list template for feature implementation"
 - [ ] T004 [P] Design and implement plugin interface architecture with standardized contracts
 - [ ] T005 [P] Implement CLI framework following Unix philosophy with comprehensive argument support
 - [ ] T006 [P] Create configuration management system with hierarchical precedence and schema validation
-- [ ] T007 [P] Design report generation framework supporting multiple output formats (JSON, HTML, XML, text)
+- [ ] T007 [P] Design pluggable report generation framework supporting markdown, HTML, JSON, XML, and text formats
 - [ ] T008 [P] Implement rule-based analysis engine with configurable precedence and severity levels
+- [ ] T009 [P] Design and implement pluggable notification architecture for email, Slack, Teams, webhooks
+- [ ] T010 [P] Create notification templating system with channel-specific formatting and content filtering
 
 ---
 

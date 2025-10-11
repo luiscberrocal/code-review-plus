@@ -113,14 +113,22 @@
 - **NFR-009**: Rule violations MUST include severity levels and remediation guidance
 
 **Comprehensive Reporting Requirements**:
-- **NFR-010**: Reports MUST be generated in multiple formats (JSON, HTML, XML, text)
+- **NFR-010**: Reports MUST be generated through pluggable format providers (markdown, HTML, JSON, XML, text)
 - **NFR-011**: Reports MUST include severity classifications and actionable insights
 - **NFR-012**: Support for report aggregation across multiple analysis runs REQUIRED
+- **NFR-013**: Report format plugins MUST be configurable with custom templates and branding support
+
+**Pluggable Notification Architecture Requirements**:
+- **NFR-014**: System MUST support configurable notification delivery via email, Slack, Teams, webhooks
+- **NFR-015**: Notification content MUST be templatable with channel-specific formatting
+- **NFR-016**: Notification triggers MUST be rule-based with filtering by severity and project
+- **NFR-017**: Rate limiting, retry mechanisms, and failure handling REQUIRED for all providers
+- **NFR-018**: Sensitive information MUST be filtered from notifications with configurable policies
 
 **Code Quality Standards Requirements**:
-- **NFR-013**: Integration with industry-standard tools (ruff, pytest, bandit) REQUIRED
-- **NFR-014**: Support for multiple programming languages with language-specific rules
-- **NFR-015**: Unified configuration and reporting interface MUST be provided
+- **NFR-019**: Integration with industry-standard tools (ruff, pytest, bandit) REQUIRED
+- **NFR-020**: Support for multiple programming languages with language-specific rules
+- **NFR-021**: Unified configuration and reporting interface MUST be provided
 
 ### Key Entities *(include if feature involves data)*
 
