@@ -31,7 +31,13 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] **Pluggable Architecture**: Plugin interface designed with clear contracts, version compatibility, and isolation
+- [ ] **CLI-First Design**: Command-line interface follows Unix philosophy with comprehensive argument support
+- [ ] **Rule-Based Analysis**: Configurable rules with hierarchical precedence (global → project → local)
+- [ ] **Comprehensive Reporting**: Multiple output formats (JSON, HTML, XML, text) with actionable insights
+- [ ] **Code Quality Standards**: Integration with industry-standard tools and language-specific analyzers
+- [ ] **Plugin Architecture Standards**: Standardized interfaces, metadata requirements, and security constraints
+- [ ] **Configuration Management**: Hierarchical config with schema validation and audit capabilities
 
 ## Project Structure
 

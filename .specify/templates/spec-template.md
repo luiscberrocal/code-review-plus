@@ -95,6 +95,33 @@
 - **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
 - **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
+### Non-Functional Requirements *(constitution-mandated)*
+
+**Pluggable Architecture Requirements**:
+- **NFR-001**: System MUST support third-party plugin integration via standardized interfaces
+- **NFR-002**: Plugin isolation MUST prevent failures from affecting core operations
+- **NFR-003**: Plugin discovery and loading MUST be automatic and configurable
+
+**CLI-First Design Requirements**:
+- **NFR-004**: Primary interface MUST be command-line with comprehensive argument support
+- **NFR-005**: All functionality MUST be accessible via CLI following Unix philosophy
+- **NFR-006**: Exit codes MUST follow standard conventions for CI/CD integration
+
+**Rule-Based Analysis Requirements**:
+- **NFR-007**: All analysis MUST be driven by configurable rules with hierarchical precedence
+- **NFR-008**: Rules MUST be declarative, version-controlled, and shareable
+- **NFR-009**: Rule violations MUST include severity levels and remediation guidance
+
+**Comprehensive Reporting Requirements**:
+- **NFR-010**: Reports MUST be generated in multiple formats (JSON, HTML, XML, text)
+- **NFR-011**: Reports MUST include severity classifications and actionable insights
+- **NFR-012**: Support for report aggregation across multiple analysis runs REQUIRED
+
+**Code Quality Standards Requirements**:
+- **NFR-013**: Integration with industry-standard tools (ruff, pytest, bandit) REQUIRED
+- **NFR-014**: Support for multiple programming languages with language-specific rules
+- **NFR-015**: Unified configuration and reporting interface MUST be provided
+
 ### Key Entities *(include if feature involves data)*
 
 - **[Entity 1]**: [What it represents, key attributes without implementation]
