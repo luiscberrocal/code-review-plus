@@ -26,6 +26,8 @@ clean:
 	@find . -type f -name "*.py[co]" -delete
 	@find . -type f -name ".DS_Store" -delete
 	@rm -rf ./dist/
+	@rm -rf ./code_review_plus.egg-info
+	@rm -rf ./build
 
 dist: clean
 	@uv build
