@@ -6,7 +6,7 @@ from typing import Any
 
 import yaml
 
-from code_review.coverage.schemas import TestConfiguration
+from code_review.plugins.coverage.schemas import TestConfiguration
 from code_review.handlers.file_handlers import change_directory
 
 
