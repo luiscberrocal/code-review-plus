@@ -7,7 +7,7 @@ description: "Task list template for feature implementation"
 **Input**: Design documents from `/specs/[###-feature-name]/`
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: Tests are MANDATORY per constitution - comprehensive testing required for plugin interfaces, CLI operations, and rule analysis engine.
+**Tests**: Tests are MANDATORY per constitution - 85% minimum coverage with stochastic testing required for non-deterministic components.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -46,8 +46,8 @@ description: "Task list template for feature implementation"
 **Purpose**: Project initialization and basic structure
 
 - [ ] T001 Create project structure per implementation plan
-- [ ] T002 Initialize [language] project with [framework] dependencies  
-- [ ] T003 [P] Configure linting and formatting tools per constitution
+- [ ] T002 Initialize Python project with dependencies (Python 3.10+, pytest, mypy, ruff, coverage.py, hypothesis)
+- [ ] T003 [P] Configure Python-specific linting, formatting, and type checking tools per constitution
 - [ ] T004 [P] Design and implement plugin interface architecture with standardized contracts
 - [ ] T005 [P] Implement CLI framework following Unix philosophy with comprehensive argument support
 - [ ] T006 [P] Create configuration management system with hierarchical precedence and schema validation
@@ -55,6 +55,9 @@ description: "Task list template for feature implementation"
 - [ ] T008 [P] Implement rule-based analysis engine with configurable precedence and severity levels
 - [ ] T009 [P] Design and implement pluggable notification architecture for email, Slack, Teams, webhooks
 - [ ] T010 [P] Create notification templating system with channel-specific formatting and content filtering
+- [ ] T011 [P] Implement Python-specific analyzers for code quality, security, and performance
+- [ ] T012 [P] Set up test coverage enforcement with 85% minimum threshold using coverage.py
+- [ ] T013 [P] Integrate hypothesis for stochastic testing framework with property-based testing support
 
 ---
 

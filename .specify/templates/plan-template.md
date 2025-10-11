@@ -35,8 +35,9 @@
 - [ ] **CLI-First Design**: Command-line interface follows Unix philosophy with comprehensive argument support
 - [ ] **Rule-Based Analysis**: Configurable rules with hierarchical precedence (global → project → local)
 - [ ] **Comprehensive Reporting**: Pluggable format providers (markdown, HTML, JSON, XML, text) with templating support
-- [ ] **Code Quality Standards**: Integration with industry-standard tools and language-specific analyzers
+- [ ] **Code Quality Standards**: Python-specific tools integration with 85% test coverage + stochastic testing requirements
 - [ ] **Pluggable Notification Architecture**: Configurable delivery via email, Slack, Teams, webhooks with templating
+- [ ] **Python-Specific Requirements**: Python 3.10+ support, pytest, mypy, hypothesis for stochastic testing
 - [ ] **Plugin Architecture Standards**: Standardized interfaces, metadata requirements, and security constraints
 - [ ] **Configuration Management**: Hierarchical config with schema validation, notification settings, and audit capabilities
 

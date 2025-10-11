@@ -1,14 +1,16 @@
 <!--
 Sync Impact Report:
-- Version change: 1.0.0 → 1.1.0
-- Modified principles: IV. Comprehensive Reporting (expanded with pluggable formats)
-- Added principles: VI. Pluggable Notification Architecture
-- Added sections: Notification Architecture Standards (expanded Configuration Management)
+- Version change: 1.1.0 → 1.2.0
+- Modified principles: V. Code Quality Standards (Python-focused with 85% coverage + stochastic testing)
+- Added sections: Python-Specific Requirements
+- Enhanced sections: Testing requirements with stochastic testing mandate
 - Templates requiring updates: ✅ plan-template.md, spec-template.md, tasks-template.md, agent-file-template.md
 - Follow-up TODOs: None
 -->
 
 # Code Review Plus Constitution
+
+**Project Scope**: Python applications and libraries code review and quality analysis tool.
 
 ## Core Principles
 
@@ -57,14 +59,17 @@ and compliance teams. Pluggable report formats ensure seamless integration with 
 documentation workflows and organizational standards.
 
 ### V. Code Quality Standards
-Enforce industry best practices for linting, test coverage, security scanning, performance 
-analysis, and documentation completeness. Support for multiple programming languages with 
-language-specific rules and analyzers. Integration with existing tools (ruff, pytest, 
-bandit, etc.) while providing unified configuration and reporting interface.
+Enforce Python-specific industry best practices for linting, test coverage, security 
+scanning, performance analysis, and documentation completeness. All features MUST achieve 
+minimum 85% test coverage with comprehensive unit, integration, and stochastic tests. 
+Stochastic testing REQUIRED for algorithms with random behavior, concurrent operations, 
+or non-deterministic components. Integration with Python ecosystem tools (ruff, pytest, 
+bandit, mypy, coverage.py) while providing unified configuration and reporting interface.
 
-**Rationale**: Code quality is multifaceted requiring coordinated analysis across multiple 
-dimensions. Unified tooling reduces configuration complexity and provides holistic 
-quality assessment.
+**Rationale**: Python applications require language-specific quality standards with 
+rigorous testing including stochastic validation. High coverage thresholds ensure 
+reliability while stochastic testing validates behavior under uncertainty and edge cases 
+common in real-world Python applications.
 
 ### VI. Pluggable Notification Architecture
 The system MUST support configurable notification delivery through pluggable providers 
@@ -78,6 +83,22 @@ content policies.
 **Rationale**: Automated notifications ensure timely awareness of code review results 
 across distributed teams. Pluggable architecture accommodates diverse communication 
 preferences and organizational policies while maintaining security and reliability.
+
+## Python-Specific Requirements
+
+All Python code analysis MUST support Python 3.10+ with full type hint validation using 
+mypy or equivalent. Testing framework MUST use pytest with coverage.py for coverage 
+reporting. Stochastic tests MUST use hypothesis for property-based testing or custom 
+implementations with documented random seed management for reproducibility.
+
+Code formatting enforcement through black or ruff formatter. Import sorting via isort 
+or ruff. Security analysis through bandit with custom rules for Python-specific 
+vulnerabilities. Performance profiling integration with cProfile and memory_profiler 
+for resource usage analysis.
+
+Virtual environment detection and dependency analysis through pip-audit, safety, or 
+equivalent tools. Support for pyproject.toml, setup.cfg, and requirements.txt parsing 
+with version constraint validation.
 
 ## Plugin Architecture Standards
 
@@ -116,9 +137,10 @@ compatibility requires adherence to defined interfaces and standards. Breaking c
 to core interfaces require major version increments and migration documentation.
 
 Code reviews must verify plugin interface compliance, configuration schema adherence, 
-report format consistency, and notification delivery reliability. Performance benchmarks 
-required for all analysis operations with regression testing for optimization changes. 
-Security reviews mandatory for plugin interfaces, external integrations, and notification 
-channels.
+report format consistency, notification delivery reliability, and Python-specific quality 
+standards including 85% test coverage with stochastic testing compliance. Performance 
+benchmarks required for all analysis operations with regression testing for optimization 
+changes. Security reviews mandatory for plugin interfaces, external integrations, and 
+notification channels.
 
-**Version**: 1.1.0 | **Ratified**: 2025-10-11 | **Last Amended**: 2025-10-11
+**Version**: 1.2.0 | **Ratified**: 2025-10-11 | **Last Amended**: 2025-10-11

@@ -9,8 +9,9 @@ All development must adhere to the project constitution principles:
 - **CLI-First Design**: Unix philosophy with comprehensive CLI support  
 - **Rule-Based Analysis**: Configurable rules with hierarchical precedence
 - **Comprehensive Reporting**: Pluggable format providers (markdown, HTML, JSON, XML, text) with templating
-- **Code Quality Standards**: Integration with industry-standard tools
+- **Code Quality Standards**: Python-specific tools with 85% test coverage + stochastic testing requirements
 - **Pluggable Notification Architecture**: Configurable delivery via email, Slack, Teams, webhooks with templating
+- **Python-Specific Requirements**: Python 3.10+, pytest, mypy, hypothesis integration
 
 ## Active Technologies
 [EXTRACTED FROM ALL PLAN.MD FILES]
@@ -27,6 +28,16 @@ When developing plugins:
 - Include metadata with supported file types and dependencies
 - Follow security constraints and resource limits
 - Provide comprehensive documentation and examples
+
+## Python Development Standards
+
+All Python code must follow constitution requirements:
+- Use Python 3.10+ with full type hints and mypy validation
+- Achieve minimum 85% test coverage using pytest and coverage.py
+- Include stochastic tests using hypothesis for non-deterministic components
+- Follow ruff linting and formatting standards
+- Support pyproject.toml configuration format
+- Include proper error handling and input validation
 
 ## Report Format Plugin Guidelines
 

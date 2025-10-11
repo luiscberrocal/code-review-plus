@@ -126,9 +126,17 @@
 - **NFR-018**: Sensitive information MUST be filtered from notifications with configurable policies
 
 **Code Quality Standards Requirements**:
-- **NFR-019**: Integration with industry-standard tools (ruff, pytest, bandit) REQUIRED
-- **NFR-020**: Support for multiple programming languages with language-specific rules
-- **NFR-021**: Unified configuration and reporting interface MUST be provided
+- **NFR-019**: Integration with Python-specific tools (ruff, pytest, mypy, bandit, coverage.py) REQUIRED
+- **NFR-020**: Minimum 85% test coverage MUST be achieved for all features
+- **NFR-021**: Stochastic testing REQUIRED for algorithms with random behavior or non-deterministic components
+- **NFR-022**: Unified configuration and reporting interface MUST be provided
+
+**Python-Specific Requirements**:
+- **NFR-023**: Python 3.10+ support with full type hint validation REQUIRED
+- **NFR-024**: pytest integration with coverage.py for test coverage reporting MANDATORY
+- **NFR-025**: hypothesis integration for property-based stochastic testing REQUIRED
+- **NFR-026**: Virtual environment detection and dependency analysis MUST be supported
+- **NFR-027**: pyproject.toml, setup.cfg, and requirements.txt parsing REQUIRED
 
 ### Key Entities *(include if feature involves data)*
 
