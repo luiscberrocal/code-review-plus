@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from enum import Enum
 from pathlib import Path
 
 from pydantic import BaseModel, Field
@@ -7,6 +8,27 @@ from pydantic import BaseModel, Field
 from code_review.dependencies.pip.schemas import RequirementInfo
 
 logger = logging.getLogger(__name__)
+
+
+class SeverityLevel(str, Enum):
+    """Standardized severity levels for rule validation results."""
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
+    CRITICAL = "critical"
+
+
+class RuleCategory(str, Enum):
+    """Logical groupings for rule organization and filtering."""
+    TYPE_SAFETY = "type_safety"
+    CODE_STYLE = "code_style"
+    SECURITY = "security"
+    PERFORMANCE = "performance"
+    DOCUMENTATION = "documentation"
+    TESTING = "testing"
+    DEPENDENCIES = "dependencies"
+    COMPLEXITY = "complexity"
+    GENERAL = "general"
 
 
 class SemanticVersion(BaseModel):
@@ -83,10 +105,27 @@ class BranchSchema(BaseModel):
 
 
 class RulesResult(BaseModel):
-    """Schema for rules result."""
+    """Enhanced schema for rules result with categorization and standardized severity levels."""
 
     name: str = Field(description="Name of the rule")
     passed: bool = Field(description="Indicates if the rule passed or failed", default=False)
-    level: str = Field(description="Level of the rule", default="info")
     message: str
     details: str | None = None
+    
+    # NEW FIELDS - Enhanced validation system
+    category: RuleCategory = Field(default=RuleCategory.GENERAL, description="Logical grouping of related rules")
+    severity: SeverityLevel = Field(default=SeverityLevel.WARNING, description="Standardized severity level")
+    
+    # Backward compatibility for existing 'level' field
+    @property
+    def level(self) -> str:
+        """Backward compatibility property mapping severity to old level field."""
+        return self.severity.value
+    
+    def is_violation(self) -> bool:
+        """Check if this result represents a rule violation."""
+        return not self.passed
+    
+    def is_blocking(self) -> bool:
+        """Check if this result should block builds/merges."""
+        return not self.passed and self.severity in [SeverityLevel.ERROR, SeverityLevel.CRITICAL]

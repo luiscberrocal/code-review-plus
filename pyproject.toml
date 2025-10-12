@@ -22,6 +22,9 @@ code-review-plus = "code_review.cli:cli"
 dev-dependencies = [
     "pytest>=8.4.1",
     "twine>=6.1.0",
+    "coverage>=7.3.0",
+    "hypothesis>=6.88.0",
+    "pytest-cov>=4.0.0",
 ]
 [tool.ruff]
 line-length = 120
@@ -97,6 +100,47 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 # Automatically look for packages in the current directory (default behavior for flat-layout)
 where = ["."]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=code_review",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=85",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["code_review"]
+omit = [
+    "*/tests/*",
+    "*/venv/*",
+    "*/.venv/*",
+    "*/migrations/*",
+    "*/__pycache__/*",
+]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
 
 # IMPORTANT: Exclude the 'output' folder from being considered a package
 exclude = ["output*"]

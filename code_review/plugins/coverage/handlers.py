@@ -2,12 +2,13 @@ import os
 import re
 import subprocess
 from pathlib import Path, PosixPath
-from typing import Any
+from typing import Any, List
 
 import yaml
 
 from code_review.plugins.coverage.schemas import TestConfiguration
 from code_review.handlers.file_handlers import change_directory
+from code_review.schemas import RulesResult, SeverityLevel, RuleCategory
 
 
 def run_tests_and_get_coverage(
@@ -123,3 +124,115 @@ if __name__ == "__main__":
         print(f"\nError: The specified folder '{target_folder}' does not exist.")
     except ValueError as e:
         print(f"\nError: {e}")
+
+
+def validate_coverage_rules(
+    coverage_data: dict[str, Any],
+    coverage_config: dict[str, Any],
+    file_path: Path | None = None
+) -> List[RulesResult]:
+    """
+    Validate coverage-related rules and return structured validation results.
+    
+    Args:
+        coverage_data: Coverage analysis results containing percentages and file info
+        coverage_config: Configuration for coverage thresholds and requirements  
+        file_path: Optional path to the analyzed file for context
+        
+    Returns:
+        List of enhanced rule validation results
+        
+    Raises:
+        ValueError: If coverage_data is invalid or missing required fields
+        TypeError: If arguments are not of expected types
+    """
+    if not isinstance(coverage_data, dict):
+        raise TypeError("coverage_data must be a dictionary")
+    
+    if not isinstance(coverage_config, dict):
+        raise TypeError("coverage_config must be a dictionary")
+    
+    results = []
+    
+    # Validate minimum coverage threshold
+    coverage_percentage = coverage_data.get("coverage_percentage", 0)
+    min_threshold = coverage_config.get("minimum_coverage", 85)
+    
+    if coverage_percentage >= min_threshold:
+        results.append(RulesResult(
+            name="minimum_coverage_threshold",
+            category=RuleCategory.TESTING,
+            severity=SeverityLevel.INFO,
+            passed=True,
+            message=f"Coverage {coverage_percentage}% meets minimum threshold of {min_threshold}%",
+            details=f"Current coverage: {coverage_percentage}%, Required: {min_threshold}%. Excellent test coverage maintained."
+        ))
+    else:
+        coverage_gap = min_threshold - coverage_percentage
+        results.append(RulesResult(
+            name="minimum_coverage_threshold",
+            category=RuleCategory.TESTING,
+            severity=SeverityLevel.ERROR,
+            passed=False,
+            message=f"Coverage {coverage_percentage}% below minimum threshold of {min_threshold}%",
+            details=f"Current coverage: {coverage_percentage}%, Required: {min_threshold}%. Need to add {coverage_gap:.1f}% more coverage. Focus on uncovered code paths and edge cases."
+        ))
+    
+    # Validate test count if available
+    test_count = coverage_data.get("test_count", -1)
+    if test_count > 0:
+        running_time = coverage_data.get("running_time", "unknown")
+        results.append(RulesResult(
+            name="test_execution_success",
+            category=RuleCategory.TESTING,
+            severity=SeverityLevel.INFO,
+            passed=True,
+            message=f"Successfully executed {test_count} tests",
+            details=f"Test count: {test_count}, Running time: {running_time}s. All tests completed successfully."
+        ))
+    elif test_count == 0:
+        results.append(RulesResult(
+            name="test_execution_success",
+            category=RuleCategory.TESTING,
+            severity=SeverityLevel.WARNING,
+            passed=False,
+            message="No tests were executed",
+            details="No test files found or executed. Consider adding unit tests to improve code coverage and quality. Start with testing core functionality and edge cases."
+        ))
+    # If test_count is -1 (not checked), we don't add a result
+    
+    # Validate coverage regression (if previous coverage provided)
+    previous_coverage = coverage_config.get("previous_coverage")
+    if previous_coverage is not None:
+        coverage_change = coverage_percentage - previous_coverage
+        if coverage_change >= 0:
+            results.append(RulesResult(
+                name="coverage_regression_check",
+                category=RuleCategory.TESTING,
+                severity=SeverityLevel.INFO,
+                passed=True,
+                message=f"Coverage maintained or improved by {coverage_change:.1f}%",
+                details=f"Previous: {previous_coverage}%, Current: {coverage_percentage}%, Change: +{coverage_change:.1f}%"
+            ))
+        else:
+            max_allowed_drop = coverage_config.get("max_coverage_drop", 5)
+            if abs(coverage_change) <= max_allowed_drop:
+                results.append(RulesResult(
+                    name="coverage_regression_check",
+                    category=RuleCategory.TESTING,
+                    severity=SeverityLevel.WARNING,
+                    passed=False,
+                    message=f"Coverage decreased by {abs(coverage_change):.1f}% but within allowed limit",
+                    details=f"Previous: {previous_coverage}%, Current: {coverage_percentage}%, Drop: {coverage_change:.1f}%, Max allowed: {max_allowed_drop}%"
+                ))
+            else:
+                results.append(RulesResult(
+                    name="coverage_regression_check",
+                    category=RuleCategory.TESTING,
+                    severity=SeverityLevel.ERROR,
+                    passed=False,
+                    message=f"Coverage decreased by {abs(coverage_change):.1f}% exceeding allowed limit",
+                    details=f"Previous: {previous_coverage}%, Current: {coverage_percentage}%, Drop: {coverage_change:.1f}%, Max allowed: {max_allowed_drop}%. Investigate removed or modified tests."
+                ))
+    
+    return results
