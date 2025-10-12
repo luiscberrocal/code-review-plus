@@ -130,11 +130,19 @@ A developer wants to see detailed information about coverage changes, including 
 
 ### Key Entities *(include if feature involves data)*
 
-- **Coverage Report**: Contains coverage percentage, file-level coverage details, and test execution metadata for a specific branch
+- **Coverage Report**: Contains overall project line coverage percentage (total lines covered / total executable lines), test execution metadata, and branch identifier for a specific branch
 - **Test Count Data**: Contains total test count, test categorization by type, and newly added test identification
-- **Comparison Result**: Contains coverage delta, test count delta, pass/fail status, and detailed explanations
+- **Comparison Result**: Contains coverage delta (both absolute percentage points and relative percentage change), test count delta, pass/fail status, and detailed explanations
 - **Configuration Profile**: Contains coverage thresholds, test count requirements, and tool preferences for global or project-specific settings
-- **Branch Analysis**: Contains git branch information, test execution results, and coverage analysis data for a single branch
+- **Branch Analysis**: Contains git branch information, test execution results, and overall project coverage analysis data for a single branch
+
+### Coverage Calculation Specifications
+
+- **Coverage Metric**: Line coverage only (percentage of executable lines tested)
+- **Coverage Aggregation**: Total lines method (sum of all covered lines / sum of all executable lines across entire project)
+- **Coverage Delta Reporting**: Both absolute difference in percentage points AND relative percentage change
+- **File-Level Tracking**: Not supported - only overall project-level coverage is calculated and compared
+- **Example**: Master: 85%, Feature: 87% → Report: "+2.0 percentage points (+2.35% relative increase)"
 
 ## Success Criteria *(mandatory)*
 
