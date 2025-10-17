@@ -4,7 +4,7 @@ from pathlib import Path
 
 from code_review.adapters.changelog import parse_changelog
 from code_review.adapters.setup_adapters import setup_to_dict
-from code_review.dependencies.pip.handlers import requirements_updated
+from code_review.plugins.dependencies.pip.handlers import requirements_updated
 from code_review.handlers.file_handlers import change_directory, get_not_ignored
 from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
 from code_review.plugins.coverage.main import get_makefile, get_minimum_coverage
