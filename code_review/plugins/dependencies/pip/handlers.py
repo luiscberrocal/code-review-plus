@@ -2,7 +2,7 @@ import logging
 import subprocess
 from pathlib import Path
 
-from code_review.dependencies.pip.schemas import RequirementInfo
+from code_review.plugins.dependencies.pip.schemas import RequirementInfo
 from code_review.settings import CLI_CONSOLE
 
 logger = logging.getLogger(__name__)

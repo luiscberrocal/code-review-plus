@@ -3,7 +3,7 @@ from pathlib import Path
 import click
 
 from code_review.cli import cli
-from code_review.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
+from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
 from code_review.settings import CLI_CONSOLE
 
 
