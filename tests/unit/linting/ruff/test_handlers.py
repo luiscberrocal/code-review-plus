@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from code_review.linting.ruff.handlers import count_ruff_issues
+from code_review.plugins.linting.ruff.handlers import count_ruff_issues
 
 
 def test_count():
