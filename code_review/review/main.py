@@ -5,7 +5,8 @@ import click
 from code_review.adapters.generics import parse_for_ticket
 from code_review.cli import cli
 from code_review.handlers.file_handlers import change_directory
-from code_review.plugins.git.handlers import _get_unmerged_branches, display_branches, sync_branches
+from code_review.plugins.git.handlers import _get_unmerged_branches, display_branches, sync_branches, \
+    _are_there_uncommited_changes
 from code_review.review.adapters import build_code_review_schema
 from code_review.review.handlers import display_review, write_review_to_file
 from code_review.settings import CLI_CONSOLE, CURRENT_CONFIGURATION, OUTPUT_FOLDER
@@ -25,8 +26,13 @@ def make(folder: Path, author: str, page_size: int) -> None:
     """List branches in the specified Git repository."""
     change_directory(folder)
     CLI_CONSOLE.print(f"Changing to directory: [cyan]{folder}[/cyan]")
+    uncommited_changes =_are_there_uncommited_changes()
+    if uncommited_changes:
+        CLI_CONSOLE.print(f"[red]You have uncommited changes, please commit or stash them before running the review.[/red]")
+        return
 
     sync_branches(CURRENT_CONFIGURATION["default_branches"])
+
 
     unmerged_branches = _get_unmerged_branches("master", author_pattern=author)
     if not unmerged_branches:

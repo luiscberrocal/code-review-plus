@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from code_review.dependencies.pip.schemas import RequirementInfo
+from code_review.plugins.dependencies.pip.schemas import RequirementInfo
 
 logger = logging.getLogger(__name__)
 

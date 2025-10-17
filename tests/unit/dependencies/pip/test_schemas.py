@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from code_review.dependencies.pip.schemas import RequirementInfo
+from code_review.plugins.dependencies.pip.schemas import RequirementInfo
 
 
 def test_equality() -> None:
