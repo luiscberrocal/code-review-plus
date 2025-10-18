@@ -2,7 +2,6 @@ import re
 
 from code_review.plugins.docker.schemas import DockerImageSchema
 
-
 def content_to_python_adapter(content: str) -> DockerImageSchema | None:
     """Adapter to convert content to a Python dictionary."""
 
@@ -42,3 +41,9 @@ def content_to_node_adapter(content: str) -> DockerImageSchema | None:
             operating_system = match.group(2)
             return DockerImageSchema(name="node", version=version, operating_system=operating_system)
     return None
+
+content_to_image_adapters = {
+    "python": content_to_python_adapter,
+    "postgres": content_to_postgres_adapter,
+    "node": content_to_node_adapter,
+}
