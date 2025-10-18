@@ -26,7 +26,7 @@ class TestDockerImageSchema:
             # Same everything
             (DockerImageSchema(name="python", version="3.10", operating_system="slim"),
              DockerImageSchema(name="python", version="3.10", operating_system="slim"),
-             True),
+             False),
             # Version with more parts
             (DockerImageSchema(name="python", version="3.10.1", operating_system="slim"),
              DockerImageSchema(name="python", version="3.10.2", operating_system="slim"),

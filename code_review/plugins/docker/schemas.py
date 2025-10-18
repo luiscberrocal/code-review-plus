@@ -36,6 +36,7 @@ class DockerImageSchema(BaseModel):
             except ValueError:
                 if self_part != other_part:
                     return self_part < other_part
+        return False
 
 
 
