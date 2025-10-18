@@ -1,4 +1,7 @@
 import re
+from typing import Callable
+
+from typing_extensions import TypeAlias
 
 from code_review.plugins.docker.schemas import DockerImageSchema
 
@@ -42,7 +45,9 @@ def content_to_node_adapter(content: str) -> DockerImageSchema | None:
             return DockerImageSchema(name="node", version=version, operating_system=operating_system)
     return None
 
-content_to_image_adapters = {
+ContentAdapter:TypeAlias = Callable[[str], DockerImageSchema | None]
+
+content_to_image_adapters: dict[str, ContentAdapter] = {
     "python": content_to_python_adapter,
     "postgres": content_to_postgres_adapter,
     "node": content_to_node_adapter,

@@ -2,7 +2,7 @@ import pytest
 
 from code_review.plugins.docker.docker_files.handlers import (
     extract_using_from,
-    get_versions_from_dockerfile,
+    get_versions_from_dockerfile_legacy,
     parse_dockerfile,
 )
 
@@ -12,7 +12,7 @@ def test_dockerfile_handler(fixtures_folder):
     dockerfiles = list(compose_folder.glob("**/Dockerfile"))
     for dockerfile in dockerfiles:
         content = dockerfile.read_text()
-        version = get_versions_from_dockerfile(content)
+        version = get_versions_from_dockerfile_legacy(content)
         print(dockerfile, " version:", version)
 
 
@@ -61,7 +61,7 @@ class TestGetVersionsFromDockerfile:
         ],
     )
     def test_get_versions(self, dockerfile_content, expected):
-        result = get_versions_from_dockerfile(dockerfile_content)
+        result = get_versions_from_dockerfile_legacy(dockerfile_content)
         assert result == expected
 
 

@@ -2,14 +2,15 @@ import logging
 import re
 from pathlib import Path
 
-from code_review.plugins.docker.schemas import DockerfileSchema
+from code_review.plugins.docker.docker_files.adapters import ContentAdapter
+from code_review.plugins.docker.schemas import DockerfileSchema, DockerImageSchema
 from code_review.settings import CURRENT_CONFIGURATION
 
 logger = logging.getLogger(__name__)
 
 
 
-def get_versions_from_dockerfile(dockerfile_content: str) -> dict:
+def get_versions_from_dockerfile_legacy(dockerfile_content: str) -> dict:
     """Parses a Dockerfile to extract product and version information using multiple patterns per product."""
     versions = {
         "version": None,
@@ -54,6 +55,13 @@ def extract_using_from(dockerfile_content: str, product: str) -> dict | None:
 
     return None
 
+def get_image_info_from_dockerfile_content(dockerfile_content: str, parsers:dict[str, ContentAdapter] ) -> DockerImageSchema | None:
+    """Gets Docker image information from Dockerfile content using provided parsers."""
+    for product, parser in parsers.items():
+        image_info = parser(dockerfile_content)
+        if image_info:
+            return image_info
+    return None
 
 def parse_dockerfile(dockerfile_path: Path, raise_error: bool = False) -> DockerfileSchema | None:
     """Reads a Dockerfile and extracts version information.
@@ -67,7 +75,7 @@ def parse_dockerfile(dockerfile_path: Path, raise_error: bool = False) -> Docker
     """
     try:
         content = dockerfile_path.read_text()
-        version_info = get_versions_from_dockerfile(content)
+        version_info = get_versions_from_dockerfile_legacy(content)
         version_info["file"] = dockerfile_path
         images = CURRENT_CONFIGURATION.get("docker_images", {})
 
