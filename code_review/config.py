@@ -6,6 +6,8 @@ from typing import Any
 import toml
 import tomllib
 
+from code_review.plugins.docker.schemas import DockerImageSchema
+
 logger = logging.getLogger(__name__)
 # Define a dictionary of default configuration settings.
 # These values will be used if the TOML file is not found or
@@ -15,9 +17,9 @@ DEFAULT_CONFIG = {
     "date_format": "%Y-%m-%d %H:%M:%S",
     "max_lines_to_display": 100,
     "docker_images": {
-        "python": "3.12.11-slim-bookworm",
-        "node": "20.19.4-alpine3",
-        "postgres": "16.10-bookworm",
+        "python":  {"name": "python", "version": "3.12.11", "operating_system": "slim-bookworm"},
+        "node":  {"name": "node", "version": "20.19.4", "operating_system": "alpine3"},
+        "postgres":  {"name": "postgres", "version": "16.10", "operating_system": "bookworm"},
     },
     "default_branches": ["master", "develop"],
 }
@@ -63,6 +65,10 @@ class TomlConfigManager:
 
             # Extract the settings for our application.
             app_settings = toml_data.get("tool", {}).get("cli_app", {})
+            docker_images = app_settings.get("docker_images", self.config_data["docker_images"]),
+            docker_images_dict = {}
+            for image_name, image_info in docker_images[0].items():
+                docker_images_dict[image_name] = DockerImageSchema(**image_info)
 
             # Update the configuration with values from the TOML file.
             self.config_data.update(
@@ -73,7 +79,7 @@ class TomlConfigManager:
                         "max_lines_to_display",
                         self.config_data["max_lines_to_display"],
                     ),
-                    "docker_images": app_settings.get("docker_images", self.config_data["docker_images"]),
+                    "docker_images": docker_images_dict,
                 }
             )
 
