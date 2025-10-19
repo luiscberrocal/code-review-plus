@@ -51,7 +51,8 @@ def parse_dockerfile(dockerfile_path: Path, raise_error: bool = False) -> Docker
         images = CURRENT_CONFIGURATION.get("docker_images", {})
 
         image = images.get(version_info["product"], None)
-        version_info["expected_version"] = image.get("version", None)
+        version_info["expected_version"] = image.version
+        version_info["expected_image"] = image
         return DockerfileSchema(**version_info)
     except FileNotFoundError:
         logger.error("Dockerfile not found at path: %s", dockerfile_path)
