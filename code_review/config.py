@@ -6,6 +6,7 @@ from typing import Any
 import toml
 import tomllib
 
+from code_review.exceptions import ConfigurationError
 from code_review.plugins.docker.schemas import DockerImageSchema
 
 logger = logging.getLogger(__name__)
@@ -85,11 +86,18 @@ class TomlConfigManager:
 
         except tomllib.TOMLDecodeError as e:
             logger.error("Error decoding TOML file: %s. Using default settings.", e)
+            raise ConfigurationError(f"Error decoding TOML file: {e}")
+        except TypeError as e:
+            logger.error("Type error in config file: %s. Using default settings.", e)
+            raise ConfigurationError(f"Type error in config file: {e}")
         except Exception as e:
+            if isinstance(e, ConfigurationError):
+                raise e
             logger.error(
                 "An unexpected error occurred while reading the config: %s. Using default settings.",
                 e,
             )
+            raise ConfigurationError(f"An unexpected error occurred while reading the config: {e}")
 
         return self.config_data
 
@@ -145,7 +153,11 @@ def get_config(manager: TomlConfigManager = CONFIG_MANAGER) -> dict[str, Any]:
     Returns:
         dict: A dictionary containing the complete application configuration.
     """
-    config = manager.load_config()
-    if not manager.config_file.exists():
-        manager.save_config(config, create_backup=True)
-    return config
+    try:
+        config = manager.load_config()
+        if not manager.config_file.exists():
+            manager.save_config(config, create_backup=True)
+        return config
+    except ConfigurationError as e:
+        logger.error("Failed to load configuration: %s from %s", e, manager.config_file)
+        raise e

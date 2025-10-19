@@ -33,3 +33,11 @@ class TestTomlConfigManager:
         for name, image_schema in loaded_config["docker_images"].items():
             assert name in DEFAULT_CONFIG["docker_images"]
             assert isinstance(image_schema, DockerImageSchema)
+
+    def test_load_config_old_versions(self, fixtures_folder):
+        config_manaeger = TomlConfigManager(
+            config_dir=fixtures_folder ,
+            config_file_name="config-sample_v0.10.0.toml",
+        )
+        loaded_config = config_manaeger.load_config()
+        assert loaded_config["docker_images"]["python"].version == "3.12.11"
