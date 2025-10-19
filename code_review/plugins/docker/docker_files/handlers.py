@@ -37,7 +37,7 @@ def parse_dockerfile(dockerfile_path: Path, raise_error: bool = False) -> Docker
         raise_error (bool, optional): Whether to raise an exception when parsing errors.
 
     Returns:
-        dict: A dictionary containing the extracted versions.
+        DockerfileSchema: Dockerfile schema with extracted version information.
     """
     try:
         content = dockerfile_path.read_text()
