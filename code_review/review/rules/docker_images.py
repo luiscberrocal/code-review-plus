@@ -12,7 +12,7 @@ def check_image_version(code_review: CodeReviewSchema) -> list[RulesResult]:
         A list of RulesResult indicating whether each Docker image is up to date.
     """
     rules = []
-    for dockerfile in code_review.dockerfiles:
+    for dockerfile in code_review.docker_files:
 
         if dockerfile.image == dockerfile.expected_image:
             rules.append(
@@ -21,18 +21,18 @@ def check_image_version(code_review: CodeReviewSchema) -> list[RulesResult]:
                     passed=True,
                     level="INFO",
                     message=(
-                        f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in '{dockerfile.path}' is up to date."
+                        f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in '{dockerfile.file}' is up to date."
                     ),
                 )
             )
-        elif dockerfile.image < dockerfile.expected_version:
+        elif dockerfile.image < dockerfile.expected_image:
             rules.append(
                 RulesResult(
                     name="Docker Image Version",
                     passed=False,
                     level="ERROR",
                     message=(
-                        f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in '{dockerfile.path}' is outdated. "
+                        f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in '{dockerfile.file}' is outdated. "
                         f"Expected version is '{dockerfile.expected_version}'."
                     ),
                 )
@@ -44,7 +44,7 @@ def check_image_version(code_review: CodeReviewSchema) -> list[RulesResult]:
                     passed=False,
                     level="WARNING",
                     message=(
-                        f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in '{dockerfile.path}' is not the latest version."
+                        f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in '{dockerfile.file}' is not the latest version."
                     ),
                 )
             )
