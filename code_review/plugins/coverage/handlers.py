@@ -1,11 +1,13 @@
 import os
 import re
 import subprocess
+from datetime import datetime
 from pathlib import Path, PosixPath
 from typing import Any
 
 import yaml
 
+from code_review import settings
 from code_review.plugins.coverage.schemas import TestConfiguration
 from code_review.handlers.file_handlers import change_directory
 
@@ -28,6 +30,7 @@ def run_tests_and_get_coverage(
         subprocess.CalledProcessError: If either the test or coverage report command fails.
         ValueError: If the coverage percentage cannot be extracted from the output.
     """
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     original_cwd = os.getcwd()
     try:
         change_directory(folder)
@@ -39,18 +42,23 @@ def run_tests_and_get_coverage(
             f"--exclude-tag=INTEGRATION"
         )
         print(f"Running command: {test_command}")
-        subprocess.run(test_command, shell=True, check=True)
+        test_results = subprocess.run(test_command, shell=True, check=True, text=True, capture_output=True)
+        test_output = test_results.stdout
+        test_file = settings.OUTPUT_FOLDER / f"{folder.stem}_{timestamp}_tests.txt"
+        with open(test_file, "w") as f:
+            f.write(test_output)
 
         # Command to report coverage and check against minimum
         report_command = (
             f"docker-compose -f local.yml run --rm django coverage report -m --fail-under={minimum_coverage}"
         )
         print(f"Running command: {report_command}")
-        result = subprocess.run(report_command, shell=True, check=False, text=True, capture_output=True)
+        cov_results = subprocess.run(report_command, shell=True, check=False, text=True, capture_output=True)
 
         # Extract coverage from the output
-        coverage_output = result.stdout
-        with open(os.path.join(folder, "__coverage.txt"), "w") as f:
+        coverage_output = cov_results.stdout
+        cov_file = settings.OUTPUT_FOLDER / f"{folder.stem}_{timestamp}_coverage.txt"
+        with open(cov_file, "w") as f:
             f.write(coverage_output)
 
         test_count_match = re.search(
@@ -83,24 +91,27 @@ if __name__ == "__main__":
         tests_to_run = "pay_options_middleware.middleware.tests.unit pay_options_middleware.users.tests"
         min_coverage = 85
 
-        target_folder = Path.home() / "adelantos" / "wu-integration"
-        tests_to_run = "wu_integration.rest.tests.unit"
-        min_coverage = 85
+        # target_folder = Path.home() / "adelantos" / "wu-integration"
+        # tests_to_run = "wu_integration.rest.tests.unit"
+        # min_coverage = 85
 
-        target_folder = Path.home() / "adelantos" / "payment-collector"
-        tests_to_run = [
-            "payment_collector.api.tests.unit payment_collector.users.tests",
-            " payment_collector.reconciliation.tests",
-        ]
-        min_coverage = 85.0
+        # target_folder = Path.home() / "adelantos" / "payment-collector"
+        # tests_to_run = [
+        #     "payment_collector.api.tests.unit payment_collector.users.tests",
+        #     " payment_collector.reconciliation.tests",
+        # ]
+        # min_coverage = 85.0
+
         settings_module_t = "config.settings.local"
+        unit_tests_to_run = tests_to_run.split(" ")
 
         test_configuration = TestConfiguration(
-            folder=target_folder, unit_tests=tests_to_run, min_coverage=min_coverage, settings_module=settings_module_t
+            folder=target_folder, unit_tests=unit_tests_to_run, min_coverage=min_coverage, settings_module=settings_module_t
         )
 
         config_data = test_configuration.model_dump()
-        yaml_file_path: PosixPath = Path("test_configuration.yml")
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        yaml_file_path: PosixPath = settings.OUTPUT_FOLDER / f"{target_folder.stem}_{timestamp}_test_configuration.yml"
 
         with open(yaml_file_path, "w") as file:
             # `sort_keys=False` is often used to maintain the order from the model/dictionary
