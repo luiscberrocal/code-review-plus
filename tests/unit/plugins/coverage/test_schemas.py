@@ -1,10 +1,10 @@
+import io
+from pathlib import PosixPath
+
 import yaml
 
 from code_review import settings
 from code_review.plugins.coverage.schemas import TestConfiguration
-import yaml
-from pathlib import PosixPath
-import io
 
 # --- 1. Define the YAML content with the custom tag ---
 yaml_content = """
@@ -81,7 +81,7 @@ class TestTestConfiguration:
 
         assert yaml_file_path.exists()
 
-        with open(yaml_file_path, "r") as file:
+        with open(yaml_file_path) as file:
             loaded_config = yaml.safe_load(io.StringIO(yaml_content))
 
         assert loaded_config["folder"] == str(target_folder)
@@ -91,6 +91,32 @@ class TestTestConfiguration:
 
         loaded_data = TestConfiguration(**loaded_config)
         assert loaded_data == test_config
+
+
+    def test_read_config(self):
+
+        yaml_content = """
+        folder: !!python/object/apply:pathlib.PosixPath
+        - /
+        - home
+        - luiscberrocal
+        - PycharmProjects
+        - code-review-plus
+        - output
+        - code-review-plus
+        unit_tests:
+        - middleware.middleware.tests.unit
+        - middleware.users.tests
+        min_coverage: 85.0
+        settings_module: config.settings.local
+        tags_to_exclude:
+        - INTEGRATION
+        """
+
+        data = yaml.safe_load(io.StringIO(yaml_content))
+        test_config = TestConfiguration(**data)
+        assert test_config.folder == PosixPath("/home/luiscberrocal/PycharmProjects/code-review-plus/output/code-review-plus")
+
 
 
 
