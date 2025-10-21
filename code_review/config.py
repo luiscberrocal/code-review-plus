@@ -6,6 +6,9 @@ from typing import Any
 import toml
 import tomllib
 
+from code_review.exceptions import ConfigurationError
+from code_review.plugins.docker.schemas import DockerImageSchema
+
 logger = logging.getLogger(__name__)
 # Define a dictionary of default configuration settings.
 # These values will be used if the TOML file is not found or
@@ -15,9 +18,9 @@ DEFAULT_CONFIG = {
     "date_format": "%Y-%m-%d %H:%M:%S",
     "max_lines_to_display": 100,
     "docker_images": {
-        "python": "3.12.11-slim-bookworm",
-        "node": "20.19.4-alpine3",
-        "postgres": "16.10-bookworm",
+        "python":  {"name": "python", "version": "3.12.11", "operating_system": "slim-bookworm"},
+        "node":  {"name": "node", "version": "20.19.4", "operating_system": "alpine3"},
+        "postgres":  {"name": "postgres", "version": "16.10", "operating_system": "bookworm"},
     },
     "default_branches": ["master", "develop"],
 }
@@ -63,6 +66,10 @@ class TomlConfigManager:
 
             # Extract the settings for our application.
             app_settings = toml_data.get("tool", {}).get("cli_app", {})
+            docker_images = app_settings.get("docker_images", self.config_data["docker_images"]),
+            docker_images_dict = {}
+            for image_name, image_info in docker_images[0].items():
+                docker_images_dict[image_name] = DockerImageSchema(**image_info)
 
             # Update the configuration with values from the TOML file.
             self.config_data.update(
@@ -73,17 +80,24 @@ class TomlConfigManager:
                         "max_lines_to_display",
                         self.config_data["max_lines_to_display"],
                     ),
-                    "docker_images": app_settings.get("docker_images", self.config_data["docker_images"]),
+                    "docker_images": docker_images_dict,
                 }
             )
 
         except tomllib.TOMLDecodeError as e:
             logger.error("Error decoding TOML file: %s. Using default settings.", e)
+            raise ConfigurationError(f"Error decoding TOML file: {e}")
+        except TypeError as e:
+            logger.error("Type error in config file: %s. Using default settings.", e)
+            raise ConfigurationError(f"Type error in config file: {e}")
         except Exception as e:
+            if isinstance(e, ConfigurationError):
+                raise e
             logger.error(
                 "An unexpected error occurred while reading the config: %s. Using default settings.",
                 e,
             )
+            raise ConfigurationError(f"An unexpected error occurred while reading the config: {e}")
 
         return self.config_data
 
@@ -139,7 +153,11 @@ def get_config(manager: TomlConfigManager = CONFIG_MANAGER) -> dict[str, Any]:
     Returns:
         dict: A dictionary containing the complete application configuration.
     """
-    config = manager.load_config()
-    if not manager.config_file.exists():
-        manager.save_config(config, create_backup=True)
-    return config
+    try:
+        config = manager.load_config()
+        if not manager.config_file.exists():
+            manager.save_config(config, create_backup=True)
+        return config
+    except ConfigurationError as e:
+        logger.error("Failed to load configuration: %s from %s", e, manager.config_file)
+        raise e

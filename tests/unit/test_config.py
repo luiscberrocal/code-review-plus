@@ -1,6 +1,8 @@
 import pytest
 
 from code_review.config import DEFAULT_CONFIG, TomlConfigManager
+from code_review.exceptions import ConfigurationError
+from code_review.plugins.docker.schemas import DockerImageSchema
 
 
 class TestTomlConfigManager:
@@ -27,3 +29,19 @@ class TestTomlConfigManager:
         config_manager.save_config()  # Create a sample config file
         print("Configuration file saved.", config_manager.config_file)
         assert config_manager.config_file.exists()
+        loaded_config = config_manager.load_config()
+
+        for name, image_schema in loaded_config["docker_images"].items():
+            assert name in DEFAULT_CONFIG["docker_images"]
+            assert isinstance(image_schema, DockerImageSchema)
+
+    def test_load_config_old_versions(self, fixtures_folder):
+        config_manager = TomlConfigManager(
+            config_dir=fixtures_folder ,
+            config_file_name="config-sample_v0.10.0.toml",
+        )
+        try:
+            loaded_config = config_manager.load_config()
+        except ConfigurationError as e:
+            assert str(e) == ("Type error in config file: code_review.plugins.docker.schemas.DockerImageSchema() "
+                              "argument after ** must be a mapping, not str")
