@@ -9,7 +9,7 @@ from typing import Any
 import yaml
 
 from code_review import settings
-from code_review.plugins.coverage.schemas import TestConfiguration
+from code_review.plugins.coverage.schemas import TestConfiguration, TestResult
 from code_review.handlers.file_handlers import change_directory
 
 def run_tests_and_get_coverage(
@@ -89,7 +89,7 @@ def handle_test_output(test_output: str, coverage_output) -> Any:
         coverage_percentage = float(cov_match.group("coverage"))
     return {"test_count": test_count, "coverage_percentage": coverage_percentage, }
 
-def run_coverage(test_configuration: TestConfiguration) -> dict[str, Any]:
+def run_coverage(test_configuration: TestConfiguration) -> TestResult:
     """Run tests and get coverage based on the provided test configuration.
 
     Args:
@@ -107,7 +107,7 @@ def run_coverage(test_configuration: TestConfiguration) -> dict[str, Any]:
     processed_output = handle_test_output(results["test_output"], results["coverage_output"])
     processed_output["running_time"] = results["running_time"]
 
-    return processed_output
+    return TestResult(**processed_output)
 
 
 # Example Usage:

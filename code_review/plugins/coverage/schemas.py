@@ -13,3 +13,10 @@ class TestConfiguration(BaseModel):
     tags_to_exclude: list[str] = Field(
         default_factory=lambda: ["INTEGRATION"], description="List of test tags to exclude."
     )
+
+class TestResult(BaseModel):
+    """Schema for test results."""
+
+    test_count: int = Field(default=-1, description="Number of tests executed.")
+    coverage_percentage: float = Field(default=-1.0, description="Code coverage percentage achieved.")
+    running_time: float = Field(default=-1.0, description="Time taken to run the tests in seconds.")
