@@ -53,25 +53,6 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
     else:
         CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} No Dependencies to Update![/bold green]")
 
-    for dockerfile in review.docker_files or []:
-        if dockerfile.version != dockerfile.expected_version:
-            CLI_CONSOLE.print(
-                f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Dockerfile {dockerfile.file.relative_to(review.source_folder)} need to be "
-                f"updated {dockerfile.version} -> {dockerfile.expected_version}:[/bold red]"
-            )
-        else:
-            CLI_CONSOLE.print(
-                f"[bold green]{ReviewRuleLevelIcon.INFO.value} Dockerfile {dockerfile.file.relative_to(review.source_folder)} has "
-                f"is up to date ![/bold green]"
-            )
-
-    if review.target_branch.formatting_errors != 0:
-        CLI_CONSOLE.print(
-            f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Code Formatting Issues Detected![/bold red] {review.target_branch.formatting_errors} files need formatting."
-        )
-    else:
-        CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} All Files Properly Formatted![/bold green]")
-
     logger.debug("Review Details: %s", review.target_branch.changelog_versions)
     logger.debug("Review version: %s", review.target_branch.version)
     print("-" * 80)
@@ -83,11 +64,16 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
                 CLI_CONSOLE.print(
                     f"[bold green]{ReviewRuleLevelIcon.INFO.value} Rule Passed: {rule.name} {rule.message}[/bold green]"
                 )
+            elif rule.level == "WARNING":
+                CLI_CONSOLE.print(
+                    f"[bold yellow]{ReviewRuleLevelIcon.WARNING.value} Rule Warning: {rule.name} {rule.message}[/bold yellow]"
+                )
             else:
                 CLI_CONSOLE.print(
                     f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Rule Failed: {rule.name} {rule.message}[/bold red]"
                 )
 
+    print("-" * 80)
     if len(review.target_branch.changelog_versions) == 0 or review.target_branch.version is None:
         logger.error("Skipping version check due to missing information")
         return
