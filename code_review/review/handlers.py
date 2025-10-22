@@ -44,15 +44,6 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
             f"{review.base_branch.linting_errors} while {review.target_branch.name} "
             f"has {review.target_branch.linting_errors}"
         )
-    # Requirements to update
-    requirements_pending_update_count = len(review.target_branch.requirements_to_update)
-    if requirements_pending_update_count > 0:
-        CLI_CONSOLE.print(
-            f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Dependencies to Update:[/bold red] {requirements_pending_update_count} need updates."
-        )
-    else:
-        CLI_CONSOLE.print(f"[bold green]{ReviewRuleLevelIcon.INFO.value} No Dependencies to Update![/bold green]")
-
     logger.debug("Review Details: %s", review.target_branch.changelog_versions)
     logger.debug("Review version: %s", review.target_branch.version)
     print("-" * 80)
