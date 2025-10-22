@@ -4,6 +4,9 @@ from code_review.review.rules.docker_images import check_image_version
 from code_review.schemas import RulesResult
 from hypothesis import given, strategies as st
 
+from tests.unit.plugins.coverage.coverage_factories import DockerfileSchemaFactory
+
+
 class TestCheckImageVersion:
     def make_dockerfile(self, image, expected_image, expected_version, path="Dockerfile"):
         dockerfile = MagicMock()
@@ -14,30 +17,23 @@ class TestCheckImageVersion:
         return dockerfile
 
     def test_image_up_to_date(self):
-        image = MagicMock()
-        image.name = "python"
-        image.version = "3.10"
-        dockerfile = self.make_dockerfile(image, image, "3.10")
+        docker_file = DockerfileSchemaFactory.create()
+        docker_file.expected_image = docker_file.image
+
         code_review = MagicMock()
-        code_review.dockerfiles = [dockerfile]
+        code_review.docker_files = [docker_file]
         results = check_image_version(code_review)
         assert len(results) == 1
         assert results[0].passed is True
         assert results[0].level == "INFO"
 
     def test_image_outdated(self):
-        image = MagicMock()
-        image.name = "python"
-        image.version = "3.9"
-        expected_image = MagicMock()
-        expected_image.name = "python"
-        expected_image.version = "3.10"
-        # image < expected_version triggers outdated
-        dockerfile = self.make_dockerfile(image, expected_image, expected_image)
-        # Patch __lt__ to True
-        image.__lt__.return_value = True
+        docker_file = DockerfileSchemaFactory.create(image__version="3.10")
+        docker_file.expected_image = docker_file.image.model_copy()
+        docker_file.expected_image.version = "3.12"
+
         code_review = MagicMock()
-        code_review.dockerfiles = [dockerfile]
+        code_review.docker_files = [docker_file]
         results = check_image_version(code_review)
         assert len(results) == 1
         assert results[0].passed is False
