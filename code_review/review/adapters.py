@@ -15,6 +15,7 @@ from code_review.plugins.gitlab.ci.rules import validate_ci_rules
 from code_review.review.rules.docker_images import check_image_version
 from code_review.review.rules.git_rules import rebase_rule, validate_master_develop_sync
 from code_review.review.rules.linting_rules import check_and_format_ruff
+from code_review.review.rules.readme_rules import check_urls_in_readme
 from code_review.review.rules.version_rules import check_change_log_version
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
@@ -110,6 +111,10 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     docker_image_rules = check_image_version(code_review=code_review_schema)
     if docker_image_rules:
         rules.extend(docker_image_rules)
+    # README rules
+    admin_url_check = check_urls_in_readme(folder/ "README.md")
+    if admin_url_check:
+        rules.extend(admin_url_check)
 
     code_review_schema.rules_validated = rules
     return code_review_schema
