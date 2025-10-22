@@ -49,6 +49,7 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
     print("-" * 80)
     # Rules validated
     CLI_CONSOLE.print("[bold blue]>>> Rules Validated <<<[/bold blue]")
+
     filtered_rules = [rule for rule in review.rules_validated if not rule.passed or rule.level == "WARNING"]
     if filtered_rules:
         for rule in filtered_rules:
