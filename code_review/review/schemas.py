@@ -14,7 +14,7 @@ class CodeReviewSchema(BaseModel):
     is_rebased: bool = Field(
         default=False, description="Indicates if the target branch has been rebased onto the source branch"
     )
-    source_folder: Path
+    source_folder: Path = Field(description="Path to the source folder of the code review")
     makefile_path: Path | None
     date_created: datetime | None
     ticket: str | None = Field(default=None, description="Ticket associated with the code review")

@@ -13,7 +13,6 @@ def check_image_version(code_review: CodeReviewSchema) -> list[RulesResult]:
     """
     rules = []
     for dockerfile in code_review.docker_files:
-
         if dockerfile.image == dockerfile.expected_image:
             rules.append(
                 RulesResult(
@@ -47,7 +46,7 @@ def check_image_version(code_review: CodeReviewSchema) -> list[RulesResult]:
                     level="WARNING",
                     message=(
                         f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in "
-                        f"'{dockerfile.file.relative_to(code_review.source_folder)}' is not the latest version."
+                        f"'{dockerfile.file.relative_to(code_review.source_folder)}' is newer than expected."
                     ),
                 )
             )
