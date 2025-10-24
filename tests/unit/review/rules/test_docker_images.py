@@ -1,12 +1,8 @@
-import pytest
 from unittest.mock import MagicMock
 
-from code_review.plugins.docker.schemas import DockerfileSchema
 from code_review.review.rules.docker_images import check_image_version
-from code_review.schemas import RulesResult
-from hypothesis import given, strategies as st
 
-from tests.unit.plugins.coverage.coverage_factories import DockerfileSchemaFactory
+from tests.unit.plugins.docker.docker_factories import DockerfileSchemaFactory
 
 
 class TestCheckImageVersion:
