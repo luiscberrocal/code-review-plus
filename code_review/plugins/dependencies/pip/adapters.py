@@ -101,7 +101,7 @@ def main():
     hiredis==3.2.1  # https://github.com/redis/hiredis-py
     celery==5.5.3  # pyup: < 6.0  # https://github.com/celery/celery
     django-celery-beat==2.8.1  # https://github.com/celery/django-celery-beat
-    uvicorn[standard]==0.35.0  # https://github.com/encode/uvicorn
+    uvicorn[standard]>=0.35.0  # https://github.com/encode/uvicorn
     # This is a full-line comment and should be skipped
     # uwsgi==2.0.24  # Example of a fully commented-out line
     """
