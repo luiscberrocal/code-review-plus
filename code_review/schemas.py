@@ -8,6 +8,43 @@ from code_review.plugins.dependencies.pip.schemas import RequirementInfo
 
 logger = logging.getLogger(__name__)
 
+class SemanticVersionSchema(BaseModel):
+    """Schema for semantic versioning."""
+
+    major: int
+    minor: int
+    patch: int
+
+    def __str__(self):  # noqa D105
+        return f"{self.major}.{self.minor}.{self.patch}"
+
+    @classmethod
+    def parse_version(cls, version: str, raise_error: bool = False) -> "SemanticVersionSchema":
+        """Parse a version string into a SemanticVersion object."""
+        logger.debug("Parsing version '%s'", version)
+        parts = version.split(".")
+
+        if len(parts) != 3:
+            logger.error("Invalid version '%s'", version)
+            if raise_error:
+                raise ValueError(f"Invalid version format: {version}")
+            major, minor, patch = 0, 0, 0
+            return cls(major=major, minor=minor, patch=patch)
+        try:
+            major, minor, patch = map(int, parts)
+        except ValueError:
+            major, minor, patch = 0, 0, 0
+        return cls(major=major, minor=minor, patch=patch)
+
+    def __lt__(self, other):
+        if not isinstance(other, SemanticVersion):
+            return NotImplemented
+
+        if self.major != other.major:
+            return self.major < other.major
+        if self.minor != other.minor:
+            return self.minor < other.minor
+        return self.patch < other.patch
 
 class SemanticVersion(BaseModel):
     """Schema for semantic versioning."""
@@ -53,11 +90,12 @@ class SemanticVersion(BaseModel):
 class BranchSchema(BaseModel):
     """Schema for branch information."""
 
-    name: str
-    author: str
-    email: str
-    hash: str
-    date: datetime | None = None
+    name: str = Field(description="Name of the branch")
+    author: str = Field(description="Author of the branch")
+    email: str = Field(description="Email of the branch author")
+    hash: str = Field(description="Commit hash of the branch")
+    date: datetime | None = Field(default=None, description="Date of the last commit on the branch")
+
     linting_errors: int = Field(default=-1, description="Number of linting errors found by ruff. -1 means not checked")
     min_coverage: float | None = Field(default=None, description="Minimum coverage based on the Makefile")
     version: SemanticVersion | None = Field(default=None, description="Semantic version from the version file")

@@ -4,9 +4,8 @@ from pathlib import Path
 
 from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name
-from pydantic import BaseModel, Field
 
-from code_review.plugins.dependencies.pip.schemas import RequirementInfo
+from code_review.plugins.dependencies.pip.schemas import RequirementInfo, PackageRequirement
 
 logger = logging.getLogger(__name__)
 
@@ -97,24 +96,6 @@ def parse_requirements_old(content):
             )
 
     return parsed_data
-
-
-# --- Pydantic Model ---
-class PackageRequirement(BaseModel):
-    """Model for a parsed package requirement line, conforming to Pydantic structure."""
-
-    name: str = Field(description="The canonicalized package name (e.g., 'djangorestframework' or 'ddtrace[django]').")
-    version: str | None = Field(
-        None,
-        description="The exact version specified, e.g., '3.16.0'. None if only a specifier (like '>=') or a VCS source is used.",
-    )
-    specifier: str | None = Field(
-        None, description="The full version specifier string, e.g., '==3.16.0' or '>=4.0.0, <5.0'."
-    )
-    source: str | None = Field(
-        None,
-        description="The full original source line, primarily used for complex VCS requirements (git+, hg+, etc.).",
-    )
 
 
 # --- Parsing Function ---
