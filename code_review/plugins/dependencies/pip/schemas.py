@@ -18,12 +18,11 @@ class PackageRequirement(BaseModel):
     """Model for a parsed package requirement line, conforming to Pydantic structure."""
 
     name: str = Field(description="The canonicalized package name (e.g., 'djangorestframework' or 'ddtrace[django]').")
-    version: str | None = Field(
-        None,
+    version: str = Field(
         description="The exact version specified, e.g., '3.16.0'. None if only a specifier (like '>=') or a VCS source is used.",
     )
     specifier: str | None = Field(
-        None, description="The full version specifier string, e.g., '==3.16.0' or '>=4.0.0, <5.0'."
+        None, description="The full version specifier string, e.g., '==' or '>=, <'."
     )
     source: str | None = Field(
         None,
