@@ -157,12 +157,12 @@ def parse_requirements(requirements_content: str) -> list[PackageRequirement]:
 
             # Extract the version string (e.g., '3.16.0') if it's an exact match specifier (==)
             version_str = None
-            spec_str = str(req.specifier)
+            spec_str = None
 
             if len(req.specifier) == 1:
                 spec = next(iter(req.specifier))
-                if spec.operator == "==":
-                    version_str = spec.version
+                version_str = spec.version
+                spec_str = spec.operator
 
             parsed_requirements.append(
                 PackageRequirement(

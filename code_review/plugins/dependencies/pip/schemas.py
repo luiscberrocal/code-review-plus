@@ -15,7 +15,10 @@ class RequirementInfo(BaseModel):
 
 
 class PackageRequirement(BaseModel):
-    """Model for a parsed package requirement line, conforming to Pydantic structure."""
+    """Model for a fully pinned parsed package requirement line, conforming to Pydantic structure.
+
+    Fully pinned means it includes the package name and exact version.
+    """
 
     name: str = Field(description="The canonicalized package name (e.g., 'djangorestframework' or 'ddtrace[django]').")
     version: str = Field(
