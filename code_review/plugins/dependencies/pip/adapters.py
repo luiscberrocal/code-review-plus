@@ -63,12 +63,17 @@ def parse_requirements(requirements_content: str) -> list[PackageRequirement]:
 
             # Best effort: Extract name from the repository path
             # Looks for /repo_name.git or /repo_name at the end
-            repo_match = re.search(r"\/([^\/]+)(?:\.git)?(?:\@|\Z)", clean_line)
-            name = repo_match.group(1).split("@")[0] if repo_match else "VCS_Unknown"
+            repo_match_regexp = re.compile("\s*git\+https\:\/\/.+@gitlab\.com\/.+\/(?P<name>[\w_\-]+)\.git@v(?P<version>[\w\.]+)")
+            # repo_match = re.search(r"\/([^\/]+)(?:\.git)?(?:\@|\Z)", clean_line)
+            # name = repo_match.group(1).split("@")[0] if repo_match else "VCS_Unknown"
+            repo_match = re.match(repo_match_regexp, clean_line)
+            name = "VCS_Unknown"
+            version = None
+            if repo_match:
+                name = repo_match.group("name")
+                version = repo_match.group("version")
 
             # Best effort: Extract version from the tag/commit reference (@vX.Y.Z)
-            tag_match = re.search(r"@([^\s]+)$", clean_line)
-            version = tag_match.group(1) if tag_match else None
 
             # Note: For VCS, the name should ideally be specified with #egg=packagename,
             # but since the example lacks it, we use the repo name and store the full line as source.
@@ -76,7 +81,7 @@ def parse_requirements(requirements_content: str) -> list[PackageRequirement]:
                 PackageRequirement(
                     name=name,
                     version=version,
-                    specifier=f"VCS reference: {version}" if version else "VCS reference",
+                    specifier="@",
                     source=source,
                 )
             )
@@ -93,16 +98,18 @@ def parse_requirements(requirements_content: str) -> list[PackageRequirement]:
 
             # Extract the version string (e.g., '3.16.0') if it's an exact match specifier (==)
             version_str = None
-            spec_str = None
+            spec_str = str(req.specifier)
+            operator = "?????"
 
             if len(req.specifier) == 1:
                 spec = next(iter(req.specifier))
+                # if spec.operator == "==":
                 version_str = spec.version
-                spec_str = spec.operator
+                operator = spec.operator
 
             parsed_requirements.append(
                 PackageRequirement(
-                    name=full_name, version=version_str, specifier=spec_str if spec_str else None, source=None
+                    name=full_name, version=version_str, specifier=operator if spec_str else None, source=None
                 )
             )
 
@@ -125,7 +132,7 @@ def main2():
     drf-pydantic==2.7.1  # https://pypi.org/project/drf-pydantic/
     # email-validator==2.2.0  <-- This line is commented out and will be skipped
     django-fsm==3.0.0
-    Deprecated==1.2.18
+    Deprecated>=1.2.18
 
     # Datadog APM and Logging
     # ------------------------------------------------------------------------------
@@ -133,8 +140,8 @@ def main2():
     django-datadog-logger==0.7.3  # https://github.com/Mtsohetra/django-datadog-logger
 
     # VCS Requirements without #egg=, name is inferred from repo
-    git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/pj-slack-sdk.git@v1.0.1
-    git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/oxxo-direct-sdk.git@v2.1.0
+    git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/repo1/my-weird.git@v1.0.1
+    git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/reepo1/secret-lib.git@v2.1.0
     """
 
     results = parse_requirements(requirements_content)
