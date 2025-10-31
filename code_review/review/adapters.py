@@ -13,7 +13,8 @@ from code_review.plugins.git.adapters import get_git_flow_source_branch, is_reba
 from code_review.plugins.git.handlers import branch_line_to_dict, check_out_and_pull, get_branch_info
 from code_review.plugins.gitlab.ci.rules import validate_ci_rules
 from code_review.review.rules.docker_images import check_image_version
-from code_review.review.rules.git_rules import rebase_rule, validate_master_develop_sync
+from code_review.review.rules.git_rules import rebase_rule, validate_master_develop_sync, \
+    validate_master_develop_sync_legacy
 from code_review.review.rules.linting_rules import check_and_format_ruff
 from code_review.review.rules.readme_rules import check_urls_in_readme
 from code_review.review.rules.version_rules import check_change_log_version
@@ -96,7 +97,9 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     if linting_rules:
         rules.extend(linting_rules)
     # Git rules
-    git_rules = validate_master_develop_sync(*["master", "develop"])
+    # Master amd develop sync rules
+    git_rules = validate_master_develop_sync_legacy(["master", "develop"])
+    logger.error(">>>> Git Rules Legacy: %s", git_rules)
     if git_rules:
         rules.extend(git_rules)
     # Git sync rules
