@@ -12,10 +12,10 @@ help:
 	@echo "  help     - Show this help"
 
 test:
-	$(PYTEST) -v tests/
+	uv run $(PYTEST) -v tests/unit
 
 cov:
-	$(PYTEST) --cov=docker_tools_plus --cov-report=html
+	uv run $(PYTEST) --cov=docker_tools_plus --cov-report=html
 
 lint:
 	$(RUFF) check docker_tools_plus/ tests/

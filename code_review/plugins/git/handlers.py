@@ -312,11 +312,13 @@ def compare_branches(base: str, target: str, raise_error: bool = False) -> dict[
     Args:
         base (str): The base branch to compare against (e.g., "master").
         target (str): The target branch to compare (e.g., "feature-branch").
+        raise_error (bool): Raise an exception if there are no commits between base and target.
     """
     status = {"ahead": -1, "behind": -1}
     try:
+        command = ["git", "rev-list", "--left-right", "--count", f"{base}...{target}"]
         result = subprocess.run(
-            ["git", "rev-list", "--left-right", "--count", f"{base}...{target}"],
+            command,
             capture_output=True,
             text=True,
             check=True,
@@ -325,8 +327,8 @@ def compare_branches(base: str, target: str, raise_error: bool = False) -> dict[
         behind, ahead = map(int, behind_ahead.split())
         status["ahead"] = ahead
         status["behind"] = behind
+        logger.info(f"Comparing {base} and {target}: {behind} != {ahead}. Command: {' '.join(command) }")
         return status
-        # return f"Branch '{target}' is {ahead} commits ahead and {behind} commits behind '{base}'."
     except subprocess.CalledProcessError as e:
         logger.error("Error comparing branches: %s", e.stderr.strip())
         if raise_error:

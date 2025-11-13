@@ -114,9 +114,12 @@ def run_coverage(test_configuration: TestConfiguration) -> TestResult:
 if __name__ == "__main__":
     try:
         # Replace these with your actual folder, test paths, and desired coverage
-        target_folder = Path.home() / "adelantos" / "payment-options-vue"
-        tests_to_run = "pay_options_middleware.middleware.tests.unit pay_options_middleware.users.tests"
         min_coverage = 85
+        base_project_folder = Path.home() / "adelantos"
+
+        target_folder = base_project_folder / "payment-options-vue"
+
+        tests_to_run = "pay_options_middleware.middleware.tests.unit pay_options_middleware.users.tests"
 
         # target_folder = Path.home() / "adelantos" / "wu-integration"
         # tests_to_run = "wu_integration.rest.tests.unit"
@@ -144,6 +147,7 @@ if __name__ == "__main__":
             # `sort_keys=False` is often used to maintain the order from the model/dictionary
             # `default_flow_style=False` ensures a block-style (multi-line) YAML output for readability
             yaml.dump(config_data, file, sort_keys=False, default_flow_style=False)
+        print(f"Test configuration saved to: {yaml_file_path}")
 
         # coverage = run_tests_and_get_coverage(
         #     target_folder, tests_to_run, min_coverage, settings_module=settings_module_t

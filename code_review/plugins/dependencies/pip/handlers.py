@@ -73,18 +73,3 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[Requirement
             return []
 
     return updated_packages
-
-
-# noqa: BLE001
-
-# --- Example Usage ---
-
-if __name__ == "__main__":
-    # Simulate a project directory structure for demonstration
-    projects_folder = Path.home() / "adelantos" / "refacil-payment-provider"
-    logger.debug(f"Checking for requirements updates in {projects_folder}")
-    updated = requirements_updated(projects_folder, level="major")
-    if updated:
-        CLI_CONSOLE.print("[green]Updated packages:[/green]")
-        for pkg in updated:
-            CLI_CONSOLE.print(f"- {pkg['library']}: {pkg['file'].stem}")

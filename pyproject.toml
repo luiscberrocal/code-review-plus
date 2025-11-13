@@ -21,6 +21,7 @@ code-review-plus = "code_review.cli:cli"
 
 [tool.uv]
 dev-dependencies = [
+    "factory-boy>=3.3.3",
     "pytest>=8.4.1",
     "twine>=6.1.0",
 ]
