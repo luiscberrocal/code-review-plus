@@ -41,7 +41,7 @@ def validate_master_develop_sync(base_branch_name: str, target_branch_name: str)
                 name="Git",
                 level="ERROR",
                 passed=False,
-                message=f"'{base_branch_name}' and '{target_branch_name}' branches are not in sync.",
+                message=f"'{base_branch_name}' and '{target_branch_name}' branches are not in sync based on rebase.",
             )
         )
     return rules

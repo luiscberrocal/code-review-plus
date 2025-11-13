@@ -88,7 +88,7 @@ def compare_linting_error_rules(
             RulesResult(
                 name=name,
                 level="WARNING",
-                passed=True,
+                passed=False,
                 message=f"Target branch has the same number of linting errors as the base branch {target_count} = {base_count}.",
                 details=(f"Both branches have {base_branch.linting_errors} linting errors."),
             )

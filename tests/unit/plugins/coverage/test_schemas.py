@@ -6,25 +6,6 @@ import yaml
 from code_review import settings
 from code_review.plugins.coverage.schemas import TestConfiguration
 
-# --- 1. Define the YAML content with the custom tag ---
-yaml_content = """
-project_folder: !!python/object/apply:pathlib.PosixPath
-- /
-- home
-- luiscberrocal
-- PycharmProjects
-- code-review-plus
-- output
-- project_folder
-unit_tests:
-- middleware.middleware.tests.unit
-- middleware.users.tests
-min_coverage: 85.0
-settings_module: config.settings.local
-tags_to_exclude:
-- INTEGRATION
-"""
-
 
 # --- 2. Define the Custom Constructor Function ---
 # This function tells PyYAML how to handle the specific tag.
@@ -82,9 +63,9 @@ class TestTestConfiguration:
         assert yaml_file_path.exists()
 
         with open(yaml_file_path) as file:
-            loaded_config = yaml.safe_load(io.StringIO(yaml_content))
+            loaded_config = yaml.safe_load(file)
 
-        assert loaded_config["folder"] == str(target_folder)
+        assert loaded_config["folder"] == target_folder
         assert loaded_config["unit_tests"] == unit_tests_to_run
         assert loaded_config["min_coverage"] == min_coverage
         assert loaded_config["settings_module"] == settings_module_t

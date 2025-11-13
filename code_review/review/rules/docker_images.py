@@ -13,7 +13,6 @@ def check_image_version(code_review: CodeReviewSchema) -> list[RulesResult]:
     """
     rules = []
     for dockerfile in code_review.docker_files:
-
         if dockerfile.image == dockerfile.expected_image:
             rules.append(
                 RulesResult(
@@ -21,7 +20,8 @@ def check_image_version(code_review: CodeReviewSchema) -> list[RulesResult]:
                     passed=True,
                     level="INFO",
                     message=(
-                        f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in '{dockerfile.file}' is up to date."
+                        f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in"
+                        f" '{dockerfile.file.relative_to(code_review.source_folder)}' is up to date."
                     ),
                 )
             )
@@ -32,7 +32,8 @@ def check_image_version(code_review: CodeReviewSchema) -> list[RulesResult]:
                     passed=False,
                     level="ERROR",
                     message=(
-                        f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in '{dockerfile.file}' is outdated. "
+                        f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in "
+                        f"'{dockerfile.file.relative_to(code_review.source_folder)}' is outdated. "
                         f"Expected version is '{dockerfile.expected_version}'."
                     ),
                 )
@@ -44,7 +45,8 @@ def check_image_version(code_review: CodeReviewSchema) -> list[RulesResult]:
                     passed=False,
                     level="WARNING",
                     message=(
-                        f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in '{dockerfile.file}' is not the latest version."
+                        f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in "
+                        f"'{dockerfile.file.relative_to(code_review.source_folder)}' is newer than expected."
                     ),
                 )
             )
