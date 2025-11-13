@@ -3,12 +3,12 @@ from unittest.mock import MagicMock, patch, call
 from code_review.plugins.git.handlers import display_branches
 from code_review.schemas import BranchSchema
 from datetime import datetime
-from code_review.plugins.git.handlers import compare_branches
+from code_review.plugins.git.handlers import compare_branches_deprecated
 
 
 class TestCompareBranches:
     def test_compare_handler(self):
-        result = compare_branches("master", "feature/bulk_git_sync")
+        result = compare_branches_deprecated("master", "feature/bulk_git_sync")
         assert result is not None
 
 

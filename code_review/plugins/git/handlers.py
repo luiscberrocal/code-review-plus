@@ -306,7 +306,7 @@ def refresh_from_remote(remote_source: str) -> None:
         raise SimpleGitToolError(f"Could not refresh from remote '{remote_source}'")
 
 
-def compare_branches(base: str, target: str, raise_error: bool = False) -> dict[str, int]:
+def compare_branches_deprecated(base: str, target: str, raise_error: bool = False) -> dict[str, int]:
     """Compare two branches and return how many commits one is ahead or behind the other.
 
     Args:
@@ -412,3 +412,20 @@ def sync_branches(branches: list[str], verbose: bool = True) -> None:
 
     if verbose:
         CLI_CONSOLE.print("🎉 [bold green]All branches synced successfully![/bold green]")
+
+
+
+def get_tree_hash(branch_name:str) -> str|None:
+    """Fetches the Tree Object Hash for a given branch."""
+    try:
+        # Get the SHA-1 of the directory tree associated with the branch's tip commit
+        result = subprocess.run(
+            ['git', 'rev-parse', f'{branch_name}^{{tree}}'],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        logger.error("Error fetching tree hash for %s. Error: %s", branch_name, e)
+        return None
