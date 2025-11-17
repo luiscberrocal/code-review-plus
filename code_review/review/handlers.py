@@ -11,7 +11,12 @@ logger = logging.getLogger(__name__)
 
 
 def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") -> None:
-    """Display the details of a code review."""
+    """Display the details of a code review.
+
+    Args:
+        review: Review schema to display.
+        base_branch_name: base branch name for comparison.
+    """
     CLI_CONSOLE.print(f"[bold blue]Code Review for Project:[/bold blue] {review.name} by {review.target_branch.author}")
     CLI_CONSOLE.print(f"[bold blue]Branch: {review.target_branch.name}[/bold blue]")
     if review.is_rebased:
