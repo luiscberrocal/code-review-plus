@@ -90,20 +90,7 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
         )
 
 
-def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:
-    """Write the code review details to a JSON file."""
-    # dated_folder = get_dated_folder_for_code_reviews(folder)
-    file = folder / f"{review.ticket}-{review.name}_code_review.json"
-    backup_file = None
-    if file.exists():
-        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        backup_file = folder / f"{review.ticket}-{review.name}_code_review_{timestamp}.json"
-        file.rename(backup_file)
 
-    with open(file, "w") as f:
-        json.dump(review.model_dump(), f, indent=4, default=str)
-
-    return file, backup_file
 
 
 def get_dated_folder_for_code_reviews(folder: Path) -> Path:
