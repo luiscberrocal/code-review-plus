@@ -17,6 +17,7 @@ from code_review.review.rules.git_rules import rebase_rule, validate_master_deve
     validate_master_develop_sync_legacy
 from code_review.review.rules.linting_rules import check_and_format_ruff
 from code_review.review.rules.readme_rules import check_urls_in_readme
+from code_review.review.rules.requirement_rules import check
 from code_review.review.rules.version_rules import check_change_log_version
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
@@ -118,6 +119,11 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     admin_url_check = check_urls_in_readme(folder/ "README.md")
     if admin_url_check:
         rules.extend(admin_url_check)
+
+    # Requirements update rules
+    requirement_rules = check(code_review_schema)
+    if requirement_rules:
+        rules.extend(requirement_rules)
 
     code_review_schema.rules_validated = rules
     return code_review_schema
