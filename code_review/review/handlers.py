@@ -87,16 +87,29 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
 
 def write_review_to_file(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | None]:
     """Write the code review details to a JSON file."""
-    dated_folder = folder / "code_reviews" / datetime.now().strftime("%Y-%m-%d")
-    dated_folder.mkdir(parents=True, exist_ok=True)
-    file = dated_folder / f"{review.ticket}-{review.name}_code_review.json"
+    # dated_folder = get_dated_folder_for_code_reviews(folder)
+    file = folder / f"{review.ticket}-{review.name}_code_review.json"
     backup_file = None
     if file.exists():
         timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        backup_file = dated_folder / f"{review.ticket}-{review.name}_code_review_{timestamp}.json"
+        backup_file = folder / f"{review.ticket}-{review.name}_code_review_{timestamp}.json"
         file.rename(backup_file)
 
     with open(file, "w") as f:
         json.dump(review.model_dump(), f, indent=4, default=str)
 
     return file, backup_file
+
+
+def get_dated_folder_for_code_reviews(folder: Path) -> Path:
+    """Gets or creates a dated folder for code reviews.
+
+    Args:
+        folder: Root folder where the code_reviews folder will be created.
+
+    Returns:
+        Path: Path where the dated folder will be created.
+    """
+    dated_folder = folder / "code_reviews" / datetime.now().strftime("%Y-%m-%d")
+    dated_folder.mkdir(parents=True, exist_ok=True)
+    return dated_folder

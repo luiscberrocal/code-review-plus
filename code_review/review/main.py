@@ -8,7 +8,8 @@ from code_review.handlers.file_handlers import change_directory
 from code_review.plugins.git.handlers import _get_unmerged_branches, display_branches, sync_branches, \
     _are_there_uncommited_changes
 from code_review.review.adapters import build_code_review_schema
-from code_review.review.handlers import display_review, write_review_to_file
+from code_review.review.handlers import display_review, write_review_to_file, get_dated_folder_for_code_reviews
+from code_review.review.reporting import markdown
 from code_review.settings import CLI_CONSOLE, CURRENT_CONFIGURATION, OUTPUT_FOLDER
 
 
@@ -55,6 +56,10 @@ def make(folder: Path, author: str, page_size: int) -> None:
         base_branch_to_check = "master"
 
     display_review(code_review_schema, base_branch_name=base_branch_to_check)
-
-    new_file, backup_file = write_review_to_file(review=code_review_schema, folder=OUTPUT_FOLDER)
+    
+    code_review_folder = get_dated_folder_for_code_reviews(OUTPUT_FOLDER)
+    new_file, backup_file = write_review_to_file(review=code_review_schema, folder=code_review_folder)
     CLI_CONSOLE.print("[bold blue]Code review written to:[/bold blue] " + str(new_file))
+    # Write markdown report
+    report_path = markdown.write_review(review=code_review_schema, folder=code_review_folder)
+    CLI_CONSOLE.print("[bold blue]Code review report written to:[/bold blue] " + str(report_path))
