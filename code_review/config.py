@@ -88,6 +88,27 @@ DEFAULT_CONFIG = {
             {"name": "djangorestframework-simplejwt", "version": "5.5.1", "specifier": "==", "source": None},
             {"name": "deprecated", "version": "1.3.1", "specifier": "==", "source": None},
             {"name": "django-datadog-logger", "version": "0.7.3", "specifier": "==", "source": None},
+            {"name": "pydantic", "version": "2.12.3", "specifier": "==", "source": None},
+            {
+                "name": "pj_kafka_wrapper",
+                "version": "5.0.1",
+                "specifier": "@",
+                "source": "git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/pj_kafka_wrapper.git@v5.0.1",
+            },
+            {"name": "pytz", "version": "2025.2", "specifier": "==", "source": None},
+            {"name": "hypothesis", "version": "6.147.0", "specifier": "==", "source": None},
+            {"name": "psycopg", "version": "3.2.12", "specifier": "==", "source": None},
+            {
+                "name": "pj-mdc",
+                "version": "1.1.5",
+                "specifier": "@",
+                "source": "git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/pj-mdc.git@v1.1.5",
+            },            {
+                "name": "pj-slack-sdk",
+                "version": "1.0.1",
+                "specifier": "@",
+                "source": "git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/pj-slack-sdk.git@v1.0.1"
+            },
         ],
     },
 }
