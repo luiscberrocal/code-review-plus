@@ -103,11 +103,18 @@ DEFAULT_CONFIG = {
                 "version": "1.1.5",
                 "specifier": "@",
                 "source": "git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/pj-mdc.git@v1.1.5",
-            },            {
+            },
+            {
                 "name": "pj-slack-sdk",
                 "version": "1.0.1",
                 "specifier": "@",
-                "source": "git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/pj-slack-sdk.git@v1.0.1"
+                "source": "git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/pj-slack-sdk.git@v1.0.1",
+            },
+            {
+                "name": "pj_asaas_sdk",
+                "version": "1.1.7",
+                "specifier": "@",
+                "source": "git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/pj_asaas_sdk.git@v1.1.7",
             },
         ],
     },
