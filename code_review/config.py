@@ -18,7 +18,7 @@ DEFAULT_CONFIG = {
     "date_format": "%Y-%m-%d %H:%M:%S",
     "max_lines_to_display": 100,
     "docker_images": {
-        "python": {"name": "python", "version": "3.12.11", "operating_system": "slim-bookworm"},
+        "python": {"name": "python", "version": "3.12.12", "operating_system": "slim-bookworm"},
         "node": {"name": "node", "version": "20.19.4", "operating_system": "alpine3"},
         "postgres": {"name": "postgres", "version": "16.10", "operating_system": "bookworm"},
     },
@@ -85,6 +85,9 @@ DEFAULT_CONFIG = {
             {"name": "django-storages[boto3]", "version": "1.14.6", "specifier": "==", "source": None},
             {"name": "django-anymail[mailgun]", "version": "13.1", "specifier": "==", "source": None},
             {"name": "watchtower", "version": "3.4.0", "specifier": "==", "source": None},
+            {"name": "djangorestframework-simplejwt", "version": "5.5.1", "specifier": "==", "source": None},
+            {"name": "deprecated", "version": "1.3.1", "specifier": "==", "source": None},
+            {"name": "django-datadog-logger", "version": "0.7.3", "specifier": "==", "source": None},
         ],
     },
 }

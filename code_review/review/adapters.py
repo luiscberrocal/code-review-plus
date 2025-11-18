@@ -12,6 +12,7 @@ from code_review.plugins.git.adapters import get_git_flow_source_branch, is_reba
 from code_review.plugins.git.handlers import branch_line_to_dict, check_out_and_pull, get_branch_info
 from code_review.plugins.gitlab.ci.rules import validate_ci_rules
 from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
+from code_review.review.rules import unvetted_requirements_rules
 from code_review.review.rules.docker_images import check_image_version
 from code_review.review.rules.git_rules import (
     rebase_rule,
@@ -128,6 +129,10 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     requirement_rules = check(code_review_schema)
     if requirement_rules:
         rules.extend(requirement_rules)
+    # Unvetted libraries
+    unvetted_library_rules = unvetted_requirements_rules.check(code_review_schema)
+    if unvetted_library_rules:
+        rules.extend(unvetted_library_rules)
 
     code_review_schema.rules_validated = rules
     return code_review_schema
