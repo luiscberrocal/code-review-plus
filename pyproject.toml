@@ -8,6 +8,7 @@ dependencies = [
     "click>=8.2.1",
     "deprecated>=1.2.18",
     "gitignore-parser>=0.1.13",
+    "packaging>=25.0",
     "pur>=7.3.3",
     "pyaml>=25.7.0",
     "pydantic>=2.11.7",

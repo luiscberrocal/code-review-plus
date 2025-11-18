@@ -5,7 +5,7 @@ from pathlib import Path
 from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name
 
-from code_review.plugins.dependencies.pip.schemas import RequirementInfo, PackageRequirement
+from code_review.plugins.dependencies.pip.schemas import PackageRequirement
 
 logger = logging.getLogger(__name__)
 
@@ -22,15 +22,14 @@ def parser_requirement_file(requirement_file: Path) -> str:
     requirements = []
     try:
         with requirement_file.open("r") as file:
-            for line_numer, line in enumerate(file,1):
+            for line_number, line in enumerate(file, 1):
                 stripped_line = line.strip()
                 if stripped_line and not stripped_line.startswith("#"):
                     requirements.append(stripped_line)
     except FileNotFoundError:
         logger.error("Requirements file %s not found.", requirement_file)
     except Exception as e:
-        logger.error("Error reading requirements file %s in line %s: %s",
-                     requirement_file, line_numer, e)
+        logger.error("Error reading requirements file %s in line %s: %s", requirement_file, line_number, e)
     return "\n".join(requirements)
 
 
@@ -63,7 +62,9 @@ def parse_requirements(requirements_content: str) -> list[PackageRequirement]:
 
             # Best effort: Extract name from the repository path
             # Looks for /repo_name.git or /repo_name at the end
-            repo_match_regexp = re.compile("\s*git\+https\:\/\/.+@gitlab\.com\/.+\/(?P<name>[\w_\-]+)\.git@v(?P<version>[\w\.]+)")
+            repo_match_regexp = re.compile(
+                "\s*git\+https\:\/\/.+@gitlab\.com\/.+\/(?P<name>[\w_\-]+)\.git@v(?P<version>[\w\.]+)"
+            )
             # repo_match = re.search(r"\/([^\/]+)(?:\.git)?(?:\@|\Z)", clean_line)
             # name = repo_match.group(1).split("@")[0] if repo_match else "VCS_Unknown"
             repo_match = re.match(repo_match_regexp, clean_line)
