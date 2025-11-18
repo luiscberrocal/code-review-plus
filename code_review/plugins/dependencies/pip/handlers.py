@@ -8,7 +8,7 @@ from code_review.settings import CLI_CONSOLE
 logger = logging.getLogger(__name__)
 
 
-def requirements_updated(folder: Path, level: str = "minor") -> list[RequirementInfo]:
+def fiend_requirements_to_update(folder: Path, level: str = "minor") -> list[RequirementInfo]:
     """Updates minor version dependencies in requirement files within a specified folder
     and returns a list of updated packages.
 
