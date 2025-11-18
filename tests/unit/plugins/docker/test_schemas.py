@@ -1,5 +1,7 @@
 import pytest
+
 from code_review.plugins.docker.schemas import DockerImageSchema
+
 
 class TestDockerImageSchema:
     def test_initialization(self):
@@ -12,30 +14,42 @@ class TestDockerImageSchema:
         "img1,img2,expected",
         [
             # Different names
-            (DockerImageSchema(name="python", version="3.10", operating_system="slim"),
-             DockerImageSchema(name="node", version="3.10", operating_system="slim"),
-             False),
+            (
+                DockerImageSchema(name="python", version="3.10", operating_system="slim"),
+                DockerImageSchema(name="node", version="3.10", operating_system="slim"),
+                False,
+            ),
             # Same name, different version
-            (DockerImageSchema(name="python", version="3.9", operating_system="slim"),
-             DockerImageSchema(name="python", version="3.10", operating_system="slim"),
-             True),
+            (
+                DockerImageSchema(name="python", version="3.9", operating_system="slim"),
+                DockerImageSchema(name="python", version="3.10", operating_system="slim"),
+                True,
+            ),
             # Same name and version, different OS
-            (DockerImageSchema(name="python", version="3.10", operating_system="alpine"),
-             DockerImageSchema(name="python", version="3.10", operating_system="slim"),
-             True),
+            (
+                DockerImageSchema(name="python", version="3.10", operating_system="alpine"),
+                DockerImageSchema(name="python", version="3.10", operating_system="slim"),
+                True,
+            ),
             # Same everything
-            (DockerImageSchema(name="python", version="3.10", operating_system="slim"),
-             DockerImageSchema(name="python", version="3.10", operating_system="slim"),
-             False),
+            (
+                DockerImageSchema(name="python", version="3.10", operating_system="slim"),
+                DockerImageSchema(name="python", version="3.10", operating_system="slim"),
+                False,
+            ),
             # Version with more parts
-            (DockerImageSchema(name="python", version="3.10.1", operating_system="slim"),
-             DockerImageSchema(name="python", version="3.10.2", operating_system="slim"),
-             True),
+            (
+                DockerImageSchema(name="python", version="3.10.1", operating_system="slim"),
+                DockerImageSchema(name="python", version="3.10.2", operating_system="slim"),
+                True,
+            ),
             # Non-numeric version parts
-            (DockerImageSchema(name="python", version="3.10-beta", operating_system="slim"),
-             DockerImageSchema(name="python", version="3.10-rc", operating_system="slim"),
-             True),
-        ]
+            (
+                DockerImageSchema(name="python", version="3.10-beta", operating_system="slim"),
+                DockerImageSchema(name="python", version="3.10-rc", operating_system="slim"),
+                True,
+            ),
+        ],
     )
     def test_lt(self, img1, img2, expected):
         assert (img1 < img2) == expected, f"Failed for {img1} < {img2}"

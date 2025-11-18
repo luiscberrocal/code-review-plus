@@ -4,7 +4,6 @@ import re
 import subprocess
 from typing import Any
 
-from rich.console import Console
 from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn, TimeElapsedColumn
 
 from code_review.exceptions import SimpleGitToolError
@@ -327,7 +326,7 @@ def compare_branches_deprecated(base: str, target: str, raise_error: bool = Fals
         behind, ahead = map(int, behind_ahead.split())
         status["ahead"] = ahead
         status["behind"] = behind
-        logger.info(f"Comparing {base} and {target}: {behind} != {ahead}. Command: {' '.join(command) }")
+        logger.info(f"Comparing {base} and {target}: {behind} != {ahead}. Command: {' '.join(command)}")
         return status
     except subprocess.CalledProcessError as e:
         logger.error("Error comparing branches: %s", e.stderr.strip())
@@ -348,9 +347,9 @@ def sync_branches_legacy(branches: list[str], verbose: bool = True) -> None:
             CLI_CONSOLE.print(f"Checking out and pulling branch: [yellow]{branch}[/yellow]")
         check_out_and_pull(branch, check=False)
 
+
 def sync_branches(branches: list[str], verbose: bool = True) -> None:
-    """Syncs branches with a single progress bar for both remote fetch and branch processing.
-    """
+    """Syncs branches with a single progress bar for both remote fetch and branch processing."""
     if verbose:
         CLI_CONSOLE.print("[bold blue]Starting unified branch sync process...[/bold blue]")
 
@@ -366,32 +365,26 @@ def sync_branches(branches: list[str], verbose: bool = True) -> None:
     total_work = FETCH_WORK_UNIT + (total_branches * BRANCH_WORK_UNIT)
 
     with Progress(
-            SpinnerColumn(), # Use a spinner column for dynamic status updates
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TaskProgressColumn(),
-            TimeElapsedColumn(),
-            console=CLI_CONSOLE,
-            transient=True
+        SpinnerColumn(),  # Use a spinner column for dynamic status updates
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+        TimeElapsedColumn(),
+        console=CLI_CONSOLE,
+        transient=True,
     ) as progress:
-
         # Add a single task that covers the entire process
         main_task = progress.add_task("[cyan]Total Sync Progress[/cyan]", total=total_work)
 
         # ----------------------------------------------------
         # 2. Execute Refresh from Remote (The first unit of work)
         # ----------------------------------------------------
-        progress.update(
-            main_task,
-            description="[yellow]Fetching remote changes from 'origin'[/yellow]"
-        )
+        progress.update(main_task, description="[yellow]Fetching remote changes from 'origin'[/yellow]")
         refresh_from_remote("origin")
 
         # Advance the progress bar by the fetch work unit (1)
         progress.update(
-            main_task,
-            advance=FETCH_WORK_UNIT,
-            description="[green]Refreshed from remote 'origin'.[/green]"
+            main_task, advance=FETCH_WORK_UNIT, description="[green]Refreshed from remote 'origin'.[/green]"
         )
 
         # ----------------------------------------------------
@@ -399,10 +392,7 @@ def sync_branches(branches: list[str], verbose: bool = True) -> None:
         # ----------------------------------------------------
         for branch in branches:
             # Update the description to show the current branch being processed
-            progress.update(
-                main_task,
-                description=f"[cyan]Syncing branch: [yellow]{branch}[/yellow][/cyan]"
-            )
+            progress.update(main_task, description=f"[cyan]Syncing branch: [yellow]{branch}[/yellow][/cyan]")
 
             # Perform the sync action
             check_out_and_pull(branch, check=False)
@@ -414,16 +404,12 @@ def sync_branches(branches: list[str], verbose: bool = True) -> None:
         CLI_CONSOLE.print("🎉 [bold green]All branches synced successfully![/bold green]")
 
 
-
-def get_tree_hash(branch_name:str) -> str|None:
+def get_tree_hash(branch_name: str) -> str | None:
     """Fetches the Tree Object Hash for a given branch."""
     try:
         # Get the SHA-1 of the directory tree associated with the branch's tip commit
         result = subprocess.run(
-            ['git', 'rev-parse', f'{branch_name}^{{tree}}'],
-            capture_output=True,
-            text=True,
-            check=True
+            ["git", "rev-parse", f"{branch_name}^{{tree}}"], capture_output=True, text=True, check=True
         )
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:

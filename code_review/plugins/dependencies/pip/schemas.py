@@ -24,9 +24,7 @@ class PackageRequirement(BaseModel):
     version: str = Field(
         description="The exact version specified, e.g., '3.16.0'. None if only a specifier (like '>=') or a VCS source is used.",
     )
-    specifier: str | None = Field(
-        None, description="The full version specifier string, e.g., '==' or '>=, <'."
-    )
+    specifier: str | None = Field(None, description="The full version specifier string, e.g., '==' or '>=, <'.")
     source: str | None = Field(
         None,
         description="The full original source line, primarily used for complex VCS requirements (git+, hg+, etc.).",

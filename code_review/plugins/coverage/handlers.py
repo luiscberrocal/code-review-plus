@@ -9,11 +9,12 @@ from typing import Any
 import yaml
 
 from code_review import settings
-from code_review.plugins.coverage.schemas import TestConfiguration, TestResult
 from code_review.handlers.file_handlers import change_directory
+from code_review.plugins.coverage.schemas import TestConfiguration, TestResult
+
 
 def run_tests_and_get_coverage(
-    folder: Path, unit_tests: str, minimum_coverage: int|float, settings_module: str = "config.settings.test"
+    folder: Path, unit_tests: str, minimum_coverage: float, settings_module: str = "config.settings.test"
 ) -> dict[str, str]:
     """Changes to a specified folder, runs a Django test suite with coverage,
     reports the coverage, and extracts the coverage percentage.
@@ -25,6 +26,7 @@ def run_tests_and_get_coverage(
 
     Returns:
         dict[str, str]: A dictionary containing the test output, coverage output, and running time.
+
     Raises:
         subprocess.CalledProcessError: If either the test or coverage report command fails.
         ValueError: If the coverage percentage cannot be extracted from the output.
@@ -44,8 +46,8 @@ def run_tests_and_get_coverage(
         print(f"Running command: {test_command}")
         test_results = subprocess.run(test_command, shell=True, check=True, text=True, capture_output=True)
         test_output = test_results.stdout
-        #test_file = settings.OUTPUT_FOLDER / f"{folder.stem}_{timestamp}_tests.txt"
-        #with open(test_file, "w") as f:
+        # test_file = settings.OUTPUT_FOLDER / f"{folder.stem}_{timestamp}_tests.txt"
+        # with open(test_file, "w") as f:
         #    f.write(test_output)
 
         # Command to report coverage and check against minimum
@@ -61,9 +63,14 @@ def run_tests_and_get_coverage(
         # with open(cov_file, "w") as f:
         #     f.write(coverage_output)
 
-        return {"test_output": test_output, "coverage_output": coverage_output,  "running_time": time.time() - start_time}
+        return {
+            "test_output": test_output,
+            "coverage_output": coverage_output,
+            "running_time": time.time() - start_time,
+        }
     finally:
         os.chdir(original_cwd)
+
 
 def handle_test_output(test_output: str, coverage_output) -> Any:
     """Process the test output as needed.
@@ -87,7 +94,11 @@ def handle_test_output(test_output: str, coverage_output) -> Any:
     cov_match = cov_regex.search(coverage_output)
     if cov_match:
         coverage_percentage = float(cov_match.group("coverage"))
-    return {"test_count": test_count, "coverage_percentage": coverage_percentage, }
+    return {
+        "test_count": test_count,
+        "coverage_percentage": coverage_percentage,
+    }
+
 
 def run_coverage(test_configuration: TestConfiguration) -> TestResult:
     """Run tests and get coverage based on the provided test configuration.
@@ -136,7 +147,10 @@ if __name__ == "__main__":
         unit_tests_to_run = tests_to_run.split(" ")
 
         test_config = TestConfiguration(
-            folder=target_folder, unit_tests=unit_tests_to_run, min_coverage=min_coverage, settings_module=settings_module_t
+            folder=target_folder,
+            unit_tests=unit_tests_to_run,
+            min_coverage=min_coverage,
+            settings_module=settings_module_t,
         )
 
         config_data = test_config.model_dump()

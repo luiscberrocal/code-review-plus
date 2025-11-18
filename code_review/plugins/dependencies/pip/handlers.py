@@ -2,8 +2,8 @@ import logging
 import subprocess
 from pathlib import Path
 
-from code_review.plugins.dependencies.pip.adapters import parser_requirement_file, parse_requirements
-from code_review.plugins.dependencies.pip.schemas import RequirementInfo, PackageRequirement
+from code_review.plugins.dependencies.pip.adapters import parse_requirements, parser_requirement_file
+from code_review.plugins.dependencies.pip.schemas import PackageRequirement, RequirementInfo
 
 logger = logging.getLogger(__name__)
 

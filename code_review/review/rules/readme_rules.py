@@ -7,12 +7,14 @@ from code_review.schemas import RulesResult
 def check_urls_in_readme(readme_file: Path) -> list[RulesResult]:
     """Checks for Production and Staging Admin Console URLs in the README content."""
     if not readme_file.exists():
-        return [RulesResult(
-            name="README Admin Console URL Check",
-            passed=False,
-            level="ERROR",
-            message=f"README file not found at {readme_file}",
-        )]
+        return [
+            RulesResult(
+                name="README Admin Console URL Check",
+                passed=False,
+                level="ERROR",
+                message=f"README file not found at {readme_file}",
+            )
+        ]
 
     readme_content = readme_file.read_text()
     results = []

@@ -1,4 +1,3 @@
-import json
 import logging
 from datetime import datetime
 from pathlib import Path
@@ -88,9 +87,6 @@ def display_review(review: CodeReviewSchema, base_branch_name: str = "develop") 
             f"[bold red]{ReviewRuleLevelIcon.ERROR.value} Versioning is not correct expected to move from {review.target_branch.version} "
             f"to {changelog_latest_version}![/bold red] "
         )
-
-
-
 
 
 def get_dated_folder_for_code_reviews(folder: Path) -> Path:

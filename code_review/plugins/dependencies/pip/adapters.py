@@ -122,7 +122,7 @@ def parse_requirements(requirements_content: str) -> list[PackageRequirement]:
     return parsed_requirements
 
 
-def main2():
+def main2() -> None:
     requirements_content = """
     djangorestframework==3.16.0  # https://github.com/encode/django-rest-framework
     django-cors-headers==4.7.0  # https://github.com/adamchainz/django-cors-headers

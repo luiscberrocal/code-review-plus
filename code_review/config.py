@@ -18,11 +18,75 @@ DEFAULT_CONFIG = {
     "date_format": "%Y-%m-%d %H:%M:%S",
     "max_lines_to_display": 100,
     "docker_images": {
-        "python":  {"name": "python", "version": "3.12.11", "operating_system": "slim-bookworm"},
-        "node":  {"name": "node", "version": "20.19.4", "operating_system": "alpine3"},
-        "postgres":  {"name": "postgres", "version": "16.10", "operating_system": "bookworm"},
+        "python": {"name": "python", "version": "3.12.11", "operating_system": "slim-bookworm"},
+        "node": {"name": "node", "version": "20.19.4", "operating_system": "alpine3"},
+        "postgres": {"name": "postgres", "version": "16.10", "operating_system": "bookworm"},
     },
     "default_branches": ["master", "develop"],
+    "vetted_requirements": {
+        "services": [
+            {"name": "python-slugify", "version": "8.0.4", "specifier": "==", "source": None},
+            {"name": "pillow", "version": "12.0.0", "specifier": "==", "source": None},
+            {"name": "argon2-cffi", "version": "25.1.0", "specifier": "==", "source": None},
+            {"name": "whitenoise", "version": "6.11.0", "specifier": "==", "source": None},
+            {"name": "redis", "version": "6.4.0", "specifier": "==", "source": None},
+            {"name": "hiredis", "version": "3.3.0", "specifier": "==", "source": None},
+            {"name": "celery", "version": "5.5.3", "specifier": "==", "source": None},
+            {"name": "django-celery-beat", "version": "2.8.1", "specifier": "==", "source": None},
+            {"name": "django-celery-results", "version": "2.6.0", "specifier": "==", "source": None},
+            {"name": "uvicorn[standard]", "version": "0.38.0", "specifier": "==", "source": None},
+            {"name": "django", "version": "5.2.7", "specifier": "==", "source": None},
+            {"name": "django-environ", "version": "0.12.0", "specifier": "==", "source": None},
+            {"name": "django-model-utils", "version": "5.0.0", "specifier": "==", "source": None},
+            {"name": "django-allauth", "version": "65.12.1", "specifier": "==", "source": None},
+            {"name": "django-crispy-forms", "version": "2.4", "specifier": "==", "source": None},
+            {"name": "crispy-bootstrap5", "version": "2025.6", "specifier": "==", "source": None},
+            {"name": "django-redis", "version": "6.0.0", "specifier": "==", "source": None},
+            {"name": "django-filter", "version": "24.2", "specifier": "==", "source": None},
+            {"name": "djangorestframework", "version": "3.16.1", "specifier": "==", "source": None},
+            {"name": "django-cors-headers", "version": "4.9.0", "specifier": "==", "source": None},
+            {"name": "drf-spectacular", "version": "0.28.0", "specifier": "==", "source": None},
+            {"name": "factory-boy", "version": "3.3.3", "specifier": "==", "source": None},
+            {"name": "django-import-export", "version": "4.3.12", "specifier": "==", "source": None},
+            {"name": "django-widget-tweaks", "version": "1.5.0", "specifier": "==", "source": None},
+            {
+                "name": "finance-engine-sdk",
+                "version": "6.8.0",
+                "specifier": "@",
+                "source": "git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/finance-engine-sdk.git@v6.8.0",
+            },
+            {
+                "name": "pj_django_payments",
+                "version": "21.2.0",
+                "specifier": "@",
+                "source": "git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/pj_django_payments.git@v21.2.0",
+            },
+            {"name": "django-htmx", "version": "1.26.0", "specifier": "==", "source": None},
+            {"name": "werkzeug[watchdog]", "version": "3.1.3", "specifier": "==", "source": None},
+            {"name": "ipdb", "version": "0.13.13", "specifier": "==", "source": None},
+            {"name": "psycopg[c]", "version": "3.2.12", "specifier": "==", "source": None},
+            {"name": "watchfiles", "version": "1.1.1", "specifier": "==", "source": None},
+            {"name": "django-stubs", "version": "5.2.7", "specifier": "==", "source": None},
+            {"name": "pytest", "version": "8.4.2", "specifier": "==", "source": None},
+            {"name": "pytest-sugar", "version": "1.1.1", "specifier": "==", "source": None},
+            {"name": "djangorestframework-stubs", "version": "3.16.5", "specifier": "==", "source": None},
+            {"name": "coverage", "version": "7.11.0", "specifier": "==", "source": None},
+            {"name": "djlint", "version": "1.36.4", "specifier": "==", "source": None},
+            {"name": "pylint-django", "version": "2.6.1", "specifier": "==", "source": None},
+            {"name": "pylint-celery", "version": "0.3", "specifier": "==", "source": None},
+            {"name": "pre-commit", "version": "4.3.0", "specifier": "==", "source": None},
+            {"name": "django-debug-toolbar", "version": "6.0.0", "specifier": "==", "source": None},
+            {"name": "django-extensions", "version": "4.1", "specifier": "==", "source": None},
+            {"name": "django-coverage-plugin", "version": "3.2.0", "specifier": "==", "source": None},
+            {"name": "pytest-django", "version": "4.11.1", "specifier": "==", "source": None},
+            {"name": "pur", "version": "7.3.3", "specifier": "==", "source": None},
+            {"name": "gunicorn", "version": "23.0.0", "specifier": "==", "source": None},
+            {"name": "psycopg[c]", "version": "3.2.12", "specifier": "==", "source": None},
+            {"name": "django-storages[boto3]", "version": "1.14.6", "specifier": "==", "source": None},
+            {"name": "django-anymail[mailgun]", "version": "13.1", "specifier": "==", "source": None},
+            {"name": "watchtower", "version": "3.4.0", "specifier": "==", "source": None},
+        ],
+    },
 }
 
 
@@ -56,8 +120,8 @@ class TomlConfigManager:
         Returns:
             dict: A dictionary containing the complete application configuration.
         """
-        if not self.config_file.is_file():
-            logger.debug("Configuration file not found. Using default settings.")
+        if not self.config_file.is_file() or not self.config_file.exists():
+            logger.warning("Configuration file not found. Using default settings.")
             return self.config_data
 
         try:
@@ -66,7 +130,7 @@ class TomlConfigManager:
 
             # Extract the settings for our application.
             app_settings = toml_data.get("tool", {}).get("cli_app", {})
-            docker_images = app_settings.get("docker_images", self.config_data["docker_images"]),
+            docker_images = (app_settings.get("docker_images", self.config_data["docker_images"]),)
             docker_images_dict = {}
             for image_name, image_info in docker_images[0].items():
                 docker_images_dict[image_name] = DockerImageSchema(**image_info)
@@ -86,10 +150,10 @@ class TomlConfigManager:
 
         except tomllib.TOMLDecodeError as e:
             logger.error("Error decoding TOML file: %s. Using default settings.", e)
-            raise ConfigurationError(f"Error decoding TOML file: {e}")
+            raise ConfigurationError(f"Error decoding TOML file: {e}") from e
         except TypeError as e:
             logger.error("Type error in config file: %s. Using default settings.", e)
-            raise ConfigurationError(f"Type error in config file: {e}")
+            raise ConfigurationError(f"Type error in config file: {e}") from e
         except Exception as e:
             if isinstance(e, ConfigurationError):
                 raise e
@@ -97,7 +161,7 @@ class TomlConfigManager:
                 "An unexpected error occurred while reading the config: %s. Using default settings.",
                 e,
             )
-            raise ConfigurationError(f"An unexpected error occurred while reading the config: {e}")
+            raise ConfigurationError(f"An unexpected error occurred while reading the config: {e}") from e
 
         return self.config_data
 

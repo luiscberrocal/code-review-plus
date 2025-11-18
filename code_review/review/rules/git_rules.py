@@ -1,7 +1,7 @@
 import logging
 
 from code_review.plugins.git.adapters import is_rebased
-from code_review.plugins.git.handlers import compare_branches_deprecated, get_tree_hash
+from code_review.plugins.git.handlers import get_tree_hash
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import RulesResult
 
@@ -65,7 +65,6 @@ def validate_master_develop_sync_legacy(default_branches: list[str]) -> list[Rul
     master_hash = get_tree_hash(default_branches[0])
     develop_hash = get_tree_hash(default_branches[1])
 
-
     if develop_hash == master_hash:
         rules.append(
             RulesResult(
@@ -82,9 +81,7 @@ def validate_master_develop_sync_legacy(default_branches: list[str]) -> list[Rul
                 level="ERROR",
                 passed=False,
                 message="'master' and 'develop' branches are not in sync.",
-                details=(
-                    f"'master' is hash is {master_hash} and 'develop' is hash is {develop_hash}."
-                ),
+                details=(f"'master' is hash is {master_hash} and 'develop' is hash is {develop_hash}."),
             )
         )
     return rules

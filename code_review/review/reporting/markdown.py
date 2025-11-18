@@ -28,10 +28,10 @@ def write_review(review: CodeReviewSchema, folder: Path) -> tuple[Path, Path | N
         report_file.write(f"**Ticket**: {review.ticket}\n\n")
         report_file.write(f"**Branch**: {review.target_branch.name}\n\n")
 
-
         report_file.write("## Rules Validated\n")
         report_file.write("### To Fix\n")
         for rule in errors_and_warnings:
+            report_file.write(f"Found **{len(errors_and_warnings)}** issue(s) to fix.\n\n")
             status = f"{ReviewRuleLevelIcon.WARNING.value}" if rule.passed else f"{ReviewRuleLevelIcon.ERROR.value}"
             report_file.write(f"- **{status} {rule.name}**: - {rule.message}\n")
 

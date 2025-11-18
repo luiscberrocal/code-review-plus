@@ -4,17 +4,19 @@ from pathlib import Path
 
 from code_review.adapters.changelog import parse_changelog
 from code_review.adapters.setup_adapters import setup_to_dict
-from code_review.plugins.dependencies.pip.handlers import find_requirements_to_update, get_requirements
 from code_review.handlers.file_handlers import change_directory, get_not_ignored
-from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
 from code_review.plugins.coverage.main import get_makefile, get_minimum_coverage
+from code_review.plugins.dependencies.pip.handlers import find_requirements_to_update, get_requirements
 from code_review.plugins.docker.docker_files.handlers import parse_dockerfile
 from code_review.plugins.git.adapters import get_git_flow_source_branch, is_rebased
 from code_review.plugins.git.handlers import branch_line_to_dict, check_out_and_pull, get_branch_info
 from code_review.plugins.gitlab.ci.rules import validate_ci_rules
+from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
 from code_review.review.rules.docker_images import check_image_version
-from code_review.review.rules.git_rules import rebase_rule, validate_master_develop_sync, \
-    validate_master_develop_sync_legacy
+from code_review.review.rules.git_rules import (
+    rebase_rule,
+    validate_master_develop_sync_legacy,
+)
 from code_review.review.rules.linting_rules import check_and_format_ruff
 from code_review.review.rules.readme_rules import check_urls_in_readme
 from code_review.review.rules.requirement_rules import check
@@ -76,7 +78,6 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     if not source_branch_name:
         logger.warning("No source branch in target branch for target branch. %s", target_branch.name)
 
-
     rules = []
     code_review_schema = CodeReviewSchema(
         name=folder.name,
@@ -119,7 +120,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     if docker_image_rules:
         rules.extend(docker_image_rules)
     # README rules
-    admin_url_check = check_urls_in_readme(folder/ "README.md")
+    admin_url_check = check_urls_in_readme(folder / "README.md")
     if admin_url_check:
         rules.extend(admin_url_check)
 

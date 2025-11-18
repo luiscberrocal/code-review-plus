@@ -5,11 +5,15 @@ import click
 from code_review.adapters.generics import parse_for_ticket
 from code_review.cli import cli
 from code_review.handlers.file_handlers import change_directory
-from code_review.plugins.git.handlers import _get_unmerged_branches, display_branches, sync_branches, \
-    _are_there_uncommited_changes
+from code_review.plugins.git.handlers import (
+    _are_there_uncommited_changes,
+    _get_unmerged_branches,
+    display_branches,
+    sync_branches,
+)
 from code_review.review.adapters import build_code_review_schema
-from code_review.review.handlers import display_review,  get_dated_folder_for_code_reviews
-from code_review.review.reporting import markdown, json
+from code_review.review.handlers import display_review, get_dated_folder_for_code_reviews
+from code_review.review.reporting import json, markdown
 from code_review.settings import CLI_CONSOLE, CURRENT_CONFIGURATION, OUTPUT_FOLDER
 
 
@@ -27,13 +31,14 @@ def make(folder: Path, author: str, page_size: int) -> None:
     """List branches in the specified Git repository."""
     change_directory(folder)
     CLI_CONSOLE.print(f"Changing to directory: [cyan]{folder}[/cyan]")
-    uncommited_changes =_are_there_uncommited_changes()
+    uncommited_changes = _are_there_uncommited_changes()
     if uncommited_changes:
-        CLI_CONSOLE.print(f"[red]You have uncommited changes, please commit or stash them before running the review.[/red]")
+        CLI_CONSOLE.print(
+            "[red]You have uncommited changes, please commit or stash them before running the review.[/red]"
+        )
         return
 
     sync_branches(CURRENT_CONFIGURATION["default_branches"])
-
 
     unmerged_branches = _get_unmerged_branches("master", author_pattern=author)
     if not unmerged_branches:
@@ -56,7 +61,7 @@ def make(folder: Path, author: str, page_size: int) -> None:
         base_branch_to_check = "master"
 
     display_review(code_review_schema, base_branch_name=base_branch_to_check)
-    
+
     code_review_folder = get_dated_folder_for_code_reviews(OUTPUT_FOLDER)
     new_file, backup_file = json.write_review(review=code_review_schema, folder=code_review_folder)
     CLI_CONSOLE.print("[bold blue]Code review written to:[/bold blue] " + str(new_file))

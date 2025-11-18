@@ -82,15 +82,15 @@ def is_rebased(target_branch_name: str, source_branch_name: str) -> bool:
         False otherwise.
     """
     if target_branch_name is None or source_branch_name is None:
-        raise CodeReviewError(f"To check if a branch is rebased, both target and source branch names must be provided."
-                              f" Got target: {target_branch_name}, source: {source_branch_name}")
+        raise CodeReviewError(
+            f"To check if a branch is rebased, both target and source branch names must be provided."
+            f" Got target: {target_branch_name}, source: {source_branch_name}"
+        )
     try:
         # Get the commit hash of the merge base between the two branches.
         # This is the most recent common ancestor.
         merge_base_cmd = ["git", "merge-base", target_branch_name, source_branch_name]
-        merge_base_result = subprocess.run(
-            merge_base_cmd, capture_output=True, text=True, check=True
-        )
+        merge_base_result = subprocess.run(merge_base_cmd, capture_output=True, text=True, check=True)
         merge_base_hash = merge_base_result.stdout.strip()
 
         # Get the commit hash of the head of the base branch.
