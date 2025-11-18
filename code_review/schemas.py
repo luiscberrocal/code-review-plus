@@ -4,7 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from code_review.plugins.dependencies.pip.schemas import RequirementInfo
+from code_review.plugins.dependencies.pip.schemas import RequirementInfo, PackageRequirement
 
 logger = logging.getLogger(__name__)
 
@@ -108,6 +108,8 @@ class BranchSchema(BaseModel):
     formatting_errors: int = Field(
         default=-1, description="Number of formatting errors found by black. -1 means not checked"
     )
+    requirements: list[PackageRequirement] = Field(default_factory=list,
+                                                   description="List of parsed package requirements")
 
     def __lt__(self, other) -> bool:
         if not isinstance(other, BranchSchema):

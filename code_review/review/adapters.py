@@ -4,7 +4,7 @@ from pathlib import Path
 
 from code_review.adapters.changelog import parse_changelog
 from code_review.adapters.setup_adapters import setup_to_dict
-from code_review.plugins.dependencies.pip.handlers import fiend_requirements_to_update
+from code_review.plugins.dependencies.pip.handlers import find_requirements_to_update, get_requirements
 from code_review.handlers.file_handlers import change_directory, get_not_ignored
 from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
 from code_review.plugins.coverage.main import get_makefile, get_minimum_coverage
@@ -56,10 +56,12 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     target_branch_info["linting_errors"] = target_count
     target_branch_info["min_coverage"] = target_cov
 
+    target_branch_info["requirements"] = get_requirements(folder)
+
     target_branch = BranchSchema(**target_branch_info)
     target_branch.version = get_version_from_config_file(folder, folder.stem)
     target_branch.changelog_versions = parse_changelog(folder / "CHANGELOG.md", folder.stem)
-    target_branch.requirements_to_update = fiend_requirements_to_update(folder)
+    target_branch.requirements_to_update = find_requirements_to_update(folder)
 
     target_branch.formatting_errors = _check_and_format_ruff(folder)
 
@@ -73,6 +75,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     source_branch_name = get_git_flow_source_branch(target_branch.name)
     if not source_branch_name:
         logger.warning("No source branch in target branch for target branch. %s", target_branch.name)
+
 
     rules = []
     code_review_schema = CodeReviewSchema(
