@@ -2,7 +2,7 @@ import logging
 import subprocess
 from pathlib import Path
 
-from code_review.plugins.dependencies.pip.adapters import parse_requirements, parser_requirement_file
+from code_review.plugins.dependencies.pip.adapters import parse_requirements, parser_requirement_file, get_environment
 from code_review.plugins.dependencies.pip.schemas import PackageRequirement, RequirementInfo
 
 logger = logging.getLogger(__name__)
@@ -86,7 +86,8 @@ def get_requirements(folder: Path) -> list[PackageRequirement]:
     for req_file in requirements_folder.glob("*.txt"):
         try:
             requirement_content = parser_requirement_file(req_file)
-            parsed_packages = parse_requirements(requirement_content)
+            environment = get_environment(req_file)
+            parsed_packages = parse_requirements(requirement_content, environment, req_file)
             packages.extend(parsed_packages)
         except Exception as e:  # noqa: BLE001
             logger.error("An unexpected error occurred: %s", e)
