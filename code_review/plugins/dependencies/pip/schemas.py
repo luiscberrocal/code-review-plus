@@ -30,5 +30,6 @@ class PackageRequirement(BaseModel):
         None,
         description="The full original source line, primarily used for complex VCS requirements (git+, hg+, etc.).",
     )
-    file: Path = Field(description="The path to the requirements file where this package is listed.")
+    file: Path | None = Field(default=None,
+                              description="The path to the requirements file where this package is listed.")
     environment: str = Field(description="The environment to which the package is to be installed.")
