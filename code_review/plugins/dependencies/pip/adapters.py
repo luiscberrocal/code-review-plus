@@ -5,7 +5,8 @@ from pathlib import Path
 from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name
 
-from code_review.plugins.dependencies.pip.schemas import RequirementInfo, PackageRequirement
+from code_review.enums import EnvironmentType
+from code_review.plugins.dependencies.pip.schemas import PackageRequirement
 
 logger = logging.getLogger(__name__)
 
@@ -22,22 +23,24 @@ def parser_requirement_file(requirement_file: Path) -> str:
     requirements = []
     try:
         with requirement_file.open("r") as file:
-            for line_numer, line in enumerate(file,1):
+            for line_number, line in enumerate(file, 1):
                 stripped_line = line.strip()
                 if stripped_line and not stripped_line.startswith("#"):
                     requirements.append(stripped_line)
     except FileNotFoundError:
         logger.error("Requirements file %s not found.", requirement_file)
     except Exception as e:
-        logger.error("Error reading requirements file %s in line %s: %s",
-                     requirement_file, line_numer, e)
+        logger.error("Error reading requirements file %s in line %s: %s", requirement_file, line_number, e)
     return "\n".join(requirements)
 
 
 # --- Parsing Function ---
-def parse_requirements(requirements_content: str) -> list[PackageRequirement]:
-    """Parses a string containing pip requirements, handling comments, whitespace,
-    standard package specifiers, and attempting to parse complex VCS URLs.
+def parse_requirements(
+    requirements_content: str, environment: EnvironmentType, source_file: Path
+) -> list[PackageRequirement]:
+    """Parses a string containing pip requirements in a txt formant.
+
+    It handles comments, whitespace, standard package specifiers, and attempting to parse complex VCS URLs.
 
     Args:
         requirements_content: A string containing the content of a requirements file.
@@ -63,7 +66,9 @@ def parse_requirements(requirements_content: str) -> list[PackageRequirement]:
 
             # Best effort: Extract name from the repository path
             # Looks for /repo_name.git or /repo_name at the end
-            repo_match_regexp = re.compile("\s*git\+https\:\/\/.+@gitlab\.com\/.+\/(?P<name>[\w_\-]+)\.git@v(?P<version>[\w\.]+)")
+            repo_match_regexp = re.compile(
+                "\s*git\+https\:\/\/.+@gitlab\.com\/.+\/(?P<name>[\w_\-]+)\.git@v(?P<version>[\w\.]+)"
+            )
             # repo_match = re.search(r"\/([^\/]+)(?:\.git)?(?:\@|\Z)", clean_line)
             # name = repo_match.group(1).split("@")[0] if repo_match else "VCS_Unknown"
             repo_match = re.match(repo_match_regexp, clean_line)
@@ -83,6 +88,8 @@ def parse_requirements(requirements_content: str) -> list[PackageRequirement]:
                     version=version,
                     specifier="@",
                     source=source,
+                    environment=environment.value,
+                    file=source_file,
                 )
             )
             continue
@@ -109,7 +116,12 @@ def parse_requirements(requirements_content: str) -> list[PackageRequirement]:
 
             parsed_requirements.append(
                 PackageRequirement(
-                    name=full_name, version=version_str, specifier=operator if spec_str else None, source=None
+                    name=full_name,
+                    version=version_str,
+                    specifier=operator if spec_str else None,
+                    source=clean_line,
+                    environment=environment.value,
+                    file=source_file,
                 )
             )
 
@@ -121,46 +133,43 @@ def parse_requirements(requirements_content: str) -> list[PackageRequirement]:
     return parsed_requirements
 
 
-def main2():
-    requirements_content = """
-    djangorestframework==3.16.0  # https://github.com/encode/django-rest-framework
-    django-cors-headers==4.7.0  # https://github.com/adamchainz/django-cors-headers
-    # DRF-spectacular for api documentation
-    drf-spectacular==0.28.0  # https://github.com/tfranzel/drf-spectacular
-    pytz==2025.2  # https://github.com/stub42/pytz
+def get_environment(source_file: Path) -> EnvironmentType | None:
+    """Determine the environment based on the filename.
 
-    drf-pydantic==2.7.1  # https://pypi.org/project/drf-pydantic/
-    # email-validator==2.2.0  <-- This line is commented out and will be skipped
-    django-fsm==3.0.0
-    Deprecated>=1.2.18
+    Args:
+        source_file (Path): The path to the requirements file.
 
-    # Datadog APM and Logging
-    # ------------------------------------------------------------------------------
-    ddtrace[django]==3.16.0  # https://github.com/DataDog/dd-trace-py
-    django-datadog-logger==0.7.3  # https://github.com/Mtsohetra/django-datadog-logger
-
-    # VCS Requirements without #egg=, name is inferred from repo
-    git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/repo1/my-weird.git@v1.0.1
-    git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/reepo1/secret-lib.git@v2.1.0
+    Returns:
+        str: The environment name derived from the filename.
     """
-
-    results = parse_requirements(requirements_content)
-
-    print("--- Parsed Requirements ---")
-    for result in results:
-        print(f"Name: {result.name}")
-        print(f"  Version: {result.version}")
-        print(f"  Specifier: {result.specifier}")
-        if result.source:
-            print(f"  Source: {result.source}")
-        print("-" * 20)
-
-    # Example of accessing a specific field
-    print(f"\nTotal packages found: {len(results)}")
-    ddtrace_req = next((r for r in results if r.name == "ddtrace[django]"), None)
-    if ddtrace_req:
-        print(f"ddtrace[django] found with exact version: {ddtrace_req.version}")
+    if source_file.suffix != ".txt":
+        return None
+    filename = source_file.stem.lower()  # Get the filename without extension and convert to lowercase
+    if "local" in filename:
+        return EnvironmentType.DEVELOPMENT
+    if "base" in filename:
+        return EnvironmentType.PRODUCTION
+    if "production" in filename:
+        return EnvironmentType.PRODUCTION
+    return None
 
 
-if __name__ == "__main__":
-    main2()
+def parse_dependencies(source_file: Path) -> list[PackageRequirement]:
+    """Parse a pip requirements file into a list of PackageRequirement models.
+
+    Args:
+        source_file (Path): The path to the requirements file.
+
+    Returns:
+        list[PackageRequirement]: A list of parsed package requirements.
+    """
+    requirement_content = parser_requirement_file(source_file)
+    environment = get_environment(source_file)
+    parsed_packages = parse_requirements(requirement_content, environment or EnvironmentType.PRODUCTION.value,
+                                         source_file)
+
+    # Update the file attribute for each parsed package
+    for package in parsed_packages:
+        package.file = source_file
+
+    return parsed_packages

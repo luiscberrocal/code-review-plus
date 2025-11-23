@@ -19,10 +19,11 @@ def extract_using_from(dockerfile_content: str, product: str) -> dict | None:
     return None
 
 
-def get_image_info_from_dockerfile_content(dockerfile_content: str,
-                                           parsers: dict[str, ContentAdapter]) -> DockerImageSchema | None:
+def get_image_info_from_dockerfile_content(
+    dockerfile_content: str, parsers: dict[str, ContentAdapter]
+) -> DockerImageSchema | None:
     """Gets Docker image information from Dockerfile content using provided parsers."""
-    for product, parser in parsers.items():
+    for _product, parser in parsers.items():
         image_info = parser(dockerfile_content)
         if image_info:
             return image_info

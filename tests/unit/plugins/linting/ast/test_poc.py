@@ -16,6 +16,7 @@ def test_ast_parsing(fixtures_folder):
     with open(json_file, "w") as f:
         json.dump(ast_json, f, indent=4, default=str)
 
+
 def test_parse_setting(fixtures_folder):
     folder = fixtures_folder / "settings"
     file = folder / "base.py"
@@ -36,7 +37,7 @@ def test_parse_setting(fixtures_folder):
     with open(assign_file, "w") as f:
         json.dump(assignments, f, indent=4, default=str)
 
-    targets = [node.get("targets") for node  in assignments]
+    targets = [node.get("targets") for node in assignments]
     target_file = folder / "settings_targets.json"
     with open(target_file, "w") as f:
         json.dump(targets, f, indent=4, default=str)

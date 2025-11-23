@@ -4,19 +4,23 @@ from pathlib import Path
 
 from code_review.adapters.changelog import parse_changelog
 from code_review.adapters.setup_adapters import setup_to_dict
-from code_review.plugins.dependencies.pip.handlers import requirements_updated
 from code_review.handlers.file_handlers import change_directory, get_not_ignored
-from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
 from code_review.plugins.coverage.main import get_makefile, get_minimum_coverage
+from code_review.plugins.dependencies.pip.handlers import find_requirements_to_update, get_requirements
 from code_review.plugins.docker.docker_files.handlers import parse_dockerfile
 from code_review.plugins.git.adapters import get_git_flow_source_branch, is_rebased
 from code_review.plugins.git.handlers import branch_line_to_dict, check_out_and_pull, get_branch_info
 from code_review.plugins.gitlab.ci.rules import validate_ci_rules
+from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
+from code_review.review.rules import unvetted_requirements_rules
 from code_review.review.rules.docker_images import check_image_version
-from code_review.review.rules.git_rules import rebase_rule, validate_master_develop_sync, \
-    validate_master_develop_sync_legacy
+from code_review.review.rules.git_rules import (
+    rebase_rule,
+    validate_master_develop_sync_legacy,
+)
 from code_review.review.rules.linting_rules import check_and_format_ruff
 from code_review.review.rules.readme_rules import check_urls_in_readme
+from code_review.review.rules.requirement_rules import check
 from code_review.review.rules.version_rules import check_change_log_version
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
@@ -55,10 +59,12 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     target_branch_info["linting_errors"] = target_count
     target_branch_info["min_coverage"] = target_cov
 
+    target_branch_info["requirements"] = get_requirements(folder)
+
     target_branch = BranchSchema(**target_branch_info)
     target_branch.version = get_version_from_config_file(folder, folder.stem)
     target_branch.changelog_versions = parse_changelog(folder / "CHANGELOG.md", folder.stem)
-    target_branch.requirements_to_update = requirements_updated(folder)
+    target_branch.requirements_to_update = find_requirements_to_update(folder)
 
     target_branch.formatting_errors = _check_and_format_ruff(folder)
 
@@ -115,9 +121,18 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     if docker_image_rules:
         rules.extend(docker_image_rules)
     # README rules
-    admin_url_check = check_urls_in_readme(folder/ "README.md")
+    admin_url_check = check_urls_in_readme(folder / "README.md")
     if admin_url_check:
         rules.extend(admin_url_check)
+
+    # Requirements update rules
+    requirement_rules = check(code_review_schema)
+    if requirement_rules:
+        rules.extend(requirement_rules)
+    # Unvetted libraries
+    unvetted_library_rules = unvetted_requirements_rules.check(code_review_schema)
+    if unvetted_library_rules:
+        rules.extend(unvetted_library_rules)
 
     code_review_schema.rules_validated = rules
     return code_review_schema

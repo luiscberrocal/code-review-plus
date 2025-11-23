@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock
 
 from code_review.review.rules.docker_images import check_image_version
-
 from tests.unit.plugins.docker.docker_factories import DockerfileSchemaFactory
 
 
@@ -19,7 +18,7 @@ class TestCheckImageVersion:
         docker_file.expected_image = docker_file.image
 
         code_review = MagicMock()
-        code_review.source_folder  = docker_file.file.parent
+        code_review.source_folder = docker_file.file.parent
         code_review.docker_files = [docker_file]
         results = check_image_version(code_review)
         assert len(results) == 1
@@ -32,7 +31,7 @@ class TestCheckImageVersion:
         docker_file.expected_image.version = "3.12"
 
         code_review = MagicMock()
-        code_review.source_folder  = docker_file.file.parent
+        code_review.source_folder = docker_file.file.parent
         code_review.docker_files = [docker_file]
         results = check_image_version(code_review)
         assert len(results) == 1
@@ -45,7 +44,7 @@ class TestCheckImageVersion:
         docker_file.expected_image.version = "3.11"
 
         code_review = MagicMock()
-        code_review.source_folder  = docker_file.file.parent
+        code_review.source_folder = docker_file.file.parent
         code_review.docker_files = [docker_file]
         results = check_image_version(code_review)
         assert len(results) == 1
