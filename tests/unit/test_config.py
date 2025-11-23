@@ -37,11 +37,13 @@ class TestTomlConfigManager:
 
     def test_load_config_old_versions(self, fixtures_folder):
         config_manager = TomlConfigManager(
-            config_dir=fixtures_folder ,
+            config_dir=fixtures_folder,
             config_file_name="config-sample_v0.10.0.toml",
         )
         try:
-            loaded_config = config_manager.load_config()
+            config_manager.load_config()
         except ConfigurationError as e:
-            assert str(e) == ("Type error in config file: code_review.plugins.docker.schemas.DockerImageSchema() "
-                              "argument after ** must be a mapping, not str")
+            assert str(e) == (
+                "Type error in config file: code_review.plugins.docker.schemas.DockerImageSchema() "
+                "argument after ** must be a mapping, not str"
+            )

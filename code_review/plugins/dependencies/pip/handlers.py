@@ -2,13 +2,13 @@ import logging
 import subprocess
 from pathlib import Path
 
-from code_review.plugins.dependencies.pip.schemas import RequirementInfo
-from code_review.settings import CLI_CONSOLE
+from code_review.plugins.dependencies.pip.adapters import parse_requirements, parser_requirement_file, get_environment
+from code_review.plugins.dependencies.pip.schemas import PackageRequirement, RequirementInfo
 
 logger = logging.getLogger(__name__)
 
 
-def requirements_updated(folder: Path, level: str = "minor") -> list[RequirementInfo]:
+def find_requirements_to_update(folder: Path, level: str = "minor") -> list[RequirementInfo]:
     """Updates minor version dependencies in requirement files within a specified folder
     and returns a list of updated packages.
 
@@ -68,8 +68,27 @@ def requirements_updated(folder: Path, level: str = "minor") -> list[Requirement
         except subprocess.CalledProcessError as e:
             logger.error("Error running 'pur' on file %s: Stdout: %s Stderr: %s", req_file, e.stdout, e.stderr)
             return []
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             logger.error("An unexpected error occurred: %s", e)
             return []
 
     return updated_packages
+
+
+def get_requirements(folder: Path) -> list[PackageRequirement]:
+    packages = []
+    requirements_folder = folder / "requirements"
+
+    # Check if the requirements folder exists
+    if not requirements_folder.is_dir():
+        logger.error("Could not find requirements folder at %s", requirements_folder)
+        return packages
+    for req_file in requirements_folder.glob("*.txt"):
+        try:
+            requirement_content = parser_requirement_file(req_file)
+            environment = get_environment(req_file)
+            parsed_packages = parse_requirements(requirement_content, environment, req_file)
+            packages.extend(parsed_packages)
+        except Exception as e:  # noqa: BLE001
+            logger.error("An unexpected error occurred: %s", e)
+    return packages

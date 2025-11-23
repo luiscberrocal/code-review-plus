@@ -14,6 +14,7 @@ class TestConfiguration(BaseModel):
         default_factory=lambda: ["INTEGRATION"], description="List of test tags to exclude."
     )
 
+
 class TestResult(BaseModel):
     """Schema for test results."""
 

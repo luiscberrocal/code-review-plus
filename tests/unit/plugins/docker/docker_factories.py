@@ -1,10 +1,11 @@
 # factories/docker_schemas.py
-import factory
 from pathlib import Path
 
+import factory
 from factory import Iterator, lazy_attribute
 
-from code_review.plugins.docker.schemas import DockerImageSchema, DockerfileSchema
+from code_review.plugins.docker.schemas import DockerfileSchema, DockerImageSchema
+
 
 class DockerImageSchemaFactory(factory.Factory):
     class Meta:
@@ -13,6 +14,7 @@ class DockerImageSchemaFactory(factory.Factory):
     name = Iterator(["python", "postgres", "node"])
     version = Iterator(["3.12.11", "16.10", "20.19.4"])
     operating_system = Iterator(["slim-bookworm", "bookworm", "alpine3"])
+
 
 class DockerfileSchemaFactory(factory.Factory):
     class Meta:

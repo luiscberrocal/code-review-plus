@@ -13,6 +13,7 @@ class SimpleGitToolError(CodeReviewError):
 
     pass
 
+
 class ConfigurationError(CodeReviewError):
     """A custom exception class for handling configuration-related errors.
     This provides more specific and user-friendly error messages.

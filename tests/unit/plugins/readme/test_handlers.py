@@ -1,4 +1,3 @@
-
 import pytest
 
 from code_review.plugins.readme.handlers import check_admin_console_urls

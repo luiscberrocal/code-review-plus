@@ -38,23 +38,23 @@ tag_to_register = "tag:yaml.org,2002:python/object/apply:pathlib.PosixPath"
 yaml.add_constructor(tag_to_register, posixpath_constructor, Loader=yaml.SafeLoader)
 
 
-
 class TestTestConfiguration:
-    
     def test_write(self, tmp_path):
         target_folder = settings.OUTPUT_FOLDER / "project_folder"
         # target_folder = tmp_path  / "project_folder"
         tests_to_run = "middleware.middleware.tests.unit middleware.users.tests"
         min_coverage = 85
 
-
         settings_module_t = "config.settings.local"
         unit_tests_to_run = tests_to_run.split(" ")
 
         test_config = TestConfiguration(
-            folder=target_folder, unit_tests=unit_tests_to_run, min_coverage=min_coverage, settings_module=settings_module_t
+            folder=target_folder,
+            unit_tests=unit_tests_to_run,
+            min_coverage=min_coverage,
+            settings_module=settings_module_t,
         )
-        yaml_file_path = settings.OUTPUT_FOLDER  / "__test_config.yaml"
+        yaml_file_path = settings.OUTPUT_FOLDER / "__test_config.yaml"
         with open(yaml_file_path, "w") as file:
             # `sort_keys=False` is often used to maintain the order from the model/dictionary
             # `default_flow_style=False` ensures a block-style (multi-line) YAML output for readability
@@ -73,9 +73,7 @@ class TestTestConfiguration:
         loaded_data = TestConfiguration(**loaded_config)
         assert loaded_data == test_config
 
-
     def test_read_config(self):
-
         yaml_content = """
         folder: !!python/object/apply:pathlib.PosixPath
         - /
@@ -96,8 +94,6 @@ class TestTestConfiguration:
 
         data = yaml.safe_load(io.StringIO(yaml_content))
         test_config = TestConfiguration(**data)
-        assert test_config.folder == PosixPath("/home/luiscberrocal/PycharmProjects/code-review-plus/output/code-review-plus")
-
-
-
-
+        assert test_config.folder == PosixPath(
+            "/home/luiscberrocal/PycharmProjects/code-review-plus/output/code-review-plus"
+        )

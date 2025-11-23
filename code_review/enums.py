@@ -36,3 +36,9 @@ class RuleCategory(str, Enum):
     DEPENDENCIES = "dependencies"
     COMPLEXITY = "complexity"
     GENERAL = "general"
+
+class EnvironmentType(str, Enum):
+    """Types of deployment environments."""
+    DEVELOPMENT = "DEVELOPMENT"
+    STAGING = "STAGING"
+    PRODUCTION = "PRODUCTION"

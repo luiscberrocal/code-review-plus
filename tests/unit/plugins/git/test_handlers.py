@@ -1,16 +1,16 @@
-import pytest
-from unittest.mock import MagicMock, patch, call
-from code_review.plugins.git.handlers import display_branches
-from code_review.schemas import BranchSchema
 from datetime import datetime
-from code_review.plugins.git.handlers import compare_branches
+from unittest.mock import patch
+
+import pytest
+
+from code_review.plugins.git.handlers import compare_branches_deprecated, display_branches
+from code_review.schemas import BranchSchema
 
 
 class TestCompareBranches:
     def test_compare_handler(self):
-        result = compare_branches("master", "feature/bulk_git_sync")
+        result = compare_branches_deprecated("master", "feature/bulk_git_sync")
         assert result is not None
-
 
 
 class TestDisplayBranches:
@@ -24,14 +24,14 @@ class TestDisplayBranches:
                         author="John Doe",
                         email="john@example.com",
                         date=datetime(2024, 1, 15),
-                        hash="abc123"
+                        hash="abc123",
                     ),
                     BranchSchema(
                         name="fix/bug-123",
                         author="Jane Smith",
                         email="jane@example.com",
                         date=datetime(2024, 1, 20),
-                        hash="def456"
+                        hash="def456",
                     ),
                 ],
                 None,
@@ -44,14 +44,14 @@ class TestDisplayBranches:
                         author="John Doe",
                         email="john@example.com",
                         date=datetime(2024, 1, 15),
-                        hash="abc123"
+                        hash="abc123",
                     ),
                     BranchSchema(
                         name="fix/bug-123",
                         author="Jane Smith",
                         email="jane@example.com",
                         date=datetime(2024, 1, 20),
-                        hash="def456"
+                        hash="def456",
                     ),
                 ],
                 1,

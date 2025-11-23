@@ -46,7 +46,8 @@ def check_image_version(code_review: CodeReviewSchema) -> list[RulesResult]:
                     level="WARNING",
                     message=(
                         f"Docker image '{dockerfile.image.name}:{dockerfile.image.version}' in "
-                        f"'{dockerfile.file.relative_to(code_review.source_folder)}' is newer than expected."
+                        f"'{dockerfile.file.relative_to(code_review.source_folder)}' is newer than "
+                        f"expected ({dockerfile.expected_version})."
                     ),
                 )
             )

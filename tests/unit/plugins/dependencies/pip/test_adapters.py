@@ -1,6 +1,5 @@
-import pytest
 from code_review.plugins.dependencies.pip.adapters import parse_requirements
-from code_review.plugins.dependencies.pip.schemas import PackageRequirement
+
 
 class TestParseRequirements:
     def test_standard_requirements(self):
@@ -13,7 +12,7 @@ class TestParseRequirements:
         results = parse_requirements(content)
         assert any(r.name == "requests" and r.version == "2.31.0" for r in results)
         assert any(r.name == "numpy" and r.specifier == ">=" for r in results)
-        assert any(not r.name == "pandas" for r in results)
+        assert any(r.name != "pandas" for r in results)
         assert all(not r.name.startswith("#") for r in results)
 
     def test_standard_requirements_greater_than(self):
