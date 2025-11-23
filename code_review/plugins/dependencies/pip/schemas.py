@@ -21,7 +21,7 @@ class PackageRequirement(BaseModel):
     """
 
     name: str = Field(description="The canonicalized package name (e.g., 'djangorestframework' or 'ddtrace[django]').")
-    version: str = Field(
+    version: str | None = Field( default=None,
         description="The exact version specified, e.g., '3.16.0'. None if only a specifier (like '>=') or a "
                     "VCS source is used.",
     )
