@@ -29,47 +29,40 @@ def run_tests_and_get_coverage(
 
     Raises:
         subprocess.CalledProcessError: If either the test or coverage report command fails.
+        subprocess.TimeoutExpired: If the command takes longer than 3 minutes.
         ValueError: If the coverage percentage cannot be extracted from the output.
     """
     start_time = time.time()
     try:
-
+        timeout_seconds = 180  # 3 minutes
         # Command to run unit tests with coverage
         test_command = (
             f"docker-compose -f local.yml run --rm django coverage run "
             f"manage.py test {unit_tests} --settings={settings_module} "
             f"--exclude-tag=INTEGRATION"
         )
-        test_command = (
-            f"docker-compose -f local.yml run --rm django coverage run "
-            f"manage.py test --settings={settings_module} "
-            f"--exclude-tag=INTEGRATION"
-        )
         print(f"Running command: {test_command}")
-        test_results = subprocess.run(test_command, shell=True, check=True, text=True, capture_output=True)
+        test_results = subprocess.run(test_command, shell=True, check=True, text=True, capture_output=True, timeout=timeout_seconds)
         test_output = test_results.stdout
-        # test_file = settings.OUTPUT_FOLDER / f"{folder.stem}_{timestamp}_tests.txt"
-        # with open(test_file, "w") as f:
-        #    f.write(test_output)
 
         # Command to report coverage and check against minimum
         report_command = (
             f"docker-compose -f local.yml run --rm django coverage report -m --fail-under={minimum_coverage}"
         )
         print(f"Running command: {report_command}")
-        cov_results = subprocess.run(report_command, shell=True, check=False, text=True, capture_output=True)
+        cov_results = subprocess.run(report_command, shell=True, check=False, text=True, capture_output=True, timeout=timeout_seconds)
 
         # Extract coverage from the output
         coverage_output = cov_results.stdout
-        # cov_file = settings.OUTPUT_FOLDER / f"{folder.stem}_{timestamp}_coverage.txt"
-        # with open(cov_file, "w") as f:
-        #     f.write(coverage_output)
 
         return {
             "test_output": test_output,
             "coverage_output": coverage_output,
             "running_time": time.time() - start_time,
         }
+    except subprocess.TimeoutExpired as e:
+        print(f"Error: Command exceeded timeout of {timeout_seconds} seconds.")
+        raise TimeoutError(f"run_tests_and_get_coverage exceeded 3 minutes: {e}")
     except subprocess.CalledProcessError as e:
         print(f"Error during command execution: {e}")
         raise
@@ -135,10 +128,11 @@ if __name__ == "__main__":
         target_folder = base_project_folder / "payment-options-vue"
         tests_to_run = "pay_options_middleware.middleware.tests.unit pay_options_middleware.users.tests"
         unit_tests_to_run = tests_to_run.split(" ")
+        unit_tests_to_run = []
 
         target_folder = base_project_folder / "six_payment_provider"
-        print(f"\nGenerating test configuration for folder: {target_folder} {target_folder.exists()}")
-        tests_to_run = ""
+        # print(f"\nGenerating test configuration for folder: {target_folder} {target_folder.exists()}")
+        # tests_to_run = ""
         unit_tests_to_run = []
 
         change_directory(target_folder)
