@@ -32,7 +32,6 @@ class TestParseRequirements:
         )
         assert any(r.name == "pandas" for r in results)
         assert all(not r.name.startswith("#") for r in results)
-
     def test_standard_requirements_greater_than(self):
         content = """
         numpy>=1.25.0
@@ -59,7 +58,7 @@ class TestParseRequirements:
 
     def test_vcs_requirement(self):
         content = """
-        git+https://github.com/example/repo.git@v1.2.3
+        git+https://gitlab.com/example/repo.git@v1.2.3
         """
         results = parse_requirements(
             content,
