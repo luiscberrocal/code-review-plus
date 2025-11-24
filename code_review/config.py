@@ -229,6 +229,22 @@ DEFAULT_CONFIG = {
                 "source": "git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/pj-six-sdk.git@v3.1.0",
                 "environment": "PRODUCTION",
             },
+            {
+                "name": "mysqlclient",
+                "version": "2.2.7",
+                "specifier": "==",
+                "source": "mysqlclient==2.2.7",
+                "file": "/home/luiscberrocal/adelantos/in-store-payments/requirements/base.txt",
+                "environment": "PRODUCTION",
+            },
+            {
+                "name": "ddtrace[django]",
+                "version": "3.16.2",
+                "specifier": "==",
+                "source": "ddtrace[django]==3.16.2",
+                "file": "/home/luiscberrocal/adelantos/in-store-payments/requirements/base.txt",
+                "environment": "PRODUCTION",
+            },
         ],
     },
 }
