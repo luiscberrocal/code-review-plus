@@ -31,16 +31,18 @@ def run_tests_and_get_coverage(
         subprocess.CalledProcessError: If either the test or coverage report command fails.
         ValueError: If the coverage percentage cannot be extracted from the output.
     """
-    # timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     start_time = time.time()
-    original_cwd = os.getcwd()
     try:
-        change_directory(folder)
 
         # Command to run unit tests with coverage
         test_command = (
             f"docker-compose -f local.yml run --rm django coverage run "
             f"manage.py test {unit_tests} --settings={settings_module} "
+            f"--exclude-tag=INTEGRATION"
+        )
+        test_command = (
+            f"docker-compose -f local.yml run --rm django coverage run "
+            f"manage.py test --settings={settings_module} "
             f"--exclude-tag=INTEGRATION"
         )
         print(f"Running command: {test_command}")
@@ -68,8 +70,9 @@ def run_tests_and_get_coverage(
             "coverage_output": coverage_output,
             "running_time": time.time() - start_time,
         }
-    finally:
-        os.chdir(original_cwd)
+    except subprocess.CalledProcessError as e:
+        print(f"Error during command execution: {e}")
+        raise
 
 
 def handle_test_output(test_output: str, coverage_output) -> Any:
@@ -123,15 +126,22 @@ def run_coverage(test_configuration: TestConfiguration) -> TestResult:
 
 # Example Usage:
 if __name__ == "__main__":
+    original_cwd = Path(os.getcwd())
+    base_project_folder = Path.home() / "adelantos"
     try:
         # Replace these with your actual folder, test paths, and desired coverage
         min_coverage = 85
-        base_project_folder = Path.home() / "adelantos"
 
         target_folder = base_project_folder / "payment-options-vue"
-
         tests_to_run = "pay_options_middleware.middleware.tests.unit pay_options_middleware.users.tests"
+        unit_tests_to_run = tests_to_run.split(" ")
 
+        target_folder = base_project_folder / "six_payment_provider"
+        print(f"\nGenerating test configuration for folder: {target_folder} {target_folder.exists()}")
+        tests_to_run = ""
+        unit_tests_to_run = []
+
+        change_directory(target_folder)
         # target_folder = Path.home() / "adelantos" / "wu-integration"
         # tests_to_run = "wu_integration.rest.tests.unit"
         # min_coverage = 85
@@ -144,7 +154,6 @@ if __name__ == "__main__":
         # min_coverage = 85.0
 
         settings_module_t = "config.settings.local"
-        unit_tests_to_run = tests_to_run.split(" ")
 
         test_config = TestConfiguration(
             folder=target_folder,
@@ -180,3 +189,5 @@ if __name__ == "__main__":
         print(f"\nError: The specified folder '{target_folder}' does not exist.")
     except ValueError as e:
         print(f"\nError: {e}")
+    finally:
+        change_directory(original_cwd)
