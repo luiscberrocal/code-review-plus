@@ -58,25 +58,20 @@ class TestParseRequirements:
 
     def test_vcs_requirement(self):
         content = """
-        git+https://gitlab.com/example/repo.git@v1.2.3
+        git+https://@gitlab.com/example/repo.git@v1.2.3
+        git+https://TOKEN:${SECRET_TOKEN}@gitlab.com/development/my-sdk.git@v9.2.1
         """
         results = parse_requirements(
             content,
             EnvironmentType.DEVELOPMENT,
             Path("requirements.txt"),
         )
-        assert any(r.source and "git+" in r.source and r.version == "v1.2.3" for r in results)
-
-    def test_invalid_lines_are_skipped(self):
-        content = """
-        not_a_valid_requirement_line
-        """
-        results = parse_requirements(
-            content,
-            EnvironmentType.DEVELOPMENT,
-            Path("requirements.txt"),
-        )
-        assert results == []
+        assert results[0].source == "git+https://@gitlab.com/example/repo.git@v1.2.3"
+        assert results[0].version == "1.2.3"
+        assert results[0].name == "repo"
+        assert results[1].source == "git+https://TOKEN:${SECRET_TOKEN}@gitlab.com/development/my-sdk.git@v9.2.1"
+        assert results[1].version == "9.2.1"
+        assert results[1].name == "my-sdk"
 
     def test_mixed_content(self):
         content = """

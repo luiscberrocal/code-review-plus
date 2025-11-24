@@ -69,7 +69,7 @@ def parse_requirements(
             # Best effort: Extract name from the repository path
             # Looks for /repo_name.git or /repo_name at the end
             repo_match_regexp = re.compile(
-                "\s*git\+https\:\/\/.+@gitlab\.com\/.+\/(?P<name>[\w_\-]+)\.git@v(?P<version>[\w\.]+)"
+                "\s*git\+https\:\/\/.*@gitlab\.com\/.+\/(?P<name>[\w_\-]+)\.git@v(?P<version>[\w\.]+)"
             )
             # repo_match = re.search(r"\/([^\/]+)(?:\.git)?(?:\@|\Z)", clean_line)
             # name = repo_match.group(1).split("@")[0] if repo_match else "VCS_Unknown"
