@@ -11,7 +11,7 @@ class TestConfiguration(BaseModel):
     min_coverage: float = Field(default=85.0, description="Minimum coverage percentage required.")
     settings_module: str = Field(default="config.settings.local", description="Django settings module to use.")
     tags_to_exclude: list[str] = Field(
-        default_factory=lambda: ["INTEGRATION"], description="List of test tags to exclude."
+        default_factory=lambda: ["INTEGRATION", "TDD"], description="List of test tags to exclude."
     )
 
 

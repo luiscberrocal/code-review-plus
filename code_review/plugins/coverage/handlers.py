@@ -16,7 +16,9 @@ from code_review.plugins.coverage.schemas import TestConfiguration, TestResult
 def run_tests_and_get_coverage(
     folder: Path, unit_tests: str, minimum_coverage: float, settings_module: str = "config.settings.test"
 ) -> dict[str, str]:
-    """Changes to a specified folder, runs a Django test suite with coverage,
+    """Runs djanndo manage.py test.
+
+    Changes to a specified folder, runs a Django test suite with coverage,
     reports the coverage, and extracts the coverage percentage.
 
     Args:
@@ -39,10 +41,12 @@ def run_tests_and_get_coverage(
         test_command = (
             f"docker-compose -f local.yml run --rm django coverage run "
             f"manage.py test {unit_tests} --settings={settings_module} "
-            f"--exclude-tag=INTEGRATION"
+            f"--exclude-tag=INTEGRATION --exclude-tag=TDD"
         )
         print(f"Running command: {test_command}")
-        test_results = subprocess.run(test_command, shell=True, check=True, text=True, capture_output=True, timeout=timeout_seconds)
+        test_results = subprocess.run(
+            test_command, shell=True, check=True, text=True, capture_output=True, timeout=timeout_seconds
+        )
         test_output = test_results.stdout
 
         # Command to report coverage and check against minimum
@@ -50,7 +54,9 @@ def run_tests_and_get_coverage(
             f"docker-compose -f local.yml run --rm django coverage report -m --fail-under={minimum_coverage}"
         )
         print(f"Running command: {report_command}")
-        cov_results = subprocess.run(report_command, shell=True, check=False, text=True, capture_output=True, timeout=timeout_seconds)
+        cov_results = subprocess.run(
+            report_command, shell=True, check=False, text=True, capture_output=True, timeout=timeout_seconds
+        )
 
         # Extract coverage from the output
         coverage_output = cov_results.stdout
