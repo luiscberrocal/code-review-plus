@@ -269,6 +269,13 @@ DEFAULT_CONFIG = {
                 "environment": "PRODUCTION"
             },
             {
+                "name": "oxxo-direct-sdk",
+                "version": "2.1.0",
+                "specifier": "@",
+                "source": "git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/oxxo-direct-sdk.git@v2.1.0",
+                "environment": "PRODUCTION"
+            },
+            {
                 "name": "payment-options-providers-sdk",
                 "version": "1.1.3",
                 "specifier": "@",
@@ -360,6 +367,13 @@ DEFAULT_CONFIG = {
                 "specifier": "==",
                 "source": None,
                 "environment": "DEVELOPMENT"
+            },
+            {
+                "name": "pip",
+                "version": "25.3",
+                "specifier": "==",
+                "source": "pip==25.3",
+                "environment": "PRODUCTION"
             },
             {
                 "name": "pydantic",
