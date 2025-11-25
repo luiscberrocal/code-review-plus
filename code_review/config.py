@@ -343,6 +343,12 @@ DEFAULT_CONFIG = {
                 "source": None
             },
             {
+                "name": "psycopg[c, pool]",
+                "version": "3.2.12",
+                "specifier": "==",
+                "source": None
+            },
+            {
                 "name": "psycopg[c]",
                 "version": "3.2.12",
                 "specifier": "==",
