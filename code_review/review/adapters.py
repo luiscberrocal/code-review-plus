@@ -11,13 +11,19 @@ from code_review.plugins.docker.docker_files.handlers import parse_dockerfile
 from code_review.plugins.git.adapters import get_git_flow_source_branch, is_rebased
 from code_review.plugins.git.handlers import branch_line_to_dict, check_out_and_pull, get_branch_info
 from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
-from code_review.review.rules import docker_image_rules, readme_rules, requirement_rules, unvetted_requirements_rules, linting_rules, ci_file_rules
+from code_review.review.rules import (
+    ci_file_rules,
+    docker_image_rules,
+    linting_rules,
+    readme_rules,
+    requirement_rules,
+    unvetted_requirements_rules,
+version_rules,
+)
 from code_review.review.rules.git_rules import (
     rebase_rule,
     validate_master_develop_sync_legacy,
 )
-from code_review.review.rules.linting_rules import check
-from code_review.review.rules.version_rules import check_change_log_version
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
 
@@ -87,7 +93,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
         docker_files=docker_info_list,
         rules_validated=rules,
         readme_file=folder / "README.md",
-        ci_file= folder / ".gitlab-ci.yml",
+        ci_file=folder / ".gitlab-ci.yml",
     )
 
     code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, source_branch_name)
@@ -110,7 +116,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     if git_sync_rules:
         rules.extend(git_sync_rules)
     # Changelog version rules
-    change_log_rules = check_change_log_version(base_branch, target_branch)
+    change_log_rules = version_rules.check(code_review_schema)
     if change_log_rules:
         rules.extend(change_log_rules)
     # Dockerfile rules
