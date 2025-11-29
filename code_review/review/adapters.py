@@ -25,8 +25,7 @@ from code_review.review.rules.git_rules import (
     validate_master_develop_sync_legacy,
 )
 from code_review.review.schemas import CodeReviewSchema
-from code_review.schemas import BranchSchema, SemanticVersion
-from output.temp import RulesResult
+from code_review.schemas import BranchSchema, SemanticVersion, RulesResult
 
 logger = logging.getLogger(__name__)
 
