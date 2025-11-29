@@ -2,6 +2,8 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn, TimeElapsedColumn
+
 from code_review.adapters.changelog import parse_changelog
 from code_review.adapters.setup_adapters import setup_to_dict
 from code_review.handlers.file_handlers import change_directory, get_not_ignored
@@ -26,6 +28,7 @@ from code_review.review.rules.git_rules import (
 )
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion, RulesResult
+from code_review.settings import CLI_CONSOLE
 
 logger = logging.getLogger(__name__)
 
@@ -37,77 +40,100 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
         folder: Path to the folder containing the code review data.
         target_branch_name: Name of the target branch to compare against the base branch.
     """
-    change_directory(folder)
+    total_work = 10
 
-    makefile = get_makefile(folder)  # Assuming this function is defined elsewhere to get the makefile path
-    base_name = "master"
-    check_out_and_pull(base_name, check=False)
-    base_count = count_ruff_issues(folder)
-    get_branch_info(base_name)
-    base_branch_info = branch_line_to_dict(base_name)
-    base_cov = get_minimum_coverage(makefile)
-    base_branch_info["linting_errors"] = base_count
-    base_branch_info["min_coverage"] = base_cov
+    with Progress(
+            SpinnerColumn(),  # Use a spinner column for dynamic status updates
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeElapsedColumn(),
+            console=CLI_CONSOLE,
+            transient=True,
+    ) as progress:
+        # Add a single task that covers the entire process
+        main_task = progress.add_task("[cyan]Total Sync Progress[/cyan]", total=total_work)
 
-    base_branch = BranchSchema(**base_branch_info)
-    base_branch.version = get_version_from_config_file(folder, folder.stem)
-    base_branch.changelog_versions = parse_changelog(folder / "CHANGELOG.md", folder.stem)
+        # ----------------------------------------------------
+        # 2. Execute Refresh from Remote (The first unit of work)
+        # ----------------------------------------------------
+        progress.update(main_task, description="[yellow]Change folder[/yellow]")
+        change_directory(folder)
 
-    check_out_and_pull(target_branch_name, check=False)
-    get_branch_info(target_branch_name)
-    target_branch_info = branch_line_to_dict(target_branch_name)
-    target_count = count_ruff_issues(folder)
-    target_cov = get_minimum_coverage(makefile)
-    target_branch_info["linting_errors"] = target_count
-    target_branch_info["min_coverage"] = target_cov
+        progress.update(main_task,advance=1, description="[yellow]Get maka file[/yellow]")
+        makefile = get_makefile(folder)  # Assuming this function is defined elsewhere to get the makefile path
+        base_name = "master"
+        progress.update(main_task, advance=1, description="[yellow]Checkout and pull[/yellow]")
+        check_out_and_pull(base_name, check=False)
+        progress.update(main_task, advance=1, description="[yellow]Running ruff[/yellow]")
+        base_count = count_ruff_issues(folder)
+        progress.update(main_task, advance=1, description="[yellow]Get branch info[/yellow]")
+        get_branch_info(base_name)
+        base_branch_info = branch_line_to_dict(base_name)
+        progress.update(main_task, advance=1, description="[yellow]Gwt min cov[/yellow]")
+        base_cov = get_minimum_coverage(makefile)
+        base_branch_info["linting_errors"] = base_count
+        base_branch_info["min_coverage"] = base_cov
 
-    target_branch_info["requirements"] = get_requirements(folder)
+        base_branch = BranchSchema(**base_branch_info)
+        base_branch.version = get_version_from_config_file(folder, folder.stem)
+        base_branch.changelog_versions = parse_changelog(folder / "CHANGELOG.md", folder.stem)
 
-    target_branch = BranchSchema(**target_branch_info)
-    target_branch.version = get_version_from_config_file(folder, folder.stem)
-    target_branch.changelog_versions = parse_changelog(folder / "CHANGELOG.md", folder.stem)
-    target_branch.requirements_to_update = find_requirements_to_update(folder)
+        check_out_and_pull(target_branch_name, check=False)
+        get_branch_info(target_branch_name)
+        target_branch_info = branch_line_to_dict(target_branch_name)
+        target_count = count_ruff_issues(folder)
+        target_cov = get_minimum_coverage(makefile)
+        target_branch_info["linting_errors"] = target_count
+        target_branch_info["min_coverage"] = target_cov
 
-    target_branch.formatting_errors = _check_and_format_ruff(folder)
+        target_branch_info["requirements"] = get_requirements(folder)
 
-    # Dockerfiles
-    docker_files = get_not_ignored(folder, "Dockerfile")
-    docker_info_list = []
-    for file in docker_files:
-        docker_info = parse_dockerfile(file)
-        if docker_info:
-            docker_info_list.append(docker_info)
-    source_branch_name = get_git_flow_source_branch(target_branch.name)
-    if not source_branch_name:
-        logger.warning("No source branch in target branch for target branch. %s", target_branch.name)
+        target_branch = BranchSchema(**target_branch_info)
+        target_branch.version = get_version_from_config_file(folder, folder.stem)
+        target_branch.changelog_versions = parse_changelog(folder / "CHANGELOG.md", folder.stem)
+        target_branch.requirements_to_update = find_requirements_to_update(folder)
 
-    rules = []
-    code_review_schema = CodeReviewSchema(
-        name=folder.name,
-        source_folder=folder,
-        makefile_path=makefile,
-        target_branch=target_branch,
-        source_branch_name=source_branch_name,
-        base_branch=base_branch,
-        date_created=datetime.now(),
-        docker_files=docker_info_list,
-        rules_validated=rules,
-        readme_file=folder / "README.md",
-        ci_file=folder / ".gitlab-ci.yml",
-    )
+        target_branch.formatting_errors = _check_and_format_ruff(folder)
 
-    code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, source_branch_name)
+        # Dockerfiles
+        docker_files = get_not_ignored(folder, "Dockerfile")
+        docker_info_list = []
+        for file in docker_files:
+            docker_info = parse_dockerfile(file)
+            if docker_info:
+                docker_info_list.append(docker_info)
+        source_branch_name = get_git_flow_source_branch(target_branch.name)
+        if not source_branch_name:
+            logger.warning("No source branch in target branch for target branch. %s", target_branch.name)
 
-    # Master amd develop sync rules
-    git_rules = validate_master_develop_sync_legacy(["master", "develop"])
-    if git_rules:
-        rules.extend(git_rules)
+        rules = []
+        code_review_schema = CodeReviewSchema(
+            name=folder.name,
+            source_folder=folder,
+            makefile_path=makefile,
+            target_branch=target_branch,
+            source_branch_name=source_branch_name,
+            base_branch=base_branch,
+            date_created=datetime.now(),
+            docker_files=docker_info_list,
+            rules_validated=rules,
+            readme_file=folder / "README.md",
+            ci_file=folder / ".gitlab-ci.yml",
+        )
 
-    rules_list = check_all_rules(code_review_schema)
-    rules.extend(rules_list)
+        code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, source_branch_name)
 
-    code_review_schema.rules_validated = rules
-    return code_review_schema
+        # Master amd develop sync rules
+        git_rules = validate_master_develop_sync_legacy(["master", "develop"])
+        if git_rules:
+            rules.extend(git_rules)
+
+        rules_list = check_all_rules(code_review_schema)
+        rules.extend(rules_list)
+
+        code_review_schema.rules_validated = rules
+        return code_review_schema
 
 def check_all_rules(code_review_schema: CodeReviewSchema)-> list[RulesResult]:
     rules = []
