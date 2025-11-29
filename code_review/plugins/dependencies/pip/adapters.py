@@ -129,7 +129,7 @@ def parse_requirements(
 
         except Exception as e:
             # Skip lines that are unparseable (e.g., plain URLs not starting with a VCS scheme, invalid syntax)
-            logger.error("Warning: Skipping unparseable requirement line: '%s'. Error: %s", clean_line, e)
+            logger.debug("Warning: Skipping unparseable requirement line: '%s'. Error: %s", clean_line, e)
             continue
 
     return parsed_requirements
