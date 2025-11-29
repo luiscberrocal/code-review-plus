@@ -10,9 +10,8 @@ from code_review.plugins.dependencies.pip.handlers import find_requirements_to_u
 from code_review.plugins.docker.docker_files.handlers import parse_dockerfile
 from code_review.plugins.git.adapters import get_git_flow_source_branch, is_rebased
 from code_review.plugins.git.handlers import branch_line_to_dict, check_out_and_pull, get_branch_info
-from code_review.review.rules.ci_file_rules import validate_ci_rules
 from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
-from code_review.review.rules import docker_image_rules, readme_rules, requirement_rules, unvetted_requirements_rules, linting_rules
+from code_review.review.rules import docker_image_rules, readme_rules, requirement_rules, unvetted_requirements_rules, linting_rules, ci_file_rules
 from code_review.review.rules.git_rules import (
     rebase_rule,
     validate_master_develop_sync_legacy,
@@ -88,12 +87,13 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
         docker_files=docker_info_list,
         rules_validated=rules,
         readme_file=folder / "README.md",
+        ci_file= folder / ".gitlab-ci.yml",
     )
 
     code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, source_branch_name)
 
     # CI rules
-    ci_rules = validate_ci_rules(folder / ".gitlab-ci.yml")
+    ci_rules = ci_file_rules.check(code_review_schema)
     if ci_rules:
         rules.extend(ci_rules)
     # Ruff linting rules

@@ -1,20 +1,17 @@
-from pathlib import Path
-
 from code_review.enums import ReviewRuleLevel
 from code_review.exceptions import CodeReviewError
 from code_review.plugins.gitlab.ci.handlers import handle_multi_targets
+from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import RulesResult
 
 
-def validate_ci_rules(file: Path) -> list[RulesResult]:
+def check(code_review: CodeReviewSchema) -> list[RulesResult]:
     """Validate GitLab CI rules in the given file.
 
     Args:
-        file: Path to the .gitlab-ci.yml file.
-
-    Raises:
-        ValueError: If invalid rules are found.
+        code_review: The CodeReviewSchema object containing the CI file.
     """
+    file = code_review.ci_file
     results = []
 
     try:
