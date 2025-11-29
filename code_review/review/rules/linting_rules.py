@@ -1,9 +1,10 @@
+from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, RulesResult
 
 
-def check_and_format_ruff(base_branch: BranchSchema, target_branch: BranchSchema) -> list[RulesResult]:
-    results = compare_linting_error_rules(base_branch, target_branch, "linting_errors")
-    results.extend(compare_linting_error_rules(base_branch, target_branch, "formatting_errors"))
+def check(code_review: CodeReviewSchema) -> list[RulesResult]:
+    results = compare_linting_error_rules(code_review.base_branch,code_review.target_branch, "linting_errors")
+    results.extend(compare_linting_error_rules(code_review.base_branch, code_review.target_branch, "formatting_errors"))
     return results
 
 

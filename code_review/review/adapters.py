@@ -10,15 +10,14 @@ from code_review.plugins.dependencies.pip.handlers import find_requirements_to_u
 from code_review.plugins.docker.docker_files.handlers import parse_dockerfile
 from code_review.plugins.git.adapters import get_git_flow_source_branch, is_rebased
 from code_review.plugins.git.handlers import branch_line_to_dict, check_out_and_pull, get_branch_info
-from code_review.plugins.gitlab.ci.rules import validate_ci_rules
+from code_review.review.rules.ci_file_rules import validate_ci_rules
 from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
-from code_review.review.rules import readme_rules, unvetted_requirements_rules
+from code_review.review.rules import docker_image_rules, readme_rules, requirement_rules, unvetted_requirements_rules, linting_rules
 from code_review.review.rules.git_rules import (
     rebase_rule,
     validate_master_develop_sync_legacy,
 )
-from code_review.review.rules.linting_rules import check_and_format_ruff
-from code_review.review.rules import requirement_rules, docker_image_rules
+from code_review.review.rules.linting_rules import check
 from code_review.review.rules.version_rules import check_change_log_version
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
@@ -98,9 +97,9 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     if ci_rules:
         rules.extend(ci_rules)
     # Ruff linting rules
-    linting_rules = check_and_format_ruff(base_branch, target_branch)
-    if linting_rules:
-        rules.extend(linting_rules)
+    lint_rules = linting_rules.check(code_review_schema)
+    if lint_rules:
+        rules.extend(lint_rules)
     # Git rules
     # Master amd develop sync rules
     git_rules = validate_master_develop_sync_legacy(["master", "develop"])

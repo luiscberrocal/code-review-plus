@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from code_review.plugins.gitlab.ci.rules import validate_ci_rules
+from code_review.review.rules.ci_file_rules import validate_ci_rules
 
 
 class TestValidateCIRules:
