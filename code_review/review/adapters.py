@@ -26,6 +26,7 @@ from code_review.review.rules.git_rules import (
 )
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
+from output.temp import RulesResult
 
 logger = logging.getLogger(__name__)
 
@@ -98,6 +99,38 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
 
     code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, source_branch_name)
 
+    # Master amd develop sync rules
+    git_rules = validate_master_develop_sync_legacy(["master", "develop"])
+    if git_rules:
+        rules.extend(git_rules)
+
+    rules_list = check_all_rules(code_review_schema)
+    rules.extend(rules_list)
+
+    code_review_schema.rules_validated = rules
+    return code_review_schema
+
+def check_all_rules(code_review_schema: CodeReviewSchema)-> list[RulesResult]:
+    rules = []
+    checks = [
+        ci_file_rules.check,
+        linting_rules.check,
+        rebase_rule,
+        version_rules.check,
+        docker_image_rules.check,
+        readme_rules.check,
+        requirement_rules.check,
+        unvetted_requirements_rules.check,
+
+    ]
+    for check in checks:
+        result = check(code_review_schema)
+        if result:
+            rules.extend(result)
+    return rules
+
+def check_all_rules2(code_review_schema: CodeReviewSchema):
+    rules = []
     # CI rules
     ci_rules = ci_file_rules.check(code_review_schema)
     if ci_rules:
@@ -107,10 +140,6 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     if lint_rules:
         rules.extend(lint_rules)
     # Git rules
-    # Master amd develop sync rules
-    git_rules = validate_master_develop_sync_legacy(["master", "develop"])
-    if git_rules:
-        rules.extend(git_rules)
     # Git sync rules
     git_sync_rules = rebase_rule(code_review_schema)
     if git_sync_rules:
@@ -136,9 +165,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     unvetted_library_rules = unvetted_requirements_rules.check(code_review_schema)
     if unvetted_library_rules:
         rules.extend(unvetted_library_rules)
-
-    code_review_schema.rules_validated = rules
-    return code_review_schema
+    return rules
 
 
 def get_version_from_config_file(folder: Path, app_name: str) -> SemanticVersion | None:
