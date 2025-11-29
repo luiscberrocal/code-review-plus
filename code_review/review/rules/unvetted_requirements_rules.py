@@ -11,8 +11,13 @@ def check(code_review: CodeReviewSchema) -> list[RulesResult]:
     """
     results = []
     vetted_names = [req["name"] for req in CONFIG_MANAGER.config_data["vetted_requirements"]["services"]]
+
     for req in code_review.target_branch.requirements:
         if req.name not in vetted_names:
+            if "psycopg" in req.name:
+                # Special case: psycopg can have extras, so we consider it vetted
+                print(f">>>>>>>>>>> Requirement '{req.name}' is considered vetted due to special case handlinf, "
+                      f"Found: {req.name in vetted_names}.")
             results.append(RulesResult(
                 name="Unvetted Requirements Detail",
                 level="ERROR",

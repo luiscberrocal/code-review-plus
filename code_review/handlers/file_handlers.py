@@ -1,9 +1,11 @@
+import json
 import os
 from pathlib import Path
 
 from gitignore_parser import parse_gitignore
 
 from code_review.exceptions import SimpleGitToolError
+from code_review.settings import OUTPUT_FOLDER, CLI_CONSOLE
 
 
 def get_not_ignored(folder: Path, global_patten: str) -> list[Path]:
@@ -66,3 +68,22 @@ def get_all_project_folder(base_folder: Path, exclusion_list: list[str] = None) 
         if item.is_dir() and (item / ".git").exists() and item.name not in exclusion_list:
             project_folders.append(item)
     return project_folders
+
+def quick_save(file_path: Path | str, content: str | list | dict ) -> None:
+    """Quickly saves content to a file.
+
+    Args:
+        file_path: The Path object for the file to save.
+        content: The content to write to the file.
+    """
+    if isinstance(file_path, str):
+        file_path = OUTPUT_FOLDER / file_path
+
+    if isinstance(content, list | dict) and file_path.suffix == ".json":
+        with open(file_path, "w", encoding="utf-8") as file:
+            json.dump(content, file, indent=4, default=str)
+    elif file_path.suffix == ".txt":
+        with open(file_path, "w", encoding="utf-8") as file:
+            file.write(content)
+
+    CLI_CONSOLE.print(f"[red]>> Saved content to [/red][cyan]{file_path}[/cyan]")

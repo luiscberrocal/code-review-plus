@@ -44,6 +44,8 @@ def parse_requirements(
 
     Args:
         requirements_content: A string containing the content of a requirements file.
+        environment: The environment type (e.g., development, production).
+        source_file: The path to the source requirements file.
 
     Returns:
         A list of PackageRequirement models for all successfully parsed requirements.
@@ -67,7 +69,7 @@ def parse_requirements(
             # Best effort: Extract name from the repository path
             # Looks for /repo_name.git or /repo_name at the end
             repo_match_regexp = re.compile(
-                "\s*git\+https\:\/\/.+@gitlab\.com\/.+\/(?P<name>[\w_\-]+)\.git@v(?P<version>[\w\.]+)"
+                "\s*git\+https\:\/\/.*@gitlab\.com\/.+\/(?P<name>[\w_\-]+)\.git@v(?P<version>[\w\.]+)"
             )
             # repo_match = re.search(r"\/([^\/]+)(?:\.git)?(?:\@|\Z)", clean_line)
             # name = repo_match.group(1).split("@")[0] if repo_match else "VCS_Unknown"
@@ -125,9 +127,9 @@ def parse_requirements(
                 )
             )
 
-        except Exception:
+        except Exception as e:
             # Skip lines that are unparseable (e.g., plain URLs not starting with a VCS scheme, invalid syntax)
-            logger.error(f"Warning: Skipping unparseable requirement line: '{clean_line}'")
+            logger.error("Warning: Skipping unparseable requirement line: '%s'. Error: %s", clean_line, e)
             continue
 
     return parsed_requirements

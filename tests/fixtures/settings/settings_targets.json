@@ -1,0 +1,41 @@
+[
+    [
+        {
+            "_type": "Name",
+            "col_offset": 0,
+            "ctx": {
+                "_type": "Store"
+            },
+            "end_col_offset": 8,
+            "end_lineno": 9,
+            "id": "BASE_DIR",
+            "lineno": 9
+        }
+    ],
+    [
+        {
+            "_type": "Name",
+            "col_offset": 0,
+            "ctx": {
+                "_type": "Store"
+            },
+            "end_col_offset": 8,
+            "end_lineno": 11,
+            "id": "APPS_DIR",
+            "lineno": 11
+        }
+    ],
+    [
+        {
+            "_type": "Name",
+            "col_offset": 0,
+            "ctx": {
+                "_type": "Store"
+            },
+            "end_col_offset": 3,
+            "end_lineno": 12,
+            "id": "env",
+            "lineno": 12
+        }
+    ]
+]
