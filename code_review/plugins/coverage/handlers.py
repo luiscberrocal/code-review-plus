@@ -16,7 +16,9 @@ from code_review.plugins.coverage.schemas import TestConfiguration, TestResult
 def run_tests_and_get_coverage(
     folder: Path, unit_tests: str, minimum_coverage: float, settings_module: str = "config.settings.test"
 ) -> dict[str, str]:
-    """Changes to a specified folder, runs a Django test suite with coverage,
+    """Runs djanndo manage.py test.
+
+    Changes to a specified folder, runs a Django test suite with coverage,
     reports the coverage, and extracts the coverage percentage.
 
     Args:
@@ -29,47 +31,47 @@ def run_tests_and_get_coverage(
 
     Raises:
         subprocess.CalledProcessError: If either the test or coverage report command fails.
+        subprocess.TimeoutExpired: If the command takes longer than 3 minutes.
         ValueError: If the coverage percentage cannot be extracted from the output.
     """
-    # timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     start_time = time.time()
-    original_cwd = os.getcwd()
     try:
-        change_directory(folder)
-
+        timeout_seconds = 180  # 3 minutes
         # Command to run unit tests with coverage
         test_command = (
             f"docker-compose -f local.yml run --rm django coverage run "
             f"manage.py test {unit_tests} --settings={settings_module} "
-            f"--exclude-tag=INTEGRATION"
+            f"--exclude-tag=INTEGRATION --exclude-tag=TDD"
         )
         print(f"Running command: {test_command}")
-        test_results = subprocess.run(test_command, shell=True, check=True, text=True, capture_output=True)
+        test_results = subprocess.run(
+            test_command, shell=True, check=True, text=True, capture_output=True, timeout=timeout_seconds
+        )
         test_output = test_results.stdout
-        # test_file = settings.OUTPUT_FOLDER / f"{folder.stem}_{timestamp}_tests.txt"
-        # with open(test_file, "w") as f:
-        #    f.write(test_output)
 
         # Command to report coverage and check against minimum
         report_command = (
             f"docker-compose -f local.yml run --rm django coverage report -m --fail-under={minimum_coverage}"
         )
         print(f"Running command: {report_command}")
-        cov_results = subprocess.run(report_command, shell=True, check=False, text=True, capture_output=True)
+        cov_results = subprocess.run(
+            report_command, shell=True, check=False, text=True, capture_output=True, timeout=timeout_seconds
+        )
 
         # Extract coverage from the output
         coverage_output = cov_results.stdout
-        # cov_file = settings.OUTPUT_FOLDER / f"{folder.stem}_{timestamp}_coverage.txt"
-        # with open(cov_file, "w") as f:
-        #     f.write(coverage_output)
 
         return {
             "test_output": test_output,
             "coverage_output": coverage_output,
             "running_time": time.time() - start_time,
         }
-    finally:
-        os.chdir(original_cwd)
+    except subprocess.TimeoutExpired as e:
+        print(f"Error: Command exceeded timeout of {timeout_seconds} seconds.")
+        raise TimeoutError(f"run_tests_and_get_coverage exceeded 3 minutes: {e}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during command execution: {e}")
+        raise
 
 
 def handle_test_output(test_output: str, coverage_output) -> Any:
@@ -123,15 +125,23 @@ def run_coverage(test_configuration: TestConfiguration) -> TestResult:
 
 # Example Usage:
 if __name__ == "__main__":
+    original_cwd = Path(os.getcwd())
+    base_project_folder = Path.home() / "adelantos"
     try:
         # Replace these with your actual folder, test paths, and desired coverage
         min_coverage = 85
-        base_project_folder = Path.home() / "adelantos"
 
         target_folder = base_project_folder / "payment-options-vue"
-
         tests_to_run = "pay_options_middleware.middleware.tests.unit pay_options_middleware.users.tests"
+        unit_tests_to_run = tests_to_run.split(" ")
+        unit_tests_to_run = []
 
+        target_folder = base_project_folder / "six_payment_provider"
+        # print(f"\nGenerating test configuration for folder: {target_folder} {target_folder.exists()}")
+        # tests_to_run = ""
+        unit_tests_to_run = []
+
+        change_directory(target_folder)
         # target_folder = Path.home() / "adelantos" / "wu-integration"
         # tests_to_run = "wu_integration.rest.tests.unit"
         # min_coverage = 85
@@ -144,7 +154,6 @@ if __name__ == "__main__":
         # min_coverage = 85.0
 
         settings_module_t = "config.settings.local"
-        unit_tests_to_run = tests_to_run.split(" ")
 
         test_config = TestConfiguration(
             folder=target_folder,
@@ -180,3 +189,5 @@ if __name__ == "__main__":
         print(f"\nError: The specified folder '{target_folder}' does not exist.")
     except ValueError as e:
         print(f"\nError: {e}")
+    finally:
+        change_directory(original_cwd)
