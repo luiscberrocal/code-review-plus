@@ -13,13 +13,12 @@ from code_review.plugins.git.handlers import branch_line_to_dict, check_out_and_
 from code_review.plugins.gitlab.ci.rules import validate_ci_rules
 from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
 from code_review.review.rules import readme_rules, unvetted_requirements_rules
-from code_review.review.rules.docker_images import check_image_version
 from code_review.review.rules.git_rules import (
     rebase_rule,
     validate_master_develop_sync_legacy,
 )
 from code_review.review.rules.linting_rules import check_and_format_ruff
-from code_review.review.rules.requirement_rules import check
+from code_review.review.rules import requirement_rules, docker_image_rules
 from code_review.review.rules.version_rules import check_change_log_version
 from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import BranchSchema, SemanticVersion
@@ -105,7 +104,6 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     # Git rules
     # Master amd develop sync rules
     git_rules = validate_master_develop_sync_legacy(["master", "develop"])
-    logger.error(">>>> Git Rules Legacy: %s", git_rules)
     if git_rules:
         rules.extend(git_rules)
     # Git sync rules
@@ -117,18 +115,18 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     if change_log_rules:
         rules.extend(change_log_rules)
     # Dockerfile rules
-    docker_image_rules = check_image_version(code_review=code_review_schema)
-    if docker_image_rules:
-        rules.extend(docker_image_rules)
+    docker_rules = docker_image_rules.check(code_review=code_review_schema)
+    if docker_rules:
+        rules.extend(docker_rules)
     # README rules
     admin_url_check = readme_rules.check(code_review_schema)
     if admin_url_check:
         rules.extend(admin_url_check)
 
     # Requirements update rules
-    requirement_rules = check(code_review_schema)
-    if requirement_rules:
-        rules.extend(requirement_rules)
+    req_rules = requirement_rules.check(code_review_schema)
+    if req_rules:
+        rules.extend(req_rules)
     # Unvetted libraries
     unvetted_library_rules = unvetted_requirements_rules.check(code_review_schema)
     if unvetted_library_rules:

@@ -2,7 +2,7 @@ from code_review.review.schemas import CodeReviewSchema
 from code_review.schemas import RulesResult
 
 
-def check_image_version(code_review: CodeReviewSchema) -> list[RulesResult]:
+def check(code_review: CodeReviewSchema) -> list[RulesResult]:
     """Check if the Docker images used in the Dockerfiles have the latest versions.
 
     Args:
