@@ -16,6 +16,7 @@ class CodeReviewSchema(BaseModel):
     )
     source_folder: Path = Field(description="Path to the source folder of the code review")
     makefile_path: Path | None
+    readme_file: Path | None = Field(default=None, description="Path to the README file in the project")
     date_created: datetime | None
     ticket: str | None = Field(default=None, description="Ticket associated with the code review")
     target_branch: BranchSchema = Field(description="Details of the target branch. The branch to be reviewed.")

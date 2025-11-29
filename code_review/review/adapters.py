@@ -12,14 +12,13 @@ from code_review.plugins.git.adapters import get_git_flow_source_branch, is_reba
 from code_review.plugins.git.handlers import branch_line_to_dict, check_out_and_pull, get_branch_info
 from code_review.plugins.gitlab.ci.rules import validate_ci_rules
 from code_review.plugins.linting.ruff.handlers import _check_and_format_ruff, count_ruff_issues
-from code_review.review.rules import unvetted_requirements_rules
+from code_review.review.rules import readme_rules, unvetted_requirements_rules
 from code_review.review.rules.docker_images import check_image_version
 from code_review.review.rules.git_rules import (
     rebase_rule,
     validate_master_develop_sync_legacy,
 )
 from code_review.review.rules.linting_rules import check_and_format_ruff
-from code_review.review.rules.readme_rules import check_urls_in_readme
 from code_review.review.rules.requirement_rules import check
 from code_review.review.rules.version_rules import check_change_log_version
 from code_review.review.schemas import CodeReviewSchema
@@ -90,6 +89,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
         date_created=datetime.now(),
         docker_files=docker_info_list,
         rules_validated=rules,
+        readme_file=folder / "README.md",
     )
 
     code_review_schema.is_rebased = is_rebased(code_review_schema.target_branch.name, source_branch_name)
@@ -121,7 +121,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
     if docker_image_rules:
         rules.extend(docker_image_rules)
     # README rules
-    admin_url_check = check_urls_in_readme(folder / "README.md")
+    admin_url_check = readme_rules.check(code_review_schema)
     if admin_url_check:
         rules.extend(admin_url_check)
 
