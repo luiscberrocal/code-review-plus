@@ -15,7 +15,7 @@ class CodeReviewSchema(BaseModel):
         default=False, description="Indicates if the target branch has been rebased onto the source branch"
     )
     source_folder: Path = Field(description="Path to the source folder of the code review")
-    makefile_path: Path | None
+    makefile_path: Path | None = Field(description="Path to the file that will be used to make the code review")
     readme_file: Path | None = Field(default=None, description="Path to the README file in the project")
     ci_file: Path | None = Field(default=None, description="Path to the CI configuration file")
     date_created: datetime | None
