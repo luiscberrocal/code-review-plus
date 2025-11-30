@@ -1,3 +1,5 @@
+from pyexpat import features
+
 import factory
 from faker import Faker
 from pathlib import Path
@@ -12,7 +14,7 @@ class BranchSchemaFactory(factory.Factory):
     class Meta:
         model = BranchSchema
 
-    name = factory.LazyAttribute(lambda _: fake.git_branch())
+    name = factory.LazyAttribute(lambda _: f"branch/{fake.word()}")
     author = factory.LazyAttribute(lambda _: fake.name())
     email = factory.LazyAttribute(lambda _: fake.email())
     hash = factory.LazyAttribute(lambda _: fake.sha1())
@@ -24,6 +26,27 @@ class BranchSchemaFactory(factory.Factory):
     requirements_to_update = []
     formatting_errors = -1
     requirements = []
+
+    class Params:
+        # Git flow standard branches
+        master = factory.Trait(
+            name="master"
+        )
+        main = factory.Trait(
+            name="main"
+        )
+        develop = factory.Trait(
+            name="develop"
+        )
+        feature = factory.Trait(
+            name=factory.LazyAttribute(lambda _: f"feature/{fake.word()}")
+        )
+        release = factory.Trait(
+            name=factory.LazyAttribute(lambda _: f"release/{fake.numerify('%.#.#')}")
+        )
+        hotfix = factory.Trait(
+            name=factory.LazyAttribute(lambda _: f"hotfix/{fake.numerify('%.#.#')}")
+        )
 
 class DockerfileSchemaFactory(factory.Factory):
     class Meta:
@@ -47,9 +70,9 @@ class CodeReviewSchemaFactory(factory.Factory):
     readme_file = factory.LazyAttribute(lambda _: Path("/tmp/README.md"))
     ci_file = factory.LazyAttribute(lambda _: Path("/tmp/.gitlab-ci.yml"))
     date_created = factory.LazyAttribute(lambda _: datetime.now())
-    ticket = factory.LazyAttribute(lambda _: fake.uuid4())
-    target_branch = factory.SubFactory(BranchSchemaFactory)
-    base_branch = factory.SubFactory(BranchSchemaFactory)
+    ticket = factory.LazyAttribute(lambda _: f"{fake.lexify('????', letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ').upper()}-{fake.random_int(min=1, max=9999)}")
+    target_branch = factory.SubFactory(BranchSchemaFactory, feature=True)
+    base_branch = factory.SubFactory(BranchSchemaFactory, master=True)
     source_branch_name = factory.LazyAttribute(lambda _: fake.word())
     docker_files = factory.LazyAttribute(lambda _: [DockerfileSchemaFactory()])
     rules_validated = factory.LazyAttribute(lambda _: [])
