@@ -269,6 +269,13 @@ DEFAULT_CONFIG = {
                 "environment": "PRODUCTION"
             },
             {
+                "name": "openpyxl",
+                "version": "3.1.5",
+                "specifier": "==",
+                "source": "openpyxl==3.1.5",
+                "environment": "PRODUCTION"
+            },
+            {
                 "name": "oxxo-direct-sdk",
                 "version": "2.1.0",
                 "specifier": "@",
@@ -467,7 +474,14 @@ DEFAULT_CONFIG = {
                 "specifier": "==",
                 "source": None,
                 "environment": "DEVELOPMENT"
-            }
+            },
+            {
+                "name": "wompi-sdk",
+                "version": "2.0.4",
+                "specifier": "@",
+                "source": "git+https://PYPI_READ_TOKEN:${PYPI_TOKEN}@gitlab.com/adelantos-development/wompi-sdk.git@v2.0.4",
+                "environment": "PRODUCTION"
+            },
         ]
     },
 }
