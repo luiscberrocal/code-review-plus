@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from code_review.review.rules.docker_images import check_image_version
+from code_review.review.rules.docker_image_rules import check
 from tests.unit.plugins.docker.docker_factories import DockerfileSchemaFactory
 
 
@@ -20,7 +20,7 @@ class TestCheckImageVersion:
         code_review = MagicMock()
         code_review.source_folder = docker_file.file.parent
         code_review.docker_files = [docker_file]
-        results = check_image_version(code_review)
+        results = check(code_review)
         assert len(results) == 1
         assert results[0].passed is True
         assert results[0].level == "INFO"
@@ -33,7 +33,7 @@ class TestCheckImageVersion:
         code_review = MagicMock()
         code_review.source_folder = docker_file.file.parent
         code_review.docker_files = [docker_file]
-        results = check_image_version(code_review)
+        results = check(code_review)
         assert len(results) == 1
         assert results[0].passed is False
         assert results[0].level == "ERROR"
@@ -46,7 +46,7 @@ class TestCheckImageVersion:
         code_review = MagicMock()
         code_review.source_folder = docker_file.file.parent
         code_review.docker_files = [docker_file]
-        results = check_image_version(code_review)
+        results = check(code_review)
         assert len(results) == 1
         assert results[0].passed is False
         assert results[0].level == "WARNING"
