@@ -4,6 +4,6 @@ import code_review.plugins.linting.ruff.main  # This imports the ruff commands
 import code_review.review.main  # This imports the review commands
 from code_review.cli import cli
 
-__version__ = "0.14.0"
+__version__ = "0.15.0"
 if __name__ == "__main__":
     cli()
