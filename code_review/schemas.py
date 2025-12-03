@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from code_review.plugins.coverage.schemas import TestResult
 from code_review.plugins.dependencies.pip.schemas import PackageRequirement, RequirementInfo
 
 logger = logging.getLogger(__name__)
@@ -112,6 +113,9 @@ class BranchSchema(BaseModel):
     )
     requirements: list[PackageRequirement] = Field(
         default_factory=list, description="List of parsed package requirements"
+    )
+    coverage: TestResult | None = Field(
+        default=None, description="Test coverage results for the branch"
     )
 
     def __lt__(self, other) -> bool:

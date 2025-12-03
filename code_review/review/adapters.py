@@ -7,7 +7,9 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskPr
 from code_review.adapters.changelog import parse_changelog
 from code_review.adapters.setup_adapters import setup_to_dict
 from code_review.handlers.file_handlers import change_directory, get_not_ignored
+from code_review.plugins.coverage.handlers import run_coverage
 from code_review.plugins.coverage.main import get_makefile, get_minimum_coverage
+from code_review.plugins.coverage.schemas import TestConfiguration
 from code_review.plugins.dependencies.pip.handlers import find_requirements_to_update, get_requirements
 from code_review.plugins.docker.docker_files.handlers import parse_dockerfile
 from code_review.plugins.git.adapters import get_git_flow_source_branch, is_rebased
@@ -37,7 +39,7 @@ def _process_branch_info(
     branch_name: str,
     folder: Path,
     makefile: Path,
-    progress,
+    progress: Progress,
     main_task,
     is_target: bool = False,
 ) -> BranchSchema:
@@ -91,6 +93,16 @@ def _process_branch_info(
     progress.update(main_task, advance=1, description=f"[yellow]Parsing changelog for {branch_name}[/yellow]")
     branch.changelog_versions = parse_changelog(folder / "CHANGELOG.md", folder.stem)
 
+    test_config = TestConfiguration(
+        folder=folder,
+        unit_tests=[],
+        min_coverage=min_coverage,
+        settings_module="config.settings.local",
+    )
+    progress.update(main_task, advance=1, description=f"[yellow]Getting coverage for {branch_name}[/yellow]")
+    coverage = run_coverage(test_configuration=test_config)
+    branch.coverage = coverage
+
     # Additional processing for target branch
     if is_target:
         progress.update(main_task, advance=1, description="[yellow]Finding requirements to update[/yellow]")
@@ -98,6 +110,7 @@ def _process_branch_info(
 
         progress.update(main_task, advance=1, description="[yellow]Checking and formatting ruff[/yellow]")
         branch.formatting_errors = _check_and_format_ruff(folder)
+
 
     return branch
 
@@ -109,7 +122,7 @@ def build_code_review_schema(folder: Path, target_branch_name: str) -> CodeRevie
         folder: Path to the folder containing the code review data.
         target_branch_name: Name of the target branch to compare against the base branch.
     """
-    total_work = 20
+    total_work = 22
 
     with Progress(
             SpinnerColumn(),
