@@ -97,3 +97,5 @@ LOGGING = {
 logging.config.dictConfig(LOGGING)
 
 CURRENT_CONFIGURATION = get_config()
+
+EXPERIMENTAL_COVERAGE = False
