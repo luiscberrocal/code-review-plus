@@ -4,6 +4,7 @@ from pathlib import Path
 
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn, TimeElapsedColumn
 
+from code_review import settings
 from code_review.adapters.changelog import parse_changelog
 from code_review.adapters.setup_adapters import setup_to_dict
 from code_review.handlers.file_handlers import change_directory, get_not_ignored
@@ -92,16 +93,16 @@ def _process_branch_info(
     # Parse changelog
     progress.update(main_task, advance=1, description=f"[yellow]Parsing changelog for {branch_name}[/yellow]")
     branch.changelog_versions = parse_changelog(folder / "CHANGELOG.md", folder.stem)
-
-    test_config = TestConfiguration(
-        folder=folder,
-        unit_tests=[],
-        min_coverage=min_coverage,
-        settings_module="config.settings.local",
-    )
-    progress.update(main_task, advance=1, description=f"[yellow]Getting coverage for {branch_name}[/yellow]")
-    coverage = run_coverage(test_configuration=test_config)
-    branch.coverage = coverage
+    if settings.EXPERIMENTAL_COVERAGE:
+        test_config = TestConfiguration(
+            folder=folder,
+            unit_tests=[],
+            min_coverage=min_coverage,
+            settings_module="config.settings.local",
+        )
+        progress.update(main_task, advance=1, description=f"[yellow]Getting coverage for {branch_name}[/yellow]")
+        coverage = run_coverage(test_configuration=test_config)
+        branch.coverage = coverage
 
     # Additional processing for target branch
     if is_target:
