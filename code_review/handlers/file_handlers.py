@@ -54,7 +54,7 @@ def change_directory(folder: Path) -> None:
         os.chdir(folder)
 
 
-def get_all_project_folder(base_folder: Path, exclusion_list: list[str] = None) -> list[Path]:
+def get_all_project_folder(base_folder: Path, exclusion_list: list[str] | None = None) -> list[Path]:
     """Get all project folders in the base folder that have a .git folder in them.
 
     Args:
@@ -82,7 +82,7 @@ def quick_save(file_path: Path | str, content: str | list | dict ) -> None:
     if isinstance(content, list | dict) and file_path.suffix == ".json":
         with open(file_path, "w", encoding="utf-8") as file:
             json.dump(content, file, indent=4, default=str)
-    elif file_path.suffix == ".txt":
+    elif file_path.suffix == ".txt" and isinstance(content, str):
         with open(file_path, "w", encoding="utf-8") as file:
             file.write(content)
 
