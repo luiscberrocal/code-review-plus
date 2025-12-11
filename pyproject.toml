@@ -12,6 +12,7 @@ dependencies = [
     "pur>=7.3.3",
     "pyaml>=25.7.0",
     "pydantic>=2.11.7",
+    "pyrefly>=0.45.1",
     "python-dotenv>=1.1.1",
     "requests>=2.32.5",
     "rich>=14.1.0",
@@ -70,6 +71,12 @@ select = [
 ignore = [
     "ANN101", # Missing type annotation for self in method
     "D100"
+]
+
+[tool.pyrefly]
+project-includes = [
+    "**/*.py*",
+    "**/*.ipynb",
 ]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
