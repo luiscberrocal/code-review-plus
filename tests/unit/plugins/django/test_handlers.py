@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from code_review.plugins.django.handlers import (
+from code_review.plugins.django.models_handlers import (
     check_model_inheritance,
     lint_django_models,
 )
