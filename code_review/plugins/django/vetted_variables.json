@@ -15,7 +15,7 @@
     "name": "env",
     "type": "Env",
     "vetted": true,
-    "modules": ["base.py", "local.py", "production.py", "test.py"]
+    "modules": ["base.py"]
   },
   {
     "name": "READ_DOT_ENV_FILE",
