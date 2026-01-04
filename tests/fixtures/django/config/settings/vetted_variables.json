@@ -1,0 +1,5 @@
+[
+  {"name":  "BASE_DIR", "type": "str", "vetted": true},
+  {"name":  "DEBUG", "type": "bool", "vetted": true},
+  {"name":  "ALLOWED_HOSTS", "type": "list", "vetted": true},
+]
