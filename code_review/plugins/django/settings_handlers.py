@@ -321,3 +321,13 @@ def print_validation_report(results: list[SettingsValidationResult]) -> None:
         else:
             console.print("  [bold green]✓ No issues found[/bold green]")
 
+if __name__ == '__main__':
+    settings_folder = Path(__file__).parent.parent.parent.parent / "tests/fixtures/django/config/settings"
+    vetted_file = Path(__file__).parent / "vetted_variables.json"
+    if settings_folder.exists() and vetted_file.exists():
+        results = validate_settings_directory(settings_folder, vetted_file)
+        print_validation_report(results)
+    else:
+        print(f"Settings folder or vetted variables file not found.")
+        print(f"Settings folder: {settings_folder} exists: {settings_folder.exists()}")
+        print(f"Vetted variables file: {vetted_file} exists: {vetted_file.exists()}")
