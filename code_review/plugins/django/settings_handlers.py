@@ -5,64 +5,15 @@ import json
 import logging
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from code_review.plugins.django.schemas import VariableIssueSchema, VettedVariableSchema, SettingsValidationResultSchema
 
 logger = logging.getLogger(__name__)
-
-
-class VettedVariable(BaseModel):
-    """Schema for a vetted Django settings variable."""
-
-    name: str = Field(description="Variable name")
-    type: str = Field(description="Python type of the variable")
-    vetted: bool = Field(default=True, description="Whether the variable is vetted")
-    modules: list[str] = Field(default_factory=list, description="Modules where this variable should appear")
-
-
-class VariableIssue(BaseModel):
-    """Schema for a variable validation issue."""
-
-    variable_name: str = Field(description="Name of the variable")
-    issue_type: str = Field(description="Type of issue (unknown, wrong_module, missing)")
-    module_name: str = Field(description="Name of the settings module")
-    line_number: int | None = Field(default=None, description="Line number where the issue occurs")
-    message: str = Field(description="Detailed message about the issue")
-
-
-class SettingsValidationResult(BaseModel):
-    """Schema for settings validation results."""
-
-    module_path: Path = Field(description="Path to the settings module")
-    module_name: str = Field(description="Name of the module (e.g., 'base.py', 'local.py')")
-    total_variables: int = Field(default=0, description="Total number of variables found")
-    vetted_variables: int = Field(default=0, description="Number of vetted variables")
-    issues: list[VariableIssue] = Field(default_factory=list, description="List of validation issues")
-
-    @property
-    def has_issues(self) -> bool:
-        """Check if there are any validation issues."""
-        return len(self.issues) > 0
-
-    @property
-    def unknown_variables_count(self) -> int:
-        """Count of unknown variables."""
-        return len([i for i in self.issues if i.issue_type == "unknown"])
-
-    @property
-    def wrong_module_count(self) -> int:
-        """Count of variables in wrong module."""
-        return len([i for i in self.issues if i.issue_type == "wrong_module"])
-
-    @property
-    def missing_variables_count(self) -> int:
-        """Count of missing expected variables."""
-        return len([i for i in self.issues if i.issue_type == "missing"])
 
 
 class DjangoSettingsVisitor(ast.NodeVisitor):
     """AST Node Visitor to extract and validate Django settings variables."""
 
-    def __init__(self, module_name: str, vetted_variables: dict[str, VettedVariable]):
+    def __init__(self, module_name: str, vetted_variables: dict[str, VettedVariableSchema]):
         """Initialize the visitor.
 
         Args:
@@ -72,7 +23,7 @@ class DjangoSettingsVisitor(ast.NodeVisitor):
         self.module_name = module_name
         self.vetted_variables = vetted_variables
         self.found_variables: dict[str, int] = {}  # variable_name -> line_number
-        self.issues: list[VariableIssue] = []
+        self.issues: list[VariableIssueSchema] = []
 
     def visit_Assign(self, node: ast.Assign) -> None:
         """Visit assignment nodes to extract variable definitions."""
@@ -116,7 +67,7 @@ class DjangoSettingsVisitor(ast.NodeVisitor):
         if var_name not in self.vetted_variables:
             # Unknown variable - not in vetted list
             self.issues.append(
-                VariableIssue(
+                VariableIssueSchema(
                     variable_name=var_name,
                     issue_type="unknown",
                     module_name=self.module_name,
@@ -129,7 +80,7 @@ class DjangoSettingsVisitor(ast.NodeVisitor):
             vetted_var = self.vetted_variables[var_name]
             if self.module_name not in vetted_var.modules:
                 self.issues.append(
-                    VariableIssue(
+                    VariableIssueSchema(
                         variable_name=var_name,
                         issue_type="wrong_module",
                         module_name=self.module_name,
@@ -144,7 +95,7 @@ class DjangoSettingsVisitor(ast.NodeVisitor):
             if self.module_name in vetted_var.modules:
                 if var_name not in self.found_variables:
                     self.issues.append(
-                        VariableIssue(
+                        VariableIssueSchema(
                             variable_name=var_name,
                             issue_type="missing",
                             module_name=self.module_name,
@@ -154,7 +105,7 @@ class DjangoSettingsVisitor(ast.NodeVisitor):
                     )
 
 
-def load_vetted_variables(json_path: Path) -> dict[str, VettedVariable]:
+def load_vetted_variables(json_path: Path) -> dict[str, VettedVariableSchema]:
     """Load vetted variables from JSON file.
 
     Args:
@@ -175,7 +126,7 @@ def load_vetted_variables(json_path: Path) -> dict[str, VettedVariable]:
 
     vetted_vars = {}
     for item in data:
-        var = VettedVariable(**item)
+        var = VettedVariableSchema(**item)
         vetted_vars[var.name] = var
 
     logger.info(f"Loaded {len(vetted_vars)} vetted variables from {json_path}")
@@ -184,9 +135,9 @@ def load_vetted_variables(json_path: Path) -> dict[str, VettedVariable]:
 
 def validate_settings_module(
     module_path: Path,
-    vetted_variables: dict[str, VettedVariable],
+    vetted_variables: dict[str, VettedVariableSchema],
     check_missing: bool = True,
-) -> SettingsValidationResult:
+) -> SettingsValidationResultSchema:
     """Validate a Django settings module against vetted variables.
 
     Args:
@@ -223,7 +174,7 @@ def validate_settings_module(
         visitor.check_missing_variables()
 
     # Create result
-    result = SettingsValidationResult(
+    result = SettingsValidationResultSchema(
         module_path=module_path,
         module_name=module_name,
         total_variables=len(visitor.found_variables),
@@ -243,7 +194,7 @@ def validate_settings_directory(
     settings_dir: Path,
     vetted_json_path: Path,
     check_missing: bool = True,
-) -> list[SettingsValidationResult]:
+) -> list[SettingsValidationResultSchema]:
     """Validate all Python settings modules in a directory.
 
     Args:
@@ -279,7 +230,7 @@ def validate_settings_directory(
     return results
 
 
-def print_validation_report(results: list[SettingsValidationResult]) -> None:
+def print_validation_report(results: list[SettingsValidationResultSchema]) -> None:
     """Print a formatted validation report.
 
     Args:

@@ -494,7 +494,7 @@ class TomlConfigManager:
         self,
         config_dir: Path = Path.home() / ".config" / "code_review_plus",
         config_file_name: str = "config.toml",
-        default_config: dict[str, Any] = None,
+        default_config: dict[str, Any] | None = None,
     ) -> None:
         """Initializes the TomlConfigManager.
 
@@ -562,7 +562,7 @@ class TomlConfigManager:
 
         return self.config_data
 
-    def save_config(self, data: dict[str, Any] = None, create_backup: bool = True) -> None:
+    def save_config(self, data: dict[str, Any] | None = None, create_backup: bool = True) -> None:
         """Saves the current configuration to a TOML file.
 
         Args:

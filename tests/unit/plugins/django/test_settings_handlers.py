@@ -8,9 +8,8 @@ from code_review.plugins.django.settings_handlers import (
     load_vetted_variables,
     validate_settings_module,
     validate_settings_directory,
-    VettedVariable,
-    VariableIssue,
 )
+from code_review.plugins.django.schemas import VettedVariableSchema, VariableIssueSchema, SettingsValidationResultSchema
 
 
 class TestLoadVettedVariables:
@@ -29,7 +28,7 @@ class TestLoadVettedVariables:
 
         # Check structure
         base_dir_var = vetted_vars["BASE_DIR"]
-        assert isinstance(base_dir_var, VettedVariable)
+        assert isinstance(base_dir_var, VettedVariableSchema)
         assert base_dir_var.name == "BASE_DIR"
         assert base_dir_var.type == "Path"
         assert base_dir_var.vetted is True
@@ -166,7 +165,7 @@ ANOTHER_UNKNOWN = 123
 """
 
         vetted_vars = {
-            "DEBUG": VettedVariable(name="DEBUG", type="bool", vetted=True, modules=["base.py"])
+            "DEBUG": VettedVariableSchema(name="DEBUG", type="bool", vetted=True, modules=["base.py"])
         }
 
         tree = ast.parse(code)
@@ -189,8 +188,8 @@ SECRET_KEY = "test-key"
 """
 
         vetted_vars = {
-            "DEBUG": VettedVariable(name="DEBUG", type="bool", vetted=True, modules=["base.py"]),
-            "SECRET_KEY": VettedVariable(name="SECRET_KEY", type="str", vetted=True, modules=["local.py", "production.py"]),
+            "DEBUG": VettedVariableSchema(name="DEBUG", type="bool", vetted=True, modules=["base.py"]),
+            "SECRET_KEY": VettedVariableSchema(name="SECRET_KEY", type="str", vetted=True, modules=["local.py", "production.py"]),
         }
 
         tree = ast.parse(code)
@@ -211,9 +210,9 @@ DEBUG = True
 """
 
         vetted_vars = {
-            "DEBUG": VettedVariable(name="DEBUG", type="bool", vetted=True, modules=["base.py"]),
-            "DATABASES": VettedVariable(name="DATABASES", type="dict", vetted=True, modules=["base.py"]),
-            "SECRET_KEY": VettedVariable(name="SECRET_KEY", type="str", vetted=True, modules=["local.py"]),
+            "DEBUG": VettedVariableSchema(name="DEBUG", type="bool", vetted=True, modules=["base.py"]),
+            "DATABASES": VettedVariableSchema(name="DATABASES", type="dict", vetted=True, modules=["base.py"]),
+            "SECRET_KEY": VettedVariableSchema(name="SECRET_KEY", type="str", vetted=True, modules=["local.py"]),
         }
 
         tree = ast.parse(code)
@@ -237,7 +236,7 @@ __double_private = "test"
 """
 
         vetted_vars = {
-            "_AWS_EXPIRY": VettedVariable(name="_AWS_EXPIRY", type="int", vetted=True, modules=["production.py"])
+            "_AWS_EXPIRY": VettedVariableSchema(name="_AWS_EXPIRY", type="int", vetted=True, modules=["production.py"])
         }
 
         tree = ast.parse(code)
@@ -255,9 +254,8 @@ class TestValidationResult:
 
     def test_has_issues_property(self):
         """Test has_issues property."""
-        from code_review.plugins.django.settings_handlers import SettingsValidationResult
 
-        result = SettingsValidationResult(
+        result = SettingsValidationResultSchema(
             module_path=Path("/test/base.py"),
             module_name="base.py",
             total_variables=10,
@@ -267,7 +265,7 @@ class TestValidationResult:
         assert result.has_issues is False
 
         result.issues.append(
-            VariableIssue(
+            VariableIssueSchema(
                 variable_name="TEST",
                 issue_type="unknown",
                 module_name="base.py",
@@ -278,33 +276,33 @@ class TestValidationResult:
 
     def test_issue_counts(self):
         """Test issue count properties."""
-        from code_review.plugins.django.settings_handlers import SettingsValidationResult
+        from code_review.plugins.django.settings_handlers import SettingsValidationResultSchema
 
-        result = SettingsValidationResult(
+        result = SettingsValidationResultSchema(
             module_path=Path("/test/base.py"),
             module_name="base.py",
             total_variables=10,
             vetted_variables=8,
             issues=[
-                VariableIssue(
+                VariableIssueSchema(
                     variable_name="UNKNOWN1",
                     issue_type="unknown",
                     module_name="base.py",
                     message="Unknown variable",
                 ),
-                VariableIssue(
+                VariableIssueSchema(
                     variable_name="UNKNOWN2",
                     issue_type="unknown",
                     module_name="base.py",
                     message="Unknown variable",
                 ),
-                VariableIssue(
+                VariableIssueSchema(
                     variable_name="WRONG",
                     issue_type="wrong_module",
                     module_name="base.py",
                     message="Wrong module",
                 ),
-                VariableIssue(
+                VariableIssueSchema(
                     variable_name="MISSING",
                     issue_type="missing",
                     module_name="base.py",
