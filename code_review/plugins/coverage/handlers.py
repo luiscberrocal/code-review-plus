@@ -14,7 +14,7 @@ from code_review.plugins.coverage.schemas import TestConfiguration, TestResult
 
 
 def run_tests_and_get_coverage(
-    folder: Path, unit_tests: str, minimum_coverage: float, settings_module: str = "config.settings.test"
+    unit_tests: str, minimum_coverage: float, settings_module: str = "config.settings.test"
 ) -> dict[str, str]:
     """Runs djanndo manage.py test.
 
@@ -22,7 +22,6 @@ def run_tests_and_get_coverage(
     reports the coverage, and extracts the coverage percentage.
 
     Args:
-        folder (str): The path to the directory containing the docker-compose file.
         unit_tests (str): A string of space-separated paths to unit tests.
         minimum_coverage (int|float): The minimum acceptable code coverage percentage.
 
@@ -112,7 +111,6 @@ def run_coverage(test_configuration: TestConfiguration) -> TestResult:
         dict[str, Any]: A dictionary containing test output and coverage output.
     """
     results = run_tests_and_get_coverage(
-        folder=test_configuration.folder,
         unit_tests=" ".join(test_configuration.unit_tests),
         minimum_coverage=test_configuration.min_coverage,
         settings_module=test_configuration.settings_module,

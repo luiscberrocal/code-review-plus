@@ -1,0 +1,687 @@
+[
+  {
+    "name": "BASE_DIR",
+    "type": "Path",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "APPS_DIR",
+    "type": "Path",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "env",
+    "type": "Env",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "READ_DOT_ENV_FILE",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "DEBUG",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py", "local.py"]
+  },
+  {
+    "name": "TIME_ZONE",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "LANGUAGE_CODE",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "SITE_ID",
+    "type": "int",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "USE_I18N",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "USE_TZ",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "LOCALE_PATHS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "DATABASES",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["base.py", "production.py"]
+  },
+  {
+    "name": "DEFAULT_AUTO_FIELD",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "ROOT_URLCONF",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "WSGI_APPLICATION",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "DJANGO_APPS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "THIRD_PARTY_APPS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "LOCAL_APPS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "INSTALLED_APPS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py", "local.py", "production.py"]
+  },
+  {
+    "name": "MIGRATION_MODULES",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "AUTHENTICATION_BACKENDS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "AUTH_USER_MODEL",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "LOGIN_REDIRECT_URL",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "LOGIN_URL",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "PASSWORD_HASHERS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py", "test.py"]
+  },
+  {
+    "name": "AUTH_PASSWORD_VALIDATORS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "MIDDLEWARE",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py", "local.py"]
+  },
+  {
+    "name": "STATIC_ROOT",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "STATIC_URL",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "STATICFILES_DIRS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "STATICFILES_FINDERS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "MEDIA_ROOT",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "MEDIA_URL",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py", "test.py", "production.py"]
+  },
+  {
+    "name": "TEMPLATES",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py", "test.py"]
+  },
+  {
+    "name": "FORM_RENDERER",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CRISPY_TEMPLATE_PACK",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CRISPY_ALLOWED_TEMPLATE_PACKS",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "FIXTURE_DIRS",
+    "type": "tuple",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "SESSION_COOKIE_HTTPONLY",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CSRF_COOKIE_HTTPONLY",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "X_FRAME_OPTIONS",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "EMAIL_BACKEND",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py", "test.py", "production.py"]
+  },
+  {
+    "name": "EMAIL_TIMEOUT",
+    "type": "int",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "ADMIN_URL",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py", "production.py"]
+  },
+  {
+    "name": "ADMINS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "MANAGERS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "DJANGO_ADMIN_FORCE_ALLAUTH",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "LOGGING",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["base.py", "production.py"]
+  },
+  {
+    "name": "REDIS_URL",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py", "production.py"]
+  },
+  {
+    "name": "REDIS_SSL",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_TIMEZONE",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_BROKER_URL",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_BROKER_USE_SSL",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_RESULT_BACKEND",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_REDIS_BACKEND_USE_SSL",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_RESULT_EXTENDED",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_RESULT_BACKEND_ALWAYS_RETRY",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_RESULT_BACKEND_MAX_RETRIES",
+    "type": "int",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_ACCEPT_CONTENT",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_TASK_SERIALIZER",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_RESULT_SERIALIZER",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_TASK_TIME_LIMIT",
+    "type": "int",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_TASK_SOFT_TIME_LIMIT",
+    "type": "int",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_BEAT_SCHEDULER",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_WORKER_SEND_TASK_EVENTS",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_TASK_SEND_SENT_EVENT",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CELERY_WORKER_HIJACK_ROOT_LOGGER",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "ACCOUNT_ALLOW_REGISTRATION",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "ACCOUNT_LOGIN_METHODS",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "ACCOUNT_SIGNUP_FIELDS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "ACCOUNT_USER_MODEL_USERNAME_FIELD",
+    "type": "None",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "ACCOUNT_EMAIL_VERIFICATION",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "ACCOUNT_ADAPTER",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "ACCOUNT_FORMS",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "SOCIALACCOUNT_ADAPTER",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "SOCIALACCOUNT_FORMS",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "REST_FRAMEWORK",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "CORS_URLS_REGEX",
+    "type": "str",
+    "vetted": true,
+    "modules": ["base.py"]
+  },
+  {
+    "name": "SPECTACULAR_SETTINGS",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["base.py", "production.py"]
+  },
+  {
+    "name": "SECRET_KEY",
+    "type": "str",
+    "vetted": true,
+    "modules": ["local.py", "production.py", "test.py"]
+  },
+  {
+    "name": "ALLOWED_HOSTS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["local.py", "production.py"]
+  },
+  {
+    "name": "CACHES",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["local.py", "production.py"]
+  },
+  {
+    "name": "EMAIL_HOST",
+    "type": "str",
+    "vetted": true,
+    "modules": ["local.py"]
+  },
+  {
+    "name": "EMAIL_PORT",
+    "type": "int",
+    "vetted": true,
+    "modules": ["local.py"]
+  },
+  {
+    "name": "DEBUG_TOOLBAR_CONFIG",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["local.py"]
+  },
+  {
+    "name": "INTERNAL_IPS",
+    "type": "list",
+    "vetted": true,
+    "modules": ["local.py"]
+  },
+  {
+    "name": "CELERY_TASK_EAGER_PROPAGATES",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["local.py"]
+  },
+  {
+    "name": "SECURE_PROXY_SSL_HEADER",
+    "type": "tuple",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "SECURE_SSL_REDIRECT",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "SESSION_COOKIE_SECURE",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "SESSION_COOKIE_NAME",
+    "type": "str",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "CSRF_COOKIE_SECURE",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "CSRF_COOKIE_NAME",
+    "type": "str",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "SECURE_HSTS_SECONDS",
+    "type": "int",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "SECURE_HSTS_INCLUDE_SUBDOMAINS",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "SECURE_HSTS_PRELOAD",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "SECURE_CONTENT_TYPE_NOSNIFF",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "AWS_ACCESS_KEY_ID",
+    "type": "str",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "AWS_SECRET_ACCESS_KEY",
+    "type": "str",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "AWS_STORAGE_BUCKET_NAME",
+    "type": "str",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "AWS_QUERYSTRING_AUTH",
+    "type": "bool",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "_AWS_EXPIRY",
+    "type": "int",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "AWS_S3_OBJECT_PARAMETERS",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "AWS_S3_MAX_MEMORY_SIZE",
+    "type": "int",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "AWS_S3_REGION_NAME",
+    "type": "str",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "AWS_S3_CUSTOM_DOMAIN",
+    "type": "str",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "aws_s3_domain",
+    "type": "str",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "STORAGES",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "DEFAULT_FROM_EMAIL",
+    "type": "str",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "SERVER_EMAIL",
+    "type": "str",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "EMAIL_SUBJECT_PREFIX",
+    "type": "str",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "ACCOUNT_EMAIL_SUBJECT_PREFIX",
+    "type": "str",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "ANYMAIL",
+    "type": "dict",
+    "vetted": true,
+    "modules": ["production.py"]
+  },
+  {
+    "name": "TEST_RUNNER",
+    "type": "str",
+    "vetted": true,
+    "modules": ["test.py"]
+  }
+]
+

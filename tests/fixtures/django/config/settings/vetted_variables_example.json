@@ -1,0 +1,7 @@
+[
+  {"name":  "BASE_DIR", "type": "str", "vetted": true,
+    "modules": ["base.py"]
+  },
+  {"name":  "DEBUG", "type": "bool", "vetted": true, "modules": ["production.py"]},
+  {"name":  "ALLOWED_HOSTS", "type": "list", "vetted": true, "modules": ["local.py","production.py"]},
+]
